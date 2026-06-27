@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Enroll, Grant, and Revoke Transcript - AEP Foundation</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --border: #d7dde5;
+        --code: #f4f7fb;
+        --fg: #17202a;
+        --link: #0f5e9c;
+        --muted: #5c6b7a;
+      }
+
+      body {
+        color: var(--fg);
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        line-height: 1.55;
+        margin: 0;
+      }
+
+      main {
+        margin: 0 auto;
+        max-width: 960px;
+        padding: 40px 20px 64px;
+      }
+
+      a {
+        color: var(--link);
+      }
+
+      h1 {
+        font-size: 2rem;
+        line-height: 1.2;
+        margin: 0 0 20px;
+      }
+
+      h2 {
+        border-top: 1px solid var(--border);
+        font-size: 1.25rem;
+        margin-top: 32px;
+        padding-top: 24px;
+      }
+
+      p {
+        max-width: 760px;
+      }
+
+      pre {
+        background: var(--code);
+        border: 1px solid var(--border);
+        overflow-x: auto;
+        padding: 14px;
+      }
+
+      code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 0.92em;
+      }
+
+      .back {
+        color: var(--muted);
+        display: inline-block;
+        margin-bottom: 24px;
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <a class="back" href="../">AEP Foundation Specifications</a>
+      <h1 id="enroll-grant-and-revoke-transcript">Enroll, Grant, and Revoke Transcript</h1>
+
+<p>This transcript shows the minimum successful flow for an Agent that enrolls with<br />
+a Service, requests an OAuth Bearer session credential, revokes one credential,<br />
+and then revokes all remaining session credentials. JWT values are abbreviated.</p>
+
+<h2 id="1-enroll">1. Enroll</h2>
+
+<pre><code class="language-http">POST /aep/enroll HTTP/1.1
+Host: api.example.com
+Content-Type: application/aep+json
+Accept: application/aep+json
+Authorization: AEP eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9...
+Idempotency-Key: 2e1b6f59-5fd4-4f13-9c2b-0ed4f59e2a11
+</code></pre>
+
+<pre><code class="language-json">{
+  "agent_did": "did:web:agent.example.com:agents:123",
+  "claims": {
+    "contact.email": "ops@example.com"
+  },
+  "idempotency_key": "2e1b6f59-5fd4-4f13-9c2b-0ed4f59e2a11"
+}
+</code></pre>
+
+<pre><code class="language-http">HTTP/1.1 200 OK
+Content-Type: application/aep+json
+</code></pre>
+
+<pre><code class="language-json">{
+  "status": "active"
+}
+</code></pre>
+
+<h2 id="2-grant">2. Grant</h2>
+
+<pre><code class="language-http">POST /aep/grant HTTP/1.1
+Host: api.example.com
+Content-Type: application/aep+json
+Accept: application/aep+json
+Authorization: AEP eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9...
+Idempotency-Key: 3dd9dd29-6fc0-4e68-a886-6d688c5fd3fc
+</code></pre>
+
+<pre><code class="language-json">{
+  "grant_type": "oauth-bearer",
+  "requested_scopes": ["read"],
+  "token_format": "opaque"
+}
+</code></pre>
+
+<pre><code class="language-http">HTTP/1.1 200 OK
+Content-Type: application/aep+json
+</code></pre>
+
+<pre><code class="language-json">{
+  "access_token": "ya29.example",
+  "credential_id": "tok_01HZY8W7Q2F8J7D3P9G9Z1N6TT",
+  "expires_at": "2026-12-01T00:00:00Z",
+  "scopes": ["read"],
+  "token_format": "opaque",
+  "token_type": "Bearer"
+}
+</code></pre>
+
+<h2 id="3-use-the-session-credential">3. Use the Session Credential</h2>
+
+<pre><code class="language-http">GET /v1/orders HTTP/1.1
+Host: api.example.com
+Authorization: Bearer ya29.example
+</code></pre>
+
+<h2 id="4-revoke-one-credential">4. Revoke One Credential</h2>
+
+<pre><code class="language-http">POST /aep/revoke HTTP/1.1
+Host: api.example.com
+Content-Type: application/aep+json
+Accept: application/aep+json
+Authorization: AEP eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9...
+Idempotency-Key: 2a086218-9d3f-4492-8300-417902e17537
+</code></pre>
+
+<pre><code class="language-json">{
+  "credential_id": "tok_01HZY8W7Q2F8J7D3P9G9Z1N6TT",
+  "grant_type": "oauth-bearer"
+}
+</code></pre>
+
+<pre><code class="language-http">HTTP/1.1 200 OK
+Content-Type: application/aep+json
+</code></pre>
+
+<pre><code class="language-json">{}
+</code></pre>
+
+<h2 id="5-revoke-all-session-credentials">5. Revoke All Session Credentials</h2>
+
+<pre><code class="language-http">POST /aep/revoke HTTP/1.1
+Host: api.example.com
+Content-Type: application/aep+json
+Accept: application/aep+json
+Authorization: AEP eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9...
+Idempotency-Key: 71984316-a4f4-4a0a-a980-dbff2cb34bc8
+</code></pre>
+
+<pre><code class="language-json">{
+  "all_grant_types": "true"
+}
+</code></pre>
+
+<pre><code class="language-http">HTTP/1.1 200 OK
+Content-Type: application/aep+json
+</code></pre>
+
+<pre><code class="language-json">{}
+</code></pre>
+
+    </main>
+  </body>
+</html>

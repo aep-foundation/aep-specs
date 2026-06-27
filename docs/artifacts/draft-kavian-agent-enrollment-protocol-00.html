@@ -1,0 +1,2877 @@
+<!DOCTYPE html>
+<html lang="en" class="Internet-Draft">
+<head>
+<meta charset="utf-8">
+<meta content="Common,Latin" name="scripts">
+<meta content="initial-scale=1.0" name="viewport">
+<title>The Agent Enrollment Protocol</title>
+<meta content="N. Kavian" name="author">
+<meta content="
+       The Agent Enrollment Protocol (AEP) defines an HTTP-based mechanism for autonomous agents to discover service enrollment requirements, enroll an agent identity, obtain optional session credentials, revoke those credentials, and query enrollment status. AEP uses Decentralized Identifiers, client assertion JWTs, and HTTP Problem Details to provide a narrow machine-first enrollment and authentication substrate for agent-to-service interactions. 
+    " name="description">
+<meta content="xml2rfc 3.34.0" name="generator">
+<meta content="draft-kavian-agent-enrollment-protocol-00" name="ietf.draft">
+<!-- Generator version information:
+  xml2rfc 3.34.0
+    Python 3.12.8
+    ConfigArgParse 1.7.5
+    google-i18n-address 3.1.1
+    intervaltree 3.2.1
+    Jinja2 3.1.6
+    lxml 6.1.1
+    natsort 8.4.0
+    platformdirs 4.10.0
+    pycountry 26.2.16
+    PyYAML 6.0.3
+    requests 2.34.2
+    wcwidth 0.8.1
+-->
+<link href="draft-kavian-agent-enrollment-protocol-00.xml" rel="alternate" type="application/rfc+xml">
+<link href="#copyright" rel="license">
+<style type="text/css">/*
+
+  NOTE: Changes at the bottom of this file overrides some earlier settings.
+
+  Once the style has stabilized and has been adopted as an official RFC style,
+  this can be consolidated so that style settings occur only in one place, but
+  for now the contents of this file consists first of the initial CSS work as
+  provided to the RFC Formatter (xml2rfc) work, followed by itemized and
+  commented changes found necessary during the development of the v3
+  formatters.
+
+*/
+
+/* fonts */
+@import url('https://static.ietf.org/fonts/noto-sans/import.css'); /* Sans-serif */
+@import url('https://static.ietf.org/fonts/noto-serif/import.css'); /* Serif (print) */
+@import url('https://static.ietf.org/fonts/roboto-mono/import.css'); /* Monospace */
+
+:root {
+  --font-sans: 'Noto Sans', Arial, Helvetica, sans-serif;
+  --font-serif: 'Noto Serif', 'Times', 'Times New Roman', serif;
+  --font-mono: 'Roboto Mono', Courier, 'Courier New', monospace;
+}
+
+@viewport {
+  zoom: 1.0;
+}
+@-ms-viewport {
+  width: extend-to-zoom;
+  zoom: 1.0;
+}
+/* general and mobile first */
+html {
+}
+body {
+  max-width: 90%;
+  margin: 1.5em auto;
+  color: #222;
+  background-color: #fff;
+  font-size: 14px;
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  scroll-behavior: smooth;
+  overflow-wrap: break-word;
+}
+.ears {
+  display: none;
+}
+
+/* headings */
+#title, h1, h2, h3, h4, h5, h6 {
+  margin: 1em 0 0.5em;
+  font-weight: bold;
+  line-height: 1.3;
+}
+#title {
+  clear: both;
+  border-bottom: 1px solid #ddd;
+  margin: 0 0 0.5em 0;
+  padding: 1em 0 0.5em;
+}
+.author {
+  padding-bottom: 4px;
+}
+h1 {
+  font-size: 26px;
+  margin: 1em 0;
+}
+h2 {
+  font-size: 22px;
+  margin-top: -20px;  /* provide offset for in-page anchors */
+  padding-top: 33px;
+}
+h3 {
+  font-size: 18px;
+  margin-top: -36px;  /* provide offset for in-page anchors */
+  padding-top: 42px;
+}
+h4 {
+  font-size: 16px;
+  margin-top: -36px;  /* provide offset for in-page anchors */
+  padding-top: 42px;
+}
+h5, h6 {
+  font-size: 14px;
+}
+#n-copyright-notice {
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 1em;
+  margin-bottom: 1em;
+}
+/* general structure */
+p {
+  padding: 0;
+  margin: 0 0 1em 0;
+  text-align: left;
+}
+div, span {
+  position: relative;
+}
+div {
+  margin: 0;
+}
+.alignRight.art-text {
+  background-color: #f9f9f9;
+  border: 1px solid #eee;
+  border-radius: 3px;
+  padding: 1em 1em 0;
+  margin-bottom: 1.5em;
+}
+.alignRight.art-text pre {
+  padding: 0;
+}
+.alignRight {
+  margin: 1em 0;
+}
+.alignRight > *:first-child {
+  border: none;
+  margin: 0;
+  float: right;
+  clear: both;
+}
+.alignRight > *:nth-child(2) {
+  clear: both;
+  display: block;
+  border: none;
+}
+svg {
+  display: block;
+}
+@media print {
+  svg {
+    max-height: 850px;
+    max-width: 660px;
+  }
+}
+svg[font-family~="serif" i], svg [font-family~="serif" i] {
+  font-family: var(--font-serif);
+}
+svg[font-family~="sans-serif" i], svg [font-family~="sans-serif" i] {
+  font-family: var(--font-sans);
+}
+svg[font-family~="monospace" i], svg [font-family~="monospace" i] {
+  font-family: var(--font-mono);
+}
+.alignCenter.art-text {
+  background-color: #f9f9f9;
+  border: 1px solid #eee;
+  border-radius: 3px;
+  padding: 1em 1em 0;
+  margin-bottom: 1.5em;
+}
+.alignCenter.art-text pre {
+  padding: 0;
+}
+.alignCenter {
+  margin: 1em 0;
+}
+.alignCenter > *:first-child {
+  display: table;
+  border: none;
+  margin: 0 auto;
+}
+
+/* lists */
+ol, ul {
+  padding: 0;
+  margin: 0 0 1em 2em;
+}
+ol ol, ul ul, ol ul, ul ol {
+  margin-left: 1em;
+}
+li {
+  margin: 0 0 0.25em 0;
+}
+.ulCompact li {
+  margin: 0;
+}
+ul.empty, .ulEmpty {
+  list-style-type: none;
+}
+ul.empty li, .ulEmpty li {
+  margin-top: 0.5em;
+}
+ul.ulBare, li.ulBare {
+  margin-left: 0em !important;
+}
+ul.compact, .ulCompact,
+ol.compact, .olCompact {
+  line-height: 100%;
+  margin: 0 0 0 2em;
+}
+
+/* definition lists */
+dl {
+}
+dl > dt {
+  float: left;
+  margin-right: 1em;
+}
+/* 
+dl.nohang > dt {
+  float: none;
+}
+*/
+dl > dd {
+  margin-bottom: .8em;
+  min-height: 1.3em;
+}
+dl.compact > dd, .dlCompact > dd {
+  margin-bottom: 0em;
+}
+dl > dd > dl {
+  margin-top: 0.5em;
+  margin-bottom: 0em;
+}
+
+/* links */
+a {
+  text-decoration: none;
+}
+a[href] {
+  color: #22e; /* Arlen: WCAG 2019 */
+}
+a[href]:hover {
+  background-color: #f2f2f2;
+}
+figcaption a[href],
+a[href].selfRef {
+  color: #222;
+}
+/* XXX probably not this:
+a.selfRef:hover {
+  background-color: transparent;
+  cursor: default;
+} */
+
+/* Figures */
+tt, code, pre {
+  background-color: #f9f9f9;
+  font-family: var(--font-mono);
+}
+pre {
+  border: 1px solid #eee;
+  margin: 0;
+  padding: 1em;
+}
+img {
+  max-width: 100%;
+}
+figure {
+  margin: 0;
+}
+figure blockquote {
+  margin: 0.8em 0.4em 0.4em;
+}
+figcaption {
+  font-style: italic;
+  margin: 0 0 1em 0;
+}
+@media screen {
+  pre {
+    overflow-x: auto;
+    max-width: 100%;
+    max-width: calc(100% - 22px);
+  }
+}
+
+/* aside, blockquote */
+aside, blockquote {
+  margin-left: 0;
+  padding: 1.2em 2em;
+}
+blockquote {
+  background-color: #f9f9f9;
+  color: #111; /* Arlen: WCAG 2019 */
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  margin: 1em 0;
+}
+blockquote > *:last-child {
+  margin-bottom: 0;
+}
+cite {
+  display: block;
+  text-align: right;
+  font-style: italic;
+}
+.xref {
+  overflow-wrap: normal;
+}
+
+/* tables */
+table {
+  width: 100%;
+  margin: 0 0 1em;
+  border-collapse: collapse;
+  border: 1px solid #eee;
+}
+th, td {
+  text-align: left;
+  vertical-align: top;
+  padding: 0.5em 0.75em;
+}
+th {
+  text-align: left;
+  background-color: #e9e9e9;
+}
+tr:nth-child(2n+1) > td {
+  background-color: #f5f5f5;
+}
+table caption {
+  font-style: italic;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+}
+table p {
+  /* XXX to avoid bottom margin on table row signifiers. If paragraphs should
+     be allowed within tables more generally, it would be far better to select on a class. */
+  margin: 0;
+}
+
+/* pilcrow */
+a.pilcrow {
+  color: #666; /* Arlen: AHDJ 2019 */
+  text-decoration: none;
+  visibility: hidden;
+  user-select: none;
+  -ms-user-select: none;
+  -o-user-select:none;
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+@media screen {
+  aside:hover > a.pilcrow,
+  p:hover > a.pilcrow,
+  blockquote:hover > a.pilcrow,
+  div:hover > a.pilcrow,
+  li:hover > a.pilcrow,
+  pre:hover > a.pilcrow {
+    visibility: visible;
+  }
+  a.pilcrow:hover {
+    background-color: transparent;
+  }
+}
+
+/* misc */
+hr {
+  border: 0;
+  border-top: 1px solid #eee;
+}
+.bcp14 {
+  font-variant: small-caps;
+}
+
+.role {
+  font-variant: all-small-caps;
+}
+
+/* info block */
+#identifiers {
+  margin: 0;
+  font-size: 0.9em;
+}
+#identifiers dt {
+  width: 3em;
+  clear: left;
+}
+#identifiers dd {
+  float: left;
+  margin-bottom: 0;
+}
+/* Fix PDF info block run off issue */
+@media print {
+  #identifiers dd {
+    max-width: 100%;
+  }
+}
+#identifiers .authors .author {
+  display: inline-block;
+  margin-right: 1.5em;
+}
+#identifiers .authors .org {
+  font-style: italic;
+}
+
+/* The prepared/rendered info at the very bottom of the page */
+.docInfo {
+  color: #666; /* Arlen: WCAG 2019 */
+  font-size: 0.9em;
+  font-style: italic;
+  margin-top: 2em;
+}
+.docInfo .prepared {
+  float: left;
+}
+.docInfo .prepared {
+  float: right;
+}
+
+/* table of contents */
+#toc  {
+  padding: 0.75em 0 2em 0;
+  margin-bottom: 1em;
+}
+nav.toc ul {
+  margin: 0 0.5em 0 0;
+  padding: 0;
+  list-style: none;
+}
+nav.toc li {
+  line-height: 1.3em;
+  margin: 0.75em 0;
+  padding-left: 1.2em;
+  text-indent: -1.2em;
+}
+/* references */
+.references dt {
+  text-align: right;
+  font-weight: bold;
+  min-width: 7em;
+}
+.references dd {
+  margin-left: 8em;
+  overflow: auto;
+}
+
+.refInstance {
+  margin-bottom: 1.25em;
+}
+
+.refSubseries {
+  margin-bottom: 1.25em;
+}
+
+.references .ascii {
+  margin-bottom: 0.25em;
+}
+
+/* index */
+.index ul {
+  margin: 0 0 0 1em;
+  padding: 0;
+  list-style: none;
+}
+.index ul ul {
+  margin: 0;
+}
+.index li {
+  margin: 0;
+  text-indent: -2em;
+  padding-left: 2em;
+  padding-bottom: 5px;
+}
+.indexIndex {
+  margin: 0.5em 0 1em;
+}
+.index a {
+  font-weight: 700;
+}
+/* make the index two-column on all but the smallest screens */
+@media (min-width: 600px) {
+  .index ul {
+    -moz-column-count: 2;
+    -moz-column-gap: 20px;
+  }
+  .index ul ul {
+    -moz-column-count: 1;
+    -moz-column-gap: 0;
+  }
+}
+
+/* authors */
+address.vcard {
+  font-style: normal;
+  margin: 1em 0;
+}
+
+address.vcard .nameRole {
+  font-weight: 700;
+  margin-left: 0;
+}
+address.vcard .label {
+  font-family: var(--font-sans);
+  margin: 0.5em 0;
+}
+address.vcard .type {
+  display: none;
+}
+.alternative-contact {
+  margin: 1.5em 0 1em;
+}
+hr.addr {
+  border-top: 1px dashed;
+  margin: 0;
+  color: #ddd;
+  max-width: calc(100% - 16px);
+}
+
+/* temporary notes */
+.rfcEditorRemove::before {
+  position: absolute;
+  top: 0.2em;
+  right: 0.2em;
+  padding: 0.2em;
+  content: "The RFC Editor will remove this note";
+  color: #9e2a00; /* Arlen: WCAG 2019 */
+  background-color: #ffd; /* Arlen: WCAG 2019 */
+}
+.rfcEditorRemove {
+  position: relative;
+  padding-top: 1.8em;
+  background-color: #ffd; /* Arlen: WCAG 2019 */
+  border-radius: 3px;
+}
+.cref {
+  background-color: #ffd; /* Arlen: WCAG 2019 */
+  padding: 2px 4px;
+}
+.crefSource {
+  font-style: italic;
+}
+/* alternative layout for smaller screens */
+@media screen and (max-width: 1023px) {
+  body {
+    padding-top: 2em;
+  }
+  #title {
+    padding: 1em 0;
+  }
+  h1 {
+    font-size: 24px;
+  }
+  h2 {
+    font-size: 20px;
+    margin-top: -18px;  /* provide offset for in-page anchors */
+    padding-top: 38px;
+  }
+  #identifiers dd {
+    max-width: 60%;
+  }
+  #toc {
+    position: fixed;
+    z-index: 2;
+    top: 0;
+    right: 0;
+    padding: 0;
+    margin: 0;
+    background-color: inherit;
+    border-bottom: 1px solid #ccc;
+  }
+  #toc h2 {
+    margin: -1px 0 0 0;
+    padding: 4px 0 4px 6px;
+    padding-right: 1em;
+    min-width: 190px;
+    font-size: 1.1em;
+    text-align: right;
+    background-color: #444;
+    color: white;
+    cursor: pointer;
+  }
+  #toc h2::before { /* css hamburger */
+    float: right;
+    position: relative;
+    width: 1em;
+    height: 1px;
+    left: -164px;
+    margin: 6px 0 0 0;
+    background: white none repeat scroll 0 0;
+    box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
+    content: "";
+  }
+  #toc nav {
+    display: none;
+    padding: 0.5em 1em 1em;
+    overflow: auto;
+    height: calc(100vh - 48px);
+    border-left: 1px solid #ddd;
+  }
+}
+
+/* alternative layout for wide screens */
+@media screen and (min-width: 1024px) {
+  body {
+    max-width: 724px;
+    margin: 42px auto;
+    padding-left: 1.5em;
+    padding-right: 29em;
+  }
+  #toc {
+    position: fixed;
+    top: 42px;
+    right: 42px;
+    width: 25%;
+    margin: 0;
+    padding: 0 1em;
+    z-index: 1;
+  }
+  #toc h2 {
+    border-top: none;
+    border-bottom: 1px solid #ddd;
+    font-size: 1em;
+    font-weight: normal;
+    margin: 0;
+    padding: 0.25em 1em 1em 0;
+  }
+  #toc nav {
+    display: block;
+    height: calc(90vh - 84px);
+    bottom: 0;
+    padding: 0.5em 0 0;
+    overflow: auto;
+  }
+  img { /* future proofing */
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* pagination */
+@media print {
+  body {
+    width: 100%;
+  }
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+  #n-copyright-notice {
+    border-bottom: none;
+  }
+  #toc, #n-introduction {
+    page-break-before: always;
+  }
+  #toc {
+    border-top: none;
+    padding-top: 0;
+  }
+  figure, pre {
+    page-break-inside: avoid;
+  }
+  figure {
+    overflow: scroll;
+  }
+  .breakable pre {
+    break-inside: auto;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+  }
+  h2+*, h3+*, h4+*, h5+*, h6+* {
+    page-break-before: avoid;
+  }
+  pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 10pt;
+  }
+  table {
+    border: 1px solid #ddd;
+  }
+  td {
+    border-top: 1px solid #ddd;
+  }
+}
+
+/* This is commented out here, as the string-set: doesn't
+   pass W3C validation currently */
+/*
+.ears thead .left {
+  string-set: ears-top-left content();
+}
+
+.ears thead .center {
+  string-set: ears-top-center content();
+}
+
+.ears thead .right {
+  string-set: ears-top-right content();
+}
+
+.ears tfoot .left {
+  string-set: ears-bottom-left content();
+}
+
+.ears tfoot .center {
+  string-set: ears-bottom-center content();
+}
+
+.ears tfoot .right {
+  string-set: ears-bottom-right content();
+}
+*/
+
+@page :first {
+  padding-top: 0;
+  @top-left {
+    content: normal;
+    border: none;
+  }
+  @top-center {
+    content: normal;
+    border: none;
+  }
+  @top-right {
+    content: normal;
+    border: none;
+  }
+}
+
+@page {
+  size: A4;
+  margin-bottom: 45mm;
+  padding-top: 20px;
+  /* The following is commented out here, but set appropriately by in code, as
+     the content depends on the document */
+  /*
+  @top-left {
+    content: 'Internet-Draft';
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @top-left {
+    content: string(ears-top-left);
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @top-center {
+    content: string(ears-top-center);
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @top-right {
+    content: string(ears-top-right);
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @bottom-left {
+    content: string(ears-bottom-left);
+    vertical-align: top;
+    border-top: solid 1px #ccc;
+  }
+  @bottom-center {
+    content: string(ears-bottom-center);
+    vertical-align: top;
+    border-top: solid 1px #ccc;
+  }
+  @bottom-right {
+      content: '[Page ' counter(page) ']';
+      vertical-align: top;
+      border-top: solid 1px #ccc;
+  }
+  */
+
+}
+
+/* Changes introduced to fix issues found during implementation */
+/* Make sure links are clickable even if overlapped by following H* */
+a {
+  z-index: 2;
+}
+/* Separate body from document info even without intervening H1 */
+section {
+  clear: both;
+}
+
+
+/* Top align author divs, to avoid names without organization dropping level with org names */
+.author {
+  vertical-align: top;
+}
+
+/* Leave room in document info to show Internet-Draft on one line */
+#identifiers dt {
+  width: 8em;
+}
+
+/* Don't waste quite as much whitespace between label and value in doc info */
+#identifiers dd {
+  margin-left: 1em;
+}
+
+/* Give floating toc a background color (needed when it's a div inside section */
+#toc {
+  background-color: white;
+}
+
+/* Make the collapsed ToC header render white on gray also when it's a link */
+@media screen and (max-width: 1023px) {
+  #toc h2 a,
+  #toc h2 a:link,
+  #toc h2 a:focus,
+  #toc h2 a:hover,
+  #toc a.toplink,
+  #toc a.toplink:hover {
+    color: white;
+    background-color: #444;
+    text-decoration: none;
+  }
+}
+
+/* Give the bottom of the ToC some whitespace */
+@media screen and (min-width: 1024px) {
+  #toc {
+    padding: 0 0 1em 1em;
+  }
+}
+
+/* Style section numbers with more space between number and title */
+.section-number {
+  padding-right: 0.5em;
+}
+
+/* prevent monospace from becoming overly large */
+tt, code, pre {
+  font-size: 95%;
+}
+
+/* Fix the height/width aspect for ascii art*/
+.sourcecode pre,
+.art-text pre {
+  line-height: 1.12;
+}
+
+
+/* Add styling for a link in the ToC that points to the top of the document */
+a.toplink {
+  float: right;
+  margin-right: 0.5em;
+}
+
+/* Fix the dl styling to match the RFC 7992 attributes */
+dl > dt,
+dl.dlParallel > dt {
+  float: left;
+  margin-right: 1em;
+}
+dl.dlNewline > dt {
+  float: none;
+}
+
+/* Provide styling for table cell text alignment */
+table td.text-left,
+table th.text-left {
+  text-align: left;
+}
+table td.text-center,
+table th.text-center {
+  text-align: center;
+}
+table td.text-right,
+table th.text-right {
+  text-align: right;
+}
+
+/* Make the alternative author contact information look less like just another
+   author, and group it closer with the primary author contact information */
+.alternative-contact {
+  margin: 0.5em 0 0.25em 0;
+}
+address .non-ascii {
+  margin: 0 0 0 2em;
+}
+
+/* With it being possible to set tables with alignment
+  left, center, and right, { width: 100%; } does not make sense */
+table {
+  width: auto;
+}
+
+/* Avoid reference text that sits in a block with very wide left margin,
+   because of a long floating dt label.*/
+.references dd {
+  overflow: visible;
+}
+
+/* Control caption placement */
+caption {
+  caption-side: bottom;
+}
+
+/* Limit the width of the author address vcard, so names in right-to-left
+   script don't end up on the other side of the page. */
+
+address.vcard {
+  max-width: 30em;
+  margin-right: auto;
+}
+
+/* For address alignment dependent on LTR or RTL scripts */
+address div.left {
+  text-align: left;
+}
+address div.right {
+  text-align: right;
+}
+
+/* Provide table alignment support.  We can't use the alignX classes above
+   since they do unwanted things with caption and other styling. */
+table.right {
+ margin-left: auto;
+ margin-right: 0;
+}
+table.center {
+ margin-left: auto;
+ margin-right: auto;
+}
+table.left {
+ margin-left: 0;
+ margin-right: auto;
+}
+
+/* Give the table caption label the same styling as the figcaption */
+caption a[href] {
+  color: #222;
+}
+
+@media print {
+  .toplink {
+    display: none;
+  }
+
+  /* avoid overwriting the top border line with the ToC header */
+  #toc {
+    padding-top: 1px;
+  }
+
+  /* Avoid page breaks inside dl and author address entries */
+  .vcard {
+    page-break-inside: avoid;
+  }
+
+}
+/* Tweak the bcp14 keyword presentation */
+.bcp14 {
+  font-variant: small-caps;
+  font-weight: bold;
+  font-size: 0.9em;
+}
+/* Tweak the invisible space above H* in order not to overlay links in text above */
+ h2 {
+  margin-top: -18px;  /* provide offset for in-page anchors */
+  padding-top: 31px;
+ }
+ h3 {
+  margin-top: -18px;  /* provide offset for in-page anchors */
+  padding-top: 24px;
+ }
+ h4 {
+  margin-top: -18px;  /* provide offset for in-page anchors */
+  padding-top: 24px;
+ }
+/* Float artwork pilcrow to the right */
+@media screen {
+  .artwork a.pilcrow {
+    display: block;
+    line-height: 0.7;
+    margin-top: 0.15em;
+  }
+}
+/* Make pilcrows on dd visible */
+@media screen {
+  dd:hover > a.pilcrow {
+    visibility: visible;
+  }
+}
+/* Make the placement of figcaption match that of a table's caption
+   by removing the figure's added bottom margin */
+.alignLeft.art-text,
+.alignCenter.art-text,
+.alignRight.art-text {
+   margin-bottom: 0;
+}
+.alignLeft,
+.alignCenter,
+.alignRight {
+  margin: 1em 0 0 0;
+}
+/* In print, the pilcrow won't show on hover, so prevent it from taking up space,
+   possibly even requiring a new line */
+@media print {
+  a.pilcrow {
+    display: none;
+  }
+}
+/* Styling for the external metadata */
+div#external-metadata {
+  background-color: #eee;
+  padding: 0.5em;
+  margin-bottom: 0.5em;
+  display: none;
+}
+div#internal-metadata {
+  padding: 0.5em;                       /* to match the external-metadata padding */
+}
+/* Styling for title RFC Number */
+h1#rfcnum {
+  clear: both;
+  margin: 0 0 -1em;
+  padding: 1em 0 0 0;
+}
+/* Make .olPercent look the same as <ol><li> */
+dl.olPercent > dd {
+  margin-bottom: 0.25em;
+  min-height: initial;
+}
+/* Give aside some styling to set it apart */
+aside {
+  border-left: 1px solid #ddd;
+  margin: 1em 0 1em 2em;
+  padding: 0.2em 2em;
+}
+aside > dl,
+aside > ol,
+aside > ul,
+aside > table,
+aside > p {
+  margin-bottom: 0.5em;
+}
+/* Additional page break settings */
+@media print {
+  figcaption, table caption {
+    page-break-before: avoid;
+  }
+}
+/* Font size adjustments for print */
+@media print {
+  body  { font-size: 10pt;      line-height: normal; max-width: 96%; }
+  h1    { font-size: 1.72em;    padding-top: 1.5em; } /* 1*1.2*1.2*1.2 */
+  h2    { font-size: 1.44em;    padding-top: 1.5em; } /* 1*1.2*1.2 */
+  h3    { font-size: 1.2em;     padding-top: 1.5em; } /* 1*1.2 */
+  h4    { font-size: 1em;       padding-top: 1.5em; }
+  h5, h6 { font-size: 1em;      margin: initial; padding: 0.5em 0 0.3em; }
+}
+/* Sourcecode margin in print, when there's no pilcrow */
+@media print {
+  .artwork,
+  .artwork > pre,
+  .sourcecode {
+    margin-bottom: 1em;
+  }
+}
+/* Avoid narrow tables forcing too narrow table captions, which may render badly */
+table {
+  min-width: 20em;
+}
+/* ol type a */
+ol.type-a { list-style-type: lower-alpha; }
+ol.type-A { list-style-type: upper-alpha; }
+ol.type-i { list-style-type: lower-roman; }
+ol.type-I { list-style-type: upper-roman; }
+/* Apply the print table and row borders in general, on request from the RPC,
+and increase the contrast between border and odd row background slightly */
+table {
+  border: 1px solid #ddd;
+}
+td {
+  border-top: 1px solid #ddd;
+}
+tr {
+  break-inside: avoid;
+}
+tr:nth-child(2n+1) > td {
+  background-color: #f8f8f8;
+}
+/* Use style rules to govern display of the TOC. */
+@media screen and (max-width: 1023px) {
+  #toc nav { display: none; }
+  #toc.active nav { display: block; }
+}
+/* Add support for keepWithNext */
+.keepWithNext {
+  break-after: avoid-page;
+  break-after: avoid-page;
+}
+/* Add support for keepWithPrevious */
+.keepWithPrevious {
+  break-before: avoid-page;
+}
+/* Change the approach to avoiding breaks inside artwork etc. */
+figure, pre, table, .artwork, .sourcecode  {
+  break-before: auto;
+  break-after: auto;
+}
+/* Avoid breaks between <dt> and <dd> */
+dl {
+  break-before: auto;
+  break-inside: auto;
+}
+dt {
+  break-before: auto;
+  break-after: avoid-page;
+}
+dd {
+  break-before: avoid-page;
+  break-after: auto;
+  orphans: 3;
+  widows: 3
+}
+span.break, dd.break {
+  margin-bottom: 0;
+  min-height: 0;
+  break-before: auto;
+  break-inside: auto;
+  break-after: auto;
+}
+/* Undo break-before ToC */
+@media print {
+  #toc {
+    break-before: auto;
+  }
+}
+/* Text in compact lists should not get extra bottom margin space,
+   since that would makes the list not compact */
+ul.compact p, .ulCompact p,
+ol.compact p, .olCompact p {
+ margin: 0;
+}
+/* But the list as a whole needs the extra space at the end */
+section ul.compact,
+section .ulCompact,
+section ol.compact,
+section .olCompact {
+  margin-bottom: 1em;                    /* same as p not within ul.compact etc. */
+}
+/* The tt and code background above interferes with for instance table cell
+   backgrounds.  Changed to something a bit more selective. */
+tt, code {
+  background-color: transparent;
+}
+p tt, p code, li tt, li code, dt tt, dt code {
+  background-color: #f8f8f8;
+}
+/* Tweak the pre margin -- 0px doesn't come out well */
+pre {
+   margin-top: 0.5px;
+}
+/* Tweak the compact list text */
+ul.compact, .ulCompact,
+ol.compact, .olCompact,
+dl.compact, .dlCompact {
+  line-height: normal;
+}
+/* Don't add top margin for nested lists */
+li > ul, li > ol, li > dl,
+dd > ul, dd > ol, dd > dl,
+dl > dd > dl {
+  margin-top: initial;
+}
+/* Elements that should not be rendered on the same line as a <dt> */
+/* This should match the element list in writer.text.TextWriter.render_dl() */
+dd > div.artwork:first-child,
+dd > aside:first-child,
+dd > blockquote:first-child,
+dd > figure:first-child,
+dd > ol:first-child,
+dd > div.sourcecode:first-child,
+dd > table:first-child,
+dd > ul:first-child {
+  clear: left;
+}
+/* fix for weird browser behaviour when <dd/> is empty */
+dt+dd:empty::before{
+  content: "\00a0";
+}
+/* Make paragraph spacing inside <li> smaller than in body text, to fit better within the list */
+li > p {
+  margin-bottom: 0.5em
+}
+/* Don't let p margin spill out from inside list items */
+li > p:last-of-type:only-child {
+  margin-bottom: 0;
+}
+</style>
+<link href="rfc-local.css" rel="stylesheet" type="text/css">
+</head>
+<body class="xml2rfc">
+<table class="ears">
+<thead><tr>
+<td class="left">Internet-Draft</td>
+<td class="center">AEP</td>
+<td class="right">June 2026</td>
+</tr></thead>
+<tfoot><tr>
+<td class="left">Kavian</td>
+<td class="center">Expires 29 December 2026</td>
+<td class="right">[Page]</td>
+</tr></tfoot>
+</table>
+<div id="external-metadata" class="document-information"></div>
+<div id="internal-metadata" class="document-information">
+<dl id="identifiers">
+<dt class="label-workgroup">Workgroup:</dt>
+<dd class="workgroup">Network Working Group</dd>
+<dt class="label-internet-draft">Internet-Draft:</dt>
+<dd class="internet-draft">draft-kavian-agent-enrollment-protocol-00</dd>
+<dt class="label-published">Published:</dt>
+<dd class="published">
+<time datetime="2026-06-27" class="published">27 June 2026</time>
+    </dd>
+<dt class="label-intended-status">Intended Status:</dt>
+<dd class="intended-status">Standards Track</dd>
+<dt class="label-expires">Expires:</dt>
+<dd class="expires"><time datetime="2026-12-29">29 December 2026</time></dd>
+<dt class="label-authors">Author:</dt>
+<dd class="authors">
+<div class="author">
+      <div class="author-name">N. Kavian</div>
+<div class="org">Jarwin, Inc. (InFlow)</div>
+</div>
+</dd>
+</dl>
+</div>
+<h1 id="title">The Agent Enrollment Protocol</h1>
+<section id="section-abstract">
+      <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
+<p id="section-abstract-1">The Agent Enrollment Protocol (AEP) defines an HTTP-based mechanism for autonomous agents to discover service enrollment requirements, enroll an agent identity, obtain optional session credentials, revoke those credentials, and query enrollment status. AEP uses Decentralized Identifiers, client assertion JWTs, and HTTP Problem Details to provide a narrow machine-first enrollment and authentication substrate for agent-to-service interactions.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+</section>
+<div id="status-of-memo">
+<section id="section-boilerplate.1">
+        <h2 id="name-status-of-this-memo">
+<a href="#name-status-of-this-memo" class="section-name selfRef">Status of This Memo</a>
+        </h2>
+<p id="section-boilerplate.1-1">
+        This Internet-Draft is submitted in full conformance with the
+        provisions of BCP 78 and BCP 79.<a href="#section-boilerplate.1-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-2">
+        Internet-Drafts are working documents of the Internet Engineering Task
+        Force (IETF). Note that other groups may also distribute working
+        documents as Internet-Drafts. The list of current Internet-Drafts is
+        at <span><a href="https://datatracker.ietf.org/drafts/current/">https://datatracker.ietf.org/drafts/current/</a></span>.<a href="#section-boilerplate.1-2" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-3">
+        Internet-Drafts are draft documents valid for a maximum of six months
+        and may be updated, replaced, or obsoleted by other documents at any
+        time. It is inappropriate to use Internet-Drafts as reference
+        material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-4">
+        This Internet-Draft will expire on 29 December 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="copyright">
+<section id="section-boilerplate.2">
+        <h2 id="name-copyright-notice">
+<a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
+        </h2>
+<p id="section-boilerplate.2-1">
+            Copyright (c) 2026 IETF Trust and the persons identified as the
+            document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.2-2">
+            This document is subject to BCP 78 and the IETF Trust's Legal
+            Provisions Relating to IETF Documents
+            (<span><a href="https://trustee.ietf.org/license-info">https://trustee.ietf.org/license-info</a></span>) in effect on the date of
+            publication of this document. Please review these documents
+            carefully, as they describe your rights and restrictions with
+            respect to this document. Code Components extracted from this
+            document must include Revised BSD License text as described in
+            Section 4.e of the Trust Legal Provisions and are provided without
+            warranty as described in the Revised BSD License.<a href="#section-boilerplate.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="toc">
+<section id="section-toc.1">
+        <a href="#" onclick="scroll(0,0)" class="toplink">▲</a><h2 id="name-table-of-contents">
+<a href="#name-table-of-contents" class="section-name selfRef">Table of Contents</a>
+        </h2>
+<nav class="toc"><ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
+            <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="auto internal xref">1</a>.  <a href="#name-introduction" class="internal xref">Introduction</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
+            <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-requirements-language" class="internal xref">Requirements Language</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
+            <p id="section-toc.1-1.3.1" class="keepWithNext"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-terminology" class="internal xref">Terminology</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-protocol-overview" class="internal xref">Protocol Overview</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-http-binding" class="internal xref">HTTP Binding</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-discovery-and-inspect" class="internal xref">Discovery and Inspect</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-did-method-didweb" class="internal xref">DID Method: did:web</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
+            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-aep-http-authentication-sch" class="internal xref">AEP HTTP Authentication Scheme</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
+            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-client-assertion-jwt" class="internal xref">Client Assertion JWT</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
+            <p id="section-toc.1-1.10.1"><a href="#section-10" class="auto internal xref">10</a>. <a href="#name-the-inspect-command" class="internal xref">The Inspect Command</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
+            <p id="section-toc.1-1.11.1"><a href="#section-11" class="auto internal xref">11</a>. <a href="#name-the-enroll-command" class="internal xref">The Enroll Command</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12">
+            <p id="section-toc.1-1.12.1"><a href="#section-12" class="auto internal xref">12</a>. <a href="#name-the-status-command" class="internal xref">The Status Command</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13">
+            <p id="section-toc.1-1.13.1"><a href="#section-13" class="auto internal xref">13</a>. <a href="#name-the-grant-command" class="internal xref">The Grant Command</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14">
+            <p id="section-toc.1-1.14.1"><a href="#section-14" class="auto internal xref">14</a>. <a href="#name-the-revoke-command" class="internal xref">The Revoke Command</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.15">
+            <p id="section-toc.1-1.15.1"><a href="#section-15" class="auto internal xref">15</a>. <a href="#name-idempotency" class="internal xref">Idempotency</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.16">
+            <p id="section-toc.1-1.16.1"><a href="#section-16" class="auto internal xref">16</a>. <a href="#name-error-handling" class="internal xref">Error Handling</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.17">
+            <p id="section-toc.1-1.17.1"><a href="#section-17" class="auto internal xref">17</a>. <a href="#name-extensibility" class="internal xref">Extensibility</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.18">
+            <p id="section-toc.1-1.18.1"><a href="#section-18" class="auto internal xref">18</a>. <a href="#name-wire-identifier-syntax" class="internal xref">Wire Identifier Syntax</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.19">
+            <p id="section-toc.1-1.19.1"><a href="#section-19" class="auto internal xref">19</a>. <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.19.2.1">
+                <p id="section-toc.1-1.19.2.1.1"><a href="#section-19.1" class="auto internal xref">19.1</a>.  <a href="#name-http-authentication-scheme" class="internal xref">HTTP Authentication Scheme</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.19.2.2">
+                <p id="section-toc.1-1.19.2.2.1"><a href="#section-19.2" class="auto internal xref">19.2</a>.  <a href="#name-well-known-uri" class="internal xref">Well-Known URI</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.19.2.3">
+                <p id="section-toc.1-1.19.2.3.1"><a href="#section-19.3" class="auto internal xref">19.3</a>.  <a href="#name-media-type" class="internal xref">Media Type</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.19.2.4">
+                <p id="section-toc.1-1.19.2.4.1"><a href="#section-19.4" class="auto internal xref">19.4</a>.  <a href="#name-aep-command-registry" class="internal xref">AEP Command Registry</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.19.2.5">
+                <p id="section-toc.1-1.19.2.5.1"><a href="#section-19.5" class="auto internal xref">19.5</a>.  <a href="#name-aep-binding-identifier-regi" class="internal xref">AEP Binding Identifier Registry</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.19.2.6">
+                <p id="section-toc.1-1.19.2.6.1"><a href="#section-19.6" class="auto internal xref">19.6</a>.  <a href="#name-aep-extension-identifier-re" class="internal xref">AEP Extension Identifier Registry</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.19.2.7">
+                <p id="section-toc.1-1.19.2.7.1"><a href="#section-19.7" class="auto internal xref">19.7</a>.  <a href="#name-aep-error-code-registry" class="internal xref">AEP Error Code Registry</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.19.2.8">
+                <p id="section-toc.1-1.19.2.8.1"><a href="#section-19.8" class="auto internal xref">19.8</a>.  <a href="#name-aep-grant-type-registry" class="internal xref">AEP Grant Type Registry</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.20">
+            <p id="section-toc.1-1.20.1"><a href="#section-20" class="auto internal xref">20</a>. <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.21">
+            <p id="section-toc.1-1.21.1"><a href="#section-21" class="auto internal xref">21</a>. <a href="#name-privacy-considerations" class="internal xref">Privacy Considerations</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.22">
+            <p id="section-toc.1-1.22.1"><a href="#section-22" class="auto internal xref">22</a>. <a href="#name-references" class="internal xref">References</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.22.2.1">
+                <p id="section-toc.1-1.22.2.1.1"><a href="#section-22.1" class="auto internal xref">22.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.22.2.2">
+                <p id="section-toc.1-1.22.2.2.1"><a href="#section-22.2" class="auto internal xref">22.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.23">
+            <p id="section-toc.1-1.23.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-authors-address" class="internal xref">Author's Address</a></p>
+</li>
+        </ul>
+</nav>
+</section>
+</div>
+<div id="introduction">
+<section id="section-1">
+      <h2 id="name-introduction">
+<a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
+      </h2>
+<p id="section-1-1">Autonomous agents increasingly interact with internet services without a human directly completing registration forms, email confirmations, password setup, or dashboard-based API-key provisioning. Existing HTTP authentication mechanisms can authenticate an already-provisioned client, but they do not define a machine-first enrollment flow by which an autonomous agent discovers a service's requirements, presents a cryptographic identity, and becomes recognized by that service.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-2">The Agent Enrollment Protocol (AEP) defines that enrollment substrate. AEP lets an Agent discover what a Service requires, enroll a <code>did:web</code> identity, authenticate AEP commands with a per-request client assertion JWT, optionally obtain a session credential, revoke issued session credentials, and query enrollment status.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-3">AEP is deliberately narrow. It does not define payment settlement, checkout semantics, action authorization, KYC execution, or legal policy. Those functions can compose above or beside AEP. This document defines only the minimum HTTP protocol needed for interoperable Agent enrollment and session-credential bootstrapping.<a href="#section-1-3" class="pilcrow">¶</a></p>
+<p id="section-1-4">This document's scope is limited to the HTTP binding for Inspect, Enroll, Grant, Revoke, and Status. Update, Rotate, Decommission, non-HTTP transports, concrete session-credential formats, policy disclosures, KYA, ZK proofs, and other extensions are out of scope for this document.<a href="#section-1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="requirements-language">
+<section id="section-2">
+      <h2 id="name-requirements-language">
+<a href="#section-2" class="section-number selfRef">2. </a><a href="#name-requirements-language" class="section-name selfRef">Requirements Language</a>
+      </h2>
+<p id="section-2-1">The key words "<span class="bcp14">MUST</span>", "<span class="bcp14">MUST NOT</span>", "<span class="bcp14">REQUIRED</span>", "<span class="bcp14">SHALL</span>", "<span class="bcp14">SHALL NOT</span>", "<span class="bcp14">SHOULD</span>", "<span class="bcp14">SHOULD NOT</span>", "<span class="bcp14">RECOMMENDED</span>", "<span class="bcp14">NOT RECOMMENDED</span>",
+"<span class="bcp14">MAY</span>", and "<span class="bcp14">OPTIONAL</span>" in this document are to be interpreted as
+described in BCP 14 <span>[<a href="#RFC2119" class="cite xref">RFC2119</a>]</span> <span>[<a href="#RFC8174" class="cite xref">RFC8174</a>]</span> when, and only when, they
+appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="terminology">
+<section id="section-3">
+      <h2 id="name-terminology">
+<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-terminology" class="section-name selfRef">Terminology</a>
+      </h2>
+<span class="break"></span><dl class="dlParallel" id="section-3-1">
+        <dt id="section-3-1.1">Agent:</dt>
+        <dd style="margin-left: 1.5em" id="section-3-1.2">
+          <p id="section-3-1.2.1">Software acting autonomously. An Agent holds or controls a cryptographic key and initiates AEP requests.<a href="#section-3-1.2.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-3-1.3">Service:</dt>
+        <dd style="margin-left: 1.5em" id="section-3-1.4">
+          <p id="section-3-1.4.1">The HTTP server that receives AEP requests and decides whether to enroll or recognize an Agent.<a href="#section-3-1.4.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-3-1.5">Owner:</dt>
+        <dd style="margin-left: 1.5em" id="section-3-1.6">
+          <p id="section-3-1.6.1">The human or organization that owns or controls an Agent. Owner details are represented as claims when a Service requires them.<a href="#section-3-1.6.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-3-1.7">Platform:</dt>
+        <dd style="margin-left: 1.5em" id="section-3-1.8">
+          <p id="section-3-1.8.1">An optional operator that hosts Agent identity material or signing infrastructure. A Platform is not required by AEP.<a href="#section-3-1.8.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-3-1.9">Verifier:</dt>
+        <dd style="margin-left: 1.5em" id="section-3-1.10">
+          <p id="section-3-1.10.1">A party that verifies claims about an Agent or Owner and may issue attestations referenced by the Agent. This document does not define attestation formats.<a href="#section-3-1.10.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-3-1.11">Inspect document:</dt>
+        <dd style="margin-left: 1.5em" id="section-3-1.12">
+          <p id="section-3-1.12.1">The JSON discovery document published by a Service at <code>/.well-known/aep</code>. It advertises AEP version, supported commands, accepted identity methods, requested claims, endpoint configuration, and extension support.<a href="#section-3-1.12.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-3-1.13">Client assertion:</dt>
+        <dd style="margin-left: 1.5em" id="section-3-1.14">
+          <p id="section-3-1.14.1">A JWT signed by the Agent's private key and presented on authenticated AEP commands. The assertion binds the Agent identity, Service identity, command name, issuance time, expiration time, and replay identifier.<a href="#section-3-1.14.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-3-1.15">Session credential:</dt>
+        <dd style="margin-left: 1.5em" id="section-3-1.16">
+          <p id="section-3-1.16.1">A stateful credential issued by the Grant command and presented on later requests according to a separate session-credential specification.<a href="#section-3-1.16.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-3-1.17">Grant type:</dt>
+        <dd style="margin-left: 1.5em" id="section-3-1.18">
+          <p id="section-3-1.18.1">A string identifier for a concrete session-credential format supported by the Service, such as an OAuth Bearer, API-key, or Basic credential specification.<a href="#section-3-1.18.1" class="pilcrow">¶</a></p>
+</dd>
+      <dd class="break"></dd>
+</dl>
+</section>
+</div>
+<div id="protocol-overview">
+<section id="section-4">
+      <h2 id="name-protocol-overview">
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-protocol-overview" class="section-name selfRef">Protocol Overview</a>
+      </h2>
+<p id="section-4-1">The baseline AEP flow is:<a href="#section-4-1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-4-2">
+<li id="section-4-2.1">
+          <p id="section-4-2.1.1">The Agent fetches the Service's Inspect document.<a href="#section-4-2.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-4-2.2">
+          <p id="section-4-2.2.1">The Agent evaluates whether it can satisfy the Service's <code>did:web</code> and claim requirements.<a href="#section-4-2.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-4-2.3">
+          <p id="section-4-2.3.1">The Agent constructs a client assertion JWT with <code>aud</code> equal to the Service DID and <code>op</code> equal to the command being invoked.<a href="#section-4-2.3.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-4-2.4">
+          <p id="section-4-2.4.1">The Agent invokes Enroll.<a href="#section-4-2.4.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-4-2.5">
+          <p id="section-4-2.5.1">The Agent calls Status when enrollment is pending or when it needs current state.<a href="#section-4-2.5.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-4-2.6">
+          <p id="section-4-2.6.1">The Agent may call Grant for a supported session-credential type.<a href="#section-4-2.6.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-4-2.7">
+          <p id="section-4-2.7.1">The Agent may call Revoke to invalidate issued session credentials.<a href="#section-4-2.7.1" class="pilcrow">¶</a></p>
+</li>
+      </ol>
+<p id="section-4-3">Inspect is unauthenticated. Enroll, Grant, Revoke, and Status are authenticated with the baseline <code>Authorization: AEP &lt;jwt&gt;</code> form. Session credentials, once issued, <span class="bcp14">MAY</span> be used on commands that allow the selected credential type; Grant and Revoke themselves always use the baseline client assertion.<a href="#section-4-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="http-binding">
+<section id="section-5">
+      <h2 id="name-http-binding">
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-http-binding" class="section-name selfRef">HTTP Binding</a>
+      </h2>
+<p id="section-5-1">This document defines an HTTP binding using HTTP semantics <span>[<a href="#RFC9110" class="cite xref">RFC9110</a>]</span> over HTTP/1.1 <span>[<a href="#RFC9112" class="cite xref">RFC9112</a>]</span>, HTTP/2 <span>[<a href="#RFC9113" class="cite xref">RFC9113</a>]</span>, or HTTP/3 <span>[<a href="#RFC9114" class="cite xref">RFC9114</a>]</span>. Network use of this binding requires TLS 1.3 or later <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>. Plaintext HTTP is out of scope.<a href="#section-5-1" class="pilcrow">¶</a></p>
+<p id="section-5-2">The binding uses only <code>GET</code> and <code>POST</code>:<a href="#section-5-2" class="pilcrow">¶</a></p>
+<table class="center" id="table-1">
+        <caption><a href="#table-1" class="selfRef">Table 1</a></caption>
+<thead>
+          <tr>
+            <th class="text-left" rowspan="1" colspan="1">Command</th>
+            <th class="text-left" rowspan="1" colspan="1">Method</th>
+            <th class="text-left" rowspan="1" colspan="1">Endpoint</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">Inspect</td>
+            <td class="text-left" rowspan="1" colspan="1">
+              <code>GET</code>
+</td>
+            <td class="text-left" rowspan="1" colspan="1">
+              <code>/.well-known/aep</code>
+</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">Enroll</td>
+            <td class="text-left" rowspan="1" colspan="1">
+              <code>POST</code>
+</td>
+            <td class="text-left" rowspan="1" colspan="1">
+              <code>enroll</code> relative to <code>endpoint_base</code>
+</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">Status</td>
+            <td class="text-left" rowspan="1" colspan="1">
+              <code>GET</code>
+</td>
+            <td class="text-left" rowspan="1" colspan="1">
+              <code>status</code> relative to <code>endpoint_base</code>
+</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">Grant</td>
+            <td class="text-left" rowspan="1" colspan="1">
+              <code>POST</code>
+</td>
+            <td class="text-left" rowspan="1" colspan="1">
+              <code>grant</code> relative to <code>endpoint_base</code>
+</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">Revoke</td>
+            <td class="text-left" rowspan="1" colspan="1">
+              <code>POST</code>
+</td>
+            <td class="text-left" rowspan="1" colspan="1">
+              <code>revoke</code> relative to <code>endpoint_base</code>
+</td>
+          </tr>
+        </tbody>
+      </table>
+<p id="section-5-4">The <code>endpoint_base</code> value is published in the Inspect document under <code>http.endpoint_base</code>. If omitted, Agents <span class="bcp14">MUST</span> use <code>/aep/</code>. Agents construct command URLs by appending the command's relative path to <code>endpoint_base</code> with exactly one <code>/</code> separator, regardless of whether <code>endpoint_base</code> includes a trailing slash. For example, both <code>/aep</code> and <code>/aep/</code> produce <code>/aep/enroll</code> for Enroll.<a href="#section-5-4" class="pilcrow">¶</a></p>
+<p id="section-5-5">Requests and successful responses that carry AEP JSON payloads use <code>application/aep+json</code>, which uses the <code>+json</code> structured syntax suffix <span>[<a href="#RFC6839" class="cite xref">RFC6839</a>]</span>. Error responses use <code>application/problem+json</code>.<a href="#section-5-5" class="pilcrow">¶</a></p>
+<p id="section-5-6">Authenticated commands carry a baseline client assertion as:<a href="#section-5-6" class="pilcrow">¶</a></p>
+<div class="lang-http-message sourcecode" id="section-5-7">
+<pre>
+Authorization: AEP &lt;jwt&gt;
+</pre><a href="#section-5-7" class="pilcrow">¶</a>
+</div>
+<p id="section-5-8">When a session credential is used on a command that allows it, the credential presentation form is defined by the concrete session-credential document.<a href="#section-5-8" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="discovery-and-inspect">
+<section id="section-6">
+      <h2 id="name-discovery-and-inspect">
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-discovery-and-inspect" class="section-name selfRef">Discovery and Inspect</a>
+      </h2>
+<p id="section-6-1">The Inspect document is available at the well-known URI path defined for AEP <span>[<a href="#RFC8615" class="cite xref">RFC8615</a>]</span>:<a href="#section-6-1" class="pilcrow">¶</a></p>
+<div class="lang-http-message sourcecode" id="section-6-2">
+<pre>
+GET /.well-known/aep HTTP/1.1
+Host: example.com
+Accept: application/aep+json
+</pre><a href="#section-6-2" class="pilcrow">¶</a>
+</div>
+<p id="section-6-3">The response body is a JSON object <span>[<a href="#RFC8259" class="cite xref">RFC8259</a>]</span>. AEP-owned numeric protocol values are represented as JSON strings. Field names use <code>lower_snake_case</code>.<a href="#section-6-3" class="pilcrow">¶</a></p>
+<p id="section-6-4">Claim names use dotted lowercase tokens:<a href="#section-6-4" class="pilcrow">¶</a></p>
+<div class="lang-abnf sourcecode" id="section-6-5">
+<pre>
+claim-name = claim-token *("." claim-token)
+claim-token = LCALPHA *(LCALPHA / DIGIT / "_")
+LCALPHA = %x61-7A
+</pre><a href="#section-6-5" class="pilcrow">¶</a>
+</div>
+<p id="section-6-6">The <code>LCALPHA</code> rule is defined here. The <code>DIGIT</code> rule is defined by RFC 5234 <span>[<a href="#RFC5234" class="cite xref">RFC5234</a>]</span>.<a href="#section-6-6" class="pilcrow">¶</a></p>
+<p id="section-6-7">The Inspect document shown here contains only the fields required for the HTTP binding, <code>did:web</code>, Inspect, Enroll, Grant, Revoke, and Status:<a href="#section-6-7" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-6-8">
+<pre>
+{
+  "aep_version": "1.0",
+  "bindings": {
+    "supported": ["http"]
+  },
+  "claims": {
+    "optional": [],
+    "preferred": [],
+    "required": ["contact.email"]
+  },
+  "commands": {
+    "grant_types": ["oauth-bearer"],
+    "supported": ["enroll", "grant", "inspect", "revoke", "status"]
+  },
+  "core": {
+    "signing_algorithms": ["EdDSA", "ES256"]
+  },
+  "extensions": {
+    "supported": []
+  },
+  "http": {
+    "endpoint_base": "/aep/"
+  },
+  "identity": {
+    "methods": ["did:web"]
+  },
+  "service": {
+    "did": "did:web:api.example.com"
+  }
+}
+</pre><a href="#section-6-8" class="pilcrow">¶</a>
+</div>
+<p id="section-6-9"><code>commands.supported</code> lists commands the Service exposes. Agents <span class="bcp14">MUST NOT</span> invoke commands absent from this list.<a href="#section-6-9" class="pilcrow">¶</a></p>
+<p id="section-6-10"><code>commands.grant_types</code> lists concrete session-credential formats the Service can issue and revoke. If this array is empty or absent, the Service <span class="bcp14">MUST NOT</span> list <code>grant</code> or <code>revoke</code> in <code>commands.supported</code>.<a href="#section-6-10" class="pilcrow">¶</a></p>
+<p id="section-6-11"><code>identity.methods</code> <span class="bcp14">MUST</span> contain <code>did:web</code> when the Service accepts this document's identity method. Other DID methods are out of scope for this document.<a href="#section-6-11" class="pilcrow">¶</a></p>
+<p id="section-6-12"><code>service.did</code> identifies the Service. Agents use this value as the <code>aud</code> claim in client assertion JWTs.<a href="#section-6-12" class="pilcrow">¶</a></p>
+<p id="section-6-13">Services <span class="bcp14">SHOULD</span> send HTTP cache metadata, including <code>Cache-Control</code> and <code>ETag</code>, on Inspect responses. A default freshness lifetime of 300 seconds is <span class="bcp14">RECOMMENDED</span> when the Service does not need a shorter policy window.<a href="#section-6-13" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="did-method-didweb">
+<section id="section-7">
+      <h2 id="name-did-method-didweb">
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-did-method-didweb" class="section-name selfRef">DID Method: did:web</a>
+      </h2>
+<p id="section-7-1">This document defines <code>did:web</code> <span>[<a href="#DID-WEB" class="cite xref">DID-WEB</a>]</span> as the only required identity method. A Service that supports this document advertises:<a href="#section-7-1" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-7-2">
+<pre>
+{
+  "identity": {
+    "methods": ["did:web"]
+  }
+}
+</pre><a href="#section-7-2" class="pilcrow">¶</a>
+</div>
+<p id="section-7-3">An Agent using this document identifies itself with a <code>did:web</code> URI. The Service resolves the DID to obtain the Agent's public verification key:<a href="#section-7-3" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-7-4.1">
+          <p id="section-7-4.1.1"><code>did:web:&lt;host&gt;</code> resolves to <code>https://&lt;host&gt;/.well-known/did.json</code>.<a href="#section-7-4.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-7-4.2">
+          <p id="section-7-4.2.1"><code>did:web:&lt;host&gt;:&lt;path&gt;</code> resolves to <code>https://&lt;host&gt;/&lt;path&gt;/did.json</code>.<a href="#section-7-4.2.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<p id="section-7-5">The resolved DID document <span class="bcp14">MUST</span> contain a verification method referenced by the JWT <code>kid</code> header. The verification method <span class="bcp14">MUST</span> expose a public key in a form the Service can validate against the selected JOSE signing algorithm.<a href="#section-7-5" class="pilcrow">¶</a></p>
+<p id="section-7-6">Services <span class="bcp14">MUST</span> resolve <code>did:web</code> documents over HTTPS. Services <span class="bcp14">SHOULD</span> cache resolved DID documents and <span class="bcp14">SHOULD</span> honor upstream cache metadata. A default cache lifetime of 300 seconds is <span class="bcp14">RECOMMENDED</span> when no shorter upstream lifetime is provided.<a href="#section-7-6" class="pilcrow">¶</a></p>
+<p id="section-7-7">If the Agent presents an identity method not listed in the Service's <code>identity.methods</code> array, the Service <span class="bcp14">MUST</span> reject the request as <code>not_recognized</code>.<a href="#section-7-7" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="aep-http-authentication-scheme">
+<section id="section-8">
+      <h2 id="name-aep-http-authentication-sch">
+<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-aep-http-authentication-sch" class="section-name selfRef">AEP HTTP Authentication Scheme</a>
+      </h2>
+<p id="section-8-1">The AEP HTTP authentication scheme uses the <code>AEP</code> auth-scheme value. The rules <code>ALPHA</code>, <code>DIGIT</code>, <code>DQUOTE</code>, and <code>SP</code> are defined by RFC 5234 <span>[<a href="#RFC5234" class="cite xref">RFC5234</a>]</span>. The rules <code>auth-param</code>, <code>BWS</code>, and <code>OWS</code> are defined by HTTP semantics <span>[<a href="#RFC9110" class="cite xref">RFC9110</a>]</span>.<a href="#section-8-1" class="pilcrow">¶</a></p>
+<div class="lang-abnf sourcecode" id="section-8-2">
+<pre>
+AEP-credentials = "AEP" 1*SP compact-jws
+compact-jws     = base64url "." base64url "." base64url
+base64url       = 1*( ALPHA / DIGIT / "-" / "_" )
+
+AEP-challenge        = "AEP" [ 1*SP AEP-challenge-param
+                       *( OWS "," OWS AEP-challenge-param ) ]
+AEP-challenge-param  = reason-param / auth-param
+reason-param         = "reason" BWS "=" BWS DQUOTE error-code DQUOTE
+error-code           = lc-token *( "_" lc-token )
+lc-token             = LCALPHA *( LCALPHA / DIGIT )
+</pre><a href="#section-8-2" class="pilcrow">¶</a>
+</div>
+<p id="section-8-3">The <code>AEP-credentials</code> form is used in the <code>Authorization</code> header field. The <code>AEP-challenge</code> form is used in the <code>WWW-Authenticate</code> header field. The <code>reason</code> parameter, when present, carries an AEP error code.<a href="#section-8-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="client-assertion-jwt">
+<section id="section-9">
+      <h2 id="name-client-assertion-jwt">
+<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-client-assertion-jwt" class="section-name selfRef">Client Assertion JWT</a>
+      </h2>
+<p id="section-9-1">Enroll, Grant, Revoke, and Status use a signed client assertion JWT for Agent authentication. Inspect is unauthenticated and does not use a client assertion.<a href="#section-9-1" class="pilcrow">¶</a></p>
+<p id="section-9-2">The client assertion JWT is carried as:<a href="#section-9-2" class="pilcrow">¶</a></p>
+<div class="lang-http-message sourcecode" id="section-9-3">
+<pre>
+Authorization: AEP &lt;jwt&gt;
+</pre><a href="#section-9-3" class="pilcrow">¶</a>
+</div>
+<p id="section-9-4">The JWT is a JWS compact serialization <span>[<a href="#RFC7515" class="cite xref">RFC7515</a>]</span> consisting of a JOSE header, JWT claims set <span>[<a href="#RFC7519" class="cite xref">RFC7519</a>]</span>, and signature.<a href="#section-9-4" class="pilcrow">¶</a></p>
+<p id="section-9-5">The JOSE header <span class="bcp14">MUST</span> contain:<a href="#section-9-5" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-9-6">
+<pre>
+{
+  "alg": "EdDSA",
+  "typ": "JWT",
+  "kid": "did:web:agent.example.com:agents:123#key-1"
+}
+</pre><a href="#section-9-6" class="pilcrow">¶</a>
+</div>
+<p id="section-9-7"><code>alg</code> identifies the signing algorithm. Services supporting this document <span class="bcp14">MUST</span> support <code>EdDSA</code> <span>[<a href="#RFC8037" class="cite xref">RFC8037</a>]</span> and <code>ES256</code> <span>[<a href="#RFC7518" class="cite xref">RFC7518</a>]</span> and advertise accepted algorithms in <code>core.signing_algorithms</code>. Agents <span class="bcp14">MUST</span> select an algorithm advertised by the Service. The <code>none</code> algorithm and symmetric JOSE algorithms <span class="bcp14">MUST NOT</span> be used for Agent identity assertions.<a href="#section-9-7" class="pilcrow">¶</a></p>
+<p id="section-9-8"><code>typ</code> <span class="bcp14">MUST</span> be <code>JWT</code>.<a href="#section-9-8" class="pilcrow">¶</a></p>
+<p id="section-9-9"><code>kid</code> identifies the Agent's DID and <span class="bcp14">MAY</span> include a fragment selecting a verification method in the resolved DID document. The DID portion of <code>kid</code> <span class="bcp14">MUST</span> equal the Agent DID carried in <code>iss</code> and <code>sub</code>.<a href="#section-9-9" class="pilcrow">¶</a></p>
+<p id="section-9-10">The JWT claims set <span class="bcp14">MUST</span> contain:<a href="#section-9-10" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-9-11">
+<pre>
+{
+  "iss": "did:web:agent.example.com:agents:123",
+  "sub": "did:web:agent.example.com:agents:123",
+  "aud": "did:web:api.example.com",
+  "op": "enroll",
+  "iat": 1748428800,
+  "exp": 1748428860,
+  "jti": "9f8a4d2e-1c3b-4f5e-8b7a-000000000000"
+}
+</pre><a href="#section-9-11" class="pilcrow">¶</a>
+</div>
+<p id="section-9-12"><code>iss</code> and <code>sub</code> <span class="bcp14">MUST</span> both equal the Agent DID.<a href="#section-9-12" class="pilcrow">¶</a></p>
+<p id="section-9-13"><code>aud</code> <span class="bcp14">MUST</span> equal the Service DID advertised as <code>service.did</code> in the Inspect document.<a href="#section-9-13" class="pilcrow">¶</a></p>
+<p id="section-9-14"><code>op</code> <span class="bcp14">MUST</span> equal the command being invoked. The values defined by this document are <code>enroll</code>, <code>grant</code>, <code>revoke</code>, and <code>status</code>.<a href="#section-9-14" class="pilcrow">¶</a></p>
+<p id="section-9-15"><code>iat</code> and <code>exp</code> are NumericDate values as defined by JWT <span>[<a href="#RFC7519" class="cite xref">RFC7519</a>]</span>: seconds since the Unix epoch represented as JSON numbers. These claims are an exception to AEP-owned JSON payload numeric-string encoding. Services <span class="bcp14">MUST</span> reject assertions where <code>exp - iat</code> is greater than 300 seconds. Services <span class="bcp14">SHOULD</span> allow no more than 30 seconds of local clock skew.<a href="#section-9-15" class="pilcrow">¶</a></p>
+<p id="section-9-16"><code>jti</code> <span class="bcp14">MUST</span> be freshly generated for each assertion. Services <span class="bcp14">MUST</span> maintain a replay cache keyed by at least <code>(sub, jti)</code> for the assertion lifetime plus the accepted clock-skew window.<a href="#section-9-16" class="pilcrow">¶</a></p>
+<p id="section-9-17">To verify a client assertion, the Service <span class="bcp14">MUST</span>:<a href="#section-9-17" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-9-18">
+<li id="section-9-18.1">
+          <p id="section-9-18.1.1">Parse the JWT header, claims set, and signature.<a href="#section-9-18.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-9-18.2">
+          <p id="section-9-18.2.1">Reject the assertion if <code>alg</code> is not advertised by the Service or is prohibited by this document.<a href="#section-9-18.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-9-18.3">
+          <p id="section-9-18.3.1">Resolve the DID identified by <code>kid</code>.<a href="#section-9-18.3.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-9-18.4">
+          <p id="section-9-18.4.1">Select the referenced verification method.<a href="#section-9-18.4.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-9-18.5">
+          <p id="section-9-18.5.1">Verify the JWS signature.<a href="#section-9-18.5.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-9-18.6">
+          <p id="section-9-18.6.1">Verify <code>iss</code>, <code>sub</code>, <code>aud</code>, <code>op</code>, <code>iat</code>, <code>exp</code>, and <code>jti</code> according to this section.<a href="#section-9-18.6.1" class="pilcrow">¶</a></p>
+</li>
+      </ol>
+<p id="section-9-19">Any verification failure <span class="bcp14">MUST</span> use the common <code>not_recognized</code> error defined in this document's error handling section.<a href="#section-9-19" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="the-inspect-command">
+<section id="section-10">
+      <h2 id="name-the-inspect-command">
+<a href="#section-10" class="section-number selfRef">10. </a><a href="#name-the-inspect-command" class="section-name selfRef">The Inspect Command</a>
+      </h2>
+<p id="section-10-1">Inspect is the unauthenticated discovery command. An Agent invokes Inspect by fetching the Service's well-known AEP document:<a href="#section-10-1" class="pilcrow">¶</a></p>
+<div class="lang-http-message sourcecode" id="section-10-2">
+<pre>
+GET /.well-known/aep HTTP/1.1
+Host: example.com
+Accept: application/aep+json
+</pre><a href="#section-10-2" class="pilcrow">¶</a>
+</div>
+<p id="section-10-3">The Service returns <code>200 OK</code> with an <code>application/aep+json</code> body containing the Inspect document described in this document. Inspect has no request body and no client assertion.<a href="#section-10-3" class="pilcrow">¶</a></p>
+<p id="section-10-4">Agents <span class="bcp14">SHOULD</span> cache Inspect documents according to the Service's HTTP cache metadata. Agents <span class="bcp14">MUST</span> re-fetch the Inspect document before invoking a command if the cached document has expired.<a href="#section-10-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="the-enroll-command">
+<section id="section-11">
+      <h2 id="name-the-enroll-command">
+<a href="#section-11" class="section-number selfRef">11. </a><a href="#name-the-enroll-command" class="section-name selfRef">The Enroll Command</a>
+      </h2>
+<p id="section-11-1">Enroll registers an Agent DID with a Service. The request uses the baseline client assertion with <code>op</code> equal to <code>enroll</code>.<a href="#section-11-1" class="pilcrow">¶</a></p>
+<p id="section-11-2">Endpoint:<a href="#section-11-2" class="pilcrow">¶</a></p>
+<div class="lang-http-message sourcecode" id="section-11-3">
+<pre>
+POST /aep/enroll HTTP/1.1
+Host: example.com
+Content-Type: application/aep+json
+Authorization: AEP &lt;jwt&gt;
+Idempotency-Key: &lt;opaque&gt;
+</pre><a href="#section-11-3" class="pilcrow">¶</a>
+</div>
+<p id="section-11-4">Request body:<a href="#section-11-4" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-11-5">
+<pre>
+{
+  "agent_did": "did:web:agent.example.com:agents:123",
+  "claims": {
+    "contact.email": "ops@example.com"
+  },
+  "idempotency_key": "9f8a4d2e-1c3b-4f5e-8b7a-000000000000"
+}
+</pre><a href="#section-11-5" class="pilcrow">¶</a>
+</div>
+<p id="section-11-6"><code>agent_did</code> <span class="bcp14">MUST</span> equal the Agent DID in the client assertion <code>iss</code>, <code>sub</code>, and <code>kid</code> values, ignoring any <code>kid</code> fragment. The DID method <span class="bcp14">MUST</span> be accepted by the Service's <code>identity.methods</code> advertisement.<a href="#section-11-6" class="pilcrow">¶</a></p>
+<p id="section-11-7"><code>claims</code> carries claim values requested by the Service's Inspect document. This document does not define a complete claim catalog. Claim names are strings and claim values are JSON values. Services <span class="bcp14">MUST</span> ignore unknown claims unless local policy requires rejection.<a href="#section-11-7" class="pilcrow">¶</a></p>
+<p id="section-11-8"><code>idempotency_key</code> is an opaque retry key. When both the HTTP <code>Idempotency-Key</code> header and body field are present, they <span class="bcp14">MUST</span> contain the same value.<a href="#section-11-8" class="pilcrow">¶</a></p>
+<p id="section-11-9">Successful Enroll responses use <code>200 OK</code>. A synchronous enrollment returns:<a href="#section-11-9" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-11-10">
+<pre>
+{
+  "status": "active"
+}
+</pre><a href="#section-11-10" class="pilcrow">¶</a>
+</div>
+<p id="section-11-11">If enrollment requires asynchronous verification, the Service returns:<a href="#section-11-11" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-11-12">
+<pre>
+{
+  "owner_action_required": "false",
+  "status": "pending",
+  "verification_pending": ["contact.email"]
+}
+</pre><a href="#section-11-12" class="pilcrow">¶</a>
+</div>
+<p id="section-11-13">The Agent polls Status to learn whether a pending enrollment has become <code>active</code> or <code>rejected</code>.<a href="#section-11-13" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="the-status-command">
+<section id="section-12">
+      <h2 id="name-the-status-command">
+<a href="#section-12" class="section-number selfRef">12. </a><a href="#name-the-status-command" class="section-name selfRef">The Status Command</a>
+      </h2>
+<p id="section-12-1">Status returns the Service's current state for the authenticated Agent identity. The request uses the baseline client assertion with <code>op</code> equal to <code>status</code>, or a session credential when a concrete session-credential document allows it.<a href="#section-12-1" class="pilcrow">¶</a></p>
+<p id="section-12-2">Endpoint:<a href="#section-12-2" class="pilcrow">¶</a></p>
+<div class="lang-http-message sourcecode" id="section-12-3">
+<pre>
+GET /aep/status HTTP/1.1
+Host: example.com
+Authorization: AEP &lt;jwt&gt;
+</pre><a href="#section-12-3" class="pilcrow">¶</a>
+</div>
+<p id="section-12-4">Status has no request body.<a href="#section-12-4" class="pilcrow">¶</a></p>
+<p id="section-12-5">Successful Status responses use <code>200 OK</code>:<a href="#section-12-5" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-12-6">
+<pre>
+{
+  "owner_action_required": "false",
+  "requirements_pending": [],
+  "since": "2026-05-28T12:00:00Z",
+  "status": "active"
+}
+</pre><a href="#section-12-6" class="pilcrow">¶</a>
+</div>
+<p id="section-12-7"><code>status</code> describes the Agent identity's state at the Service:<a href="#section-12-7" class="pilcrow">¶</a></p>
+<table class="center" id="table-2">
+        <caption><a href="#table-2" class="selfRef">Table 2</a></caption>
+<thead>
+          <tr>
+            <th class="text-left" rowspan="1" colspan="1">Value</th>
+            <th class="text-left" rowspan="1" colspan="1">Meaning</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">
+              <code>active</code>
+</td>
+            <td class="text-left" rowspan="1" colspan="1">The identity is enrolled and operational.</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">
+              <code>pending</code>
+</td>
+            <td class="text-left" rowspan="1" colspan="1">Enrollment is awaiting asynchronous verification.</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">
+              <code>unavailable</code>
+</td>
+            <td class="text-left" rowspan="1" colspan="1">The identity is temporarily unavailable for Service-defined non-punitive reasons.</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">
+              <code>suspended</code>
+</td>
+            <td class="text-left" rowspan="1" colspan="1">The identity is temporarily disabled by Service action.</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">
+              <code>terminated</code>
+</td>
+            <td class="text-left" rowspan="1" colspan="1">The identity is permanently de-registered.</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">
+              <code>rejected</code>
+</td>
+            <td class="text-left" rowspan="1" colspan="1">Asynchronous verification failed.</td>
+          </tr>
+        </tbody>
+      </table>
+<p id="section-12-9"><code>since</code> is the RFC 3339 <span>[<a href="#RFC3339" class="cite xref">RFC3339</a>]</span> timestamp of the last state transition.<a href="#section-12-9" class="pilcrow">¶</a></p>
+<p id="section-12-10"><code>requirements_pending</code> lists claim names the Agent should provide to satisfy current Service requirements.<a href="#section-12-10" class="pilcrow">¶</a></p>
+<p id="section-12-11"><code>owner_action_required</code> is a JSON string boolean. A value of <code>"true"</code> indicates that the Agent's Owner must complete an out-of-band action before the identity can become or remain active.<a href="#section-12-11" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="the-grant-command">
+<section id="section-13">
+      <h2 id="name-the-grant-command">
+<a href="#section-13" class="section-number selfRef">13. </a><a href="#name-the-grant-command" class="section-name selfRef">The Grant Command</a>
+      </h2>
+<p id="section-13-1">Grant exchanges a baseline client assertion for a session credential. The request uses the baseline client assertion with <code>op</code> equal to <code>grant</code>. A session credential <span class="bcp14">MUST NOT</span> be used to authenticate Grant.<a href="#section-13-1" class="pilcrow">¶</a></p>
+<p id="section-13-2">Endpoint:<a href="#section-13-2" class="pilcrow">¶</a></p>
+<div class="lang-http-message sourcecode" id="section-13-3">
+<pre>
+POST /aep/grant HTTP/1.1
+Host: example.com
+Content-Type: application/aep+json
+Authorization: AEP &lt;jwt&gt;
+Idempotency-Key: &lt;opaque&gt;
+</pre><a href="#section-13-3" class="pilcrow">¶</a>
+</div>
+<p id="section-13-4">Request body:<a href="#section-13-4" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-13-5">
+<pre>
+{
+  "grant_type": "oauth-bearer"
+}
+</pre><a href="#section-13-5" class="pilcrow">¶</a>
+</div>
+<p id="section-13-6"><code>grant_type</code> <span class="bcp14">MUST</span> be one of the values advertised in <code>commands.grant_types</code>. Concrete session-credential documents <span class="bcp14">MAY</span> define additional request fields.<a href="#section-13-6" class="pilcrow">¶</a></p>
+<p id="section-13-7">The successful response body is defined by the concrete session-credential document. This core document requires only that the response be a JSON object and that the selected document define credential presentation, expiry semantics, and revocation behavior.<a href="#section-13-7" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="the-revoke-command">
+<section id="section-14">
+      <h2 id="name-the-revoke-command">
+<a href="#section-14" class="section-number selfRef">14. </a><a href="#name-the-revoke-command" class="section-name selfRef">The Revoke Command</a>
+      </h2>
+<p id="section-14-1">Revoke invalidates session credentials previously issued by Grant. The request uses the baseline client assertion with <code>op</code> equal to <code>revoke</code>. A session credential <span class="bcp14">MUST NOT</span> be used to authenticate Revoke.<a href="#section-14-1" class="pilcrow">¶</a></p>
+<p id="section-14-2">Endpoint:<a href="#section-14-2" class="pilcrow">¶</a></p>
+<div class="lang-http-message sourcecode" id="section-14-3">
+<pre>
+POST /aep/revoke HTTP/1.1
+Host: example.com
+Content-Type: application/aep+json
+Authorization: AEP &lt;jwt&gt;
+Idempotency-Key: &lt;opaque&gt;
+</pre><a href="#section-14-3" class="pilcrow">¶</a>
+</div>
+<p id="section-14-4">Request body:<a href="#section-14-4" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-14-5">
+<pre>
+{
+  "grant_type": "oauth-bearer"
+}
+</pre><a href="#section-14-5" class="pilcrow">¶</a>
+</div>
+<p id="section-14-6"><code>grant_type</code> <span class="bcp14">MUST</span> be one of the values advertised in <code>commands.grant_types</code>. By default, Revoke targets all credentials of that grant type issued to the authenticated Agent. Concrete session-credential documents <span class="bcp14">MAY</span> define additional fields for narrower credential targeting.<a href="#section-14-6" class="pilcrow">¶</a></p>
+<p id="section-14-7">To revoke all session credentials of every grant type issued to the authenticated Agent, the request body is:<a href="#section-14-7" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-14-8">
+<pre>
+{
+  "all_grant_types": "true"
+}
+</pre><a href="#section-14-8" class="pilcrow">¶</a>
+</div>
+<p id="section-14-9"><code>all_grant_types</code> is a string boolean. When <code>all_grant_types</code> is <code>"true"</code>, the request <span class="bcp14">MUST NOT</span> contain <code>grant_type</code> or <code>credential_id</code>. A Service that supports Revoke <span class="bcp14">MUST</span> support <code>all_grant_types</code> so an Agent can invalidate all issued session credentials without discovering or iterating over every concrete grant type. A malformed Revoke request, including a request with mutually exclusive fields, fails with <code>invalid_request</code>.<a href="#section-14-9" class="pilcrow">¶</a></p>
+<p id="section-14-10">Successful Revoke responses use <code>200 OK</code> and an empty JSON object:<a href="#section-14-10" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-14-11">
+<pre>
+{}
+</pre><a href="#section-14-11" class="pilcrow">¶</a>
+</div>
+<p id="section-14-12">The Service <span class="bcp14">MUST</span> return success regardless of whether any matching credentials existed.<a href="#section-14-12" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="idempotency">
+<section id="section-15">
+      <h2 id="name-idempotency">
+<a href="#section-15" class="section-number selfRef">15. </a><a href="#name-idempotency" class="section-name selfRef">Idempotency</a>
+      </h2>
+<p id="section-15-1">POST commands are state-mutating and <span class="bcp14">MUST</span> support safe retry with the <code>Idempotency-Key</code> HTTP header. This requirement applies to Enroll, Grant, and Revoke in this document.<a href="#section-15-1" class="pilcrow">¶</a></p>
+<p id="section-15-2">Services <span class="bcp14">MUST</span> cache the response associated with <code>(agent_did, Idempotency-Key)</code> for at least 1 hour. If a request repeats the same key with the same authenticated Agent and the same request body, the Service <span class="bcp14">MUST</span> return the cached response or an equivalent successful response.<a href="#section-15-2" class="pilcrow">¶</a></p>
+<p id="section-15-3">If the same authenticated Agent reuses an idempotency key with a different request body, the Service <span class="bcp14">MUST</span> return <code>409 Conflict</code> with <code>code</code> equal to <code>idempotency_conflict</code>.<a href="#section-15-3" class="pilcrow">¶</a></p>
+<p id="section-15-4">The Enroll request body <span class="bcp14">MAY</span> also contain <code>idempotency_key</code> for bindings or application frameworks that persist idempotency metadata with the body. When both forms are present, they <span class="bcp14">MUST</span> match.<a href="#section-15-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="error-handling">
+<section id="section-16">
+      <h2 id="name-error-handling">
+<a href="#section-16" class="section-number selfRef">16. </a><a href="#name-error-handling" class="section-name selfRef">Error Handling</a>
+      </h2>
+<p id="section-16-1">The HTTP binding uses RFC 9457 Problem Details <span>[<a href="#RFC9457" class="cite xref">RFC9457</a>]</span> with an AEP <code>code</code> field.<a href="#section-16-1" class="pilcrow">¶</a></p>
+<div class="lang-http-message sourcecode" id="section-16-2">
+<pre>
+HTTP/1.1 401 Unauthorized
+Content-Type: application/problem+json
+WWW-Authenticate: AEP reason="not_recognized"
+</pre><a href="#section-16-2" class="pilcrow">¶</a>
+</div>
+<div class="lang-json sourcecode" id="section-16-3">
+<pre>
+{
+  "code": "not_recognized",
+  "status": 401,
+  "type": "https://aep.example/errors/not_recognized"
+}
+</pre><a href="#section-16-3" class="pilcrow">¶</a>
+</div>
+<p id="section-16-4">The <code>code</code> field is the canonical machine-readable AEP error code. <code>type</code> <span class="bcp14">SHOULD</span> identify stable documentation for the error class. <code>title</code> <span class="bcp14">MAY</span> be omitted from production responses.<a href="#section-16-4" class="pilcrow">¶</a></p>
+<p id="section-16-5">This document defines the following HTTP error codes:<a href="#section-16-5" class="pilcrow">¶</a></p>
+<table class="center" id="table-3">
+        <caption><a href="#table-3" class="selfRef">Table 3</a></caption>
+<thead>
+          <tr>
+            <th class="text-left" rowspan="1" colspan="1">AEP code</th>
+            <th class="text-right" rowspan="1" colspan="1">HTTP status</th>
+            <th class="text-left" rowspan="1" colspan="1">Meaning</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">
+              <code>enrollment_failed</code>
+</td>
+            <td class="text-right" rowspan="1" colspan="1">400</td>
+            <td class="text-left" rowspan="1" colspan="1">Generic enrollment failure where the Service suppresses precise detail.</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">
+              <code>invalid_request</code>
+</td>
+            <td class="text-right" rowspan="1" colspan="1">400</td>
+            <td class="text-left" rowspan="1" colspan="1">The request body, parameters, or field combination is malformed or invalid.</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">
+              <code>not_recognized</code>
+</td>
+            <td class="text-right" rowspan="1" colspan="1">401</td>
+            <td class="text-left" rowspan="1" colspan="1">Umbrella anti-enumeration error for failed identity, signature, audience, operation, replay, time-window, archived-identity, or unsupported-method checks.</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">
+              <code>identity_suspended</code>
+</td>
+            <td class="text-right" rowspan="1" colspan="1">403</td>
+            <td class="text-left" rowspan="1" colspan="1">The recognized identity is temporarily disabled by Service action.</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">
+              <code>identity_terminated</code>
+</td>
+            <td class="text-right" rowspan="1" colspan="1">403</td>
+            <td class="text-left" rowspan="1" colspan="1">The recognized identity is permanently de-registered.</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">
+              <code>identity_unavailable</code>
+</td>
+            <td class="text-right" rowspan="1" colspan="1">403</td>
+            <td class="text-left" rowspan="1" colspan="1">The recognized identity is temporarily unavailable for Service-defined reasons.</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">
+              <code>requirements_unmet</code>
+</td>
+            <td class="text-right" rowspan="1" colspan="1">422</td>
+            <td class="text-left" rowspan="1" colspan="1">Required claims are missing or invalid.</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">
+              <code>verification_pending</code>
+</td>
+            <td class="text-right" rowspan="1" colspan="1">403</td>
+            <td class="text-left" rowspan="1" colspan="1">Enrollment or required verification has not completed.</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">
+              <code>verification_timeout</code>
+</td>
+            <td class="text-right" rowspan="1" colspan="1">422</td>
+            <td class="text-left" rowspan="1" colspan="1">Required asynchronous verification did not complete in the Service's policy window.</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">
+              <code>rate_limited</code>
+</td>
+            <td class="text-right" rowspan="1" colspan="1">429</td>
+            <td class="text-left" rowspan="1" colspan="1">The Agent exceeded a Service rate limit.</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">
+              <code>unsupported_grant_type</code>
+</td>
+            <td class="text-right" rowspan="1" colspan="1">400</td>
+            <td class="text-left" rowspan="1" colspan="1">Grant or Revoke requested a <code>grant_type</code> not advertised by the Service.</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">
+              <code>idempotency_conflict</code>
+</td>
+            <td class="text-right" rowspan="1" colspan="1">409</td>
+            <td class="text-left" rowspan="1" colspan="1">An idempotency key was reused with a different request body.</td>
+          </tr>
+        </tbody>
+      </table>
+<p id="section-16-7">Services <span class="bcp14">MUST</span> use <code>not_recognized</code> for bad signatures, unknown Agent identities, wrong <code>aud</code>, wrong <code>op</code>, replayed <code>jti</code>, time-window violations, archived identities, unsupported identity methods during authenticated contact, and unknown or revoked session credentials. Services <span class="bcp14">MUST NOT</span> reveal which of these checks failed.<a href="#section-16-7" class="pilcrow">¶</a></p>
+<p id="section-16-8">Services <span class="bcp14">MUST</span> use <code>invalid_request</code> for malformed JSON, missing required fields, invalid field types, unsupported field combinations, and syntactically invalid requests when returning the error would not reveal identity-recognition state.<a href="#section-16-8" class="pilcrow">¶</a></p>
+<p id="section-16-9">Services <span class="bcp14">MUST</span> implement constant-time-shaped response behavior for <code>not_recognized</code> paths so that observable latency does not distinguish a known Agent from an unknown Agent or a validly formatted assertion from a bad signature.<a href="#section-16-9" class="pilcrow">¶</a></p>
+<p id="section-16-10">When a request fails for multiple reasons, the Service <span class="bcp14">MUST</span> choose the least revealing error. For example, a request with both a bad signature and missing claims returns <code>not_recognized</code>, not <code>requirements_unmet</code>.<a href="#section-16-10" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="extensibility">
+<section id="section-17">
+      <h2 id="name-extensibility">
+<a href="#section-17" class="section-number selfRef">17. </a><a href="#name-extensibility" class="section-name selfRef">Extensibility</a>
+      </h2>
+<p id="section-17-1">This document defines the extension points needed by the core protocol:<a href="#section-17-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-17-2.1">
+          <p id="section-17-2.1.1"><code>extensions.supported</code> advertises extension identifiers implemented by the Service.<a href="#section-17-2.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-17-2.2">
+          <p id="section-17-2.2.1"><code>commands.grant_types</code> advertises concrete session-credential formats available through Grant and Revoke.<a href="#section-17-2.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-17-2.3">
+          <p id="section-17-2.3.1"><code>commands.grant_types_config</code> <span class="bcp14">MAY</span> carry per-grant-type configuration defined by a concrete session-credential document.<a href="#section-17-2.3.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-17-2.4">
+          <p id="section-17-2.4.1"><code>claims.required</code>, <code>claims.preferred</code>, and <code>claims.optional</code> <span class="bcp14">MAY</span> contain claim names defined by other documents.<a href="#section-17-2.4.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-17-2.5">
+          <p id="section-17-2.5.1">Additional top-level Inspect fields <span class="bcp14">MAY</span> be added by future documents.<a href="#section-17-2.5.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<p id="section-17-3">Agents <span class="bcp14">MUST</span> ignore extension identifiers and additive fields they do not understand, unless local policy requires the Agent to refuse enrollment when a required capability is absent.<a href="#section-17-3" class="pilcrow">¶</a></p>
+<p id="section-17-4">Services <span class="bcp14">MUST NOT</span> redefine the semantics of commands, fields, status values, or error codes defined by this document. Extensions are additive.<a href="#section-17-4" class="pilcrow">¶</a></p>
+<p id="section-17-5">Concrete session-credential documents <span class="bcp14">MUST</span> define:<a href="#section-17-5" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-17-6">
+<li id="section-17-6.1">
+          <p id="section-17-6.1.1">The <code>grant_type</code> string.<a href="#section-17-6.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-17-6.2">
+          <p id="section-17-6.2.1">Grant request fields beyond <code>grant_type</code>, if any.<a href="#section-17-6.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-17-6.3">
+          <p id="section-17-6.3.1">Grant response shape.<a href="#section-17-6.3.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-17-6.4">
+          <p id="section-17-6.4.1">Credential presentation on HTTP requests.<a href="#section-17-6.4.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-17-6.5">
+          <p id="section-17-6.5.1">Expiry semantics.<a href="#section-17-6.5.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-17-6.6">
+          <p id="section-17-6.6.1">Revoke request fields beyond <code>grant_type</code> and <code>all_grant_types</code>, if any.<a href="#section-17-6.6.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-17-6.7">
+          <p id="section-17-6.7.1">Error behavior beyond the core errors, if any.<a href="#section-17-6.7.1" class="pilcrow">¶</a></p>
+</li>
+      </ol>
+</section>
+</div>
+<div id="wire-identifier-syntax">
+<section id="section-18">
+      <h2 id="name-wire-identifier-syntax">
+<a href="#section-18" class="section-number selfRef">18. </a><a href="#name-wire-identifier-syntax" class="section-name selfRef">Wire Identifier Syntax</a>
+      </h2>
+<p id="section-18-1">Command identifiers, binding identifiers, and grant type identifiers use lowercase hyphenated tokens:<a href="#section-18-1" class="pilcrow">¶</a></p>
+<div class="lang-abnf sourcecode" id="section-18-2">
+<pre>
+wire-identifier = lc-token *( "-" lc-token )
+</pre><a href="#section-18-2" class="pilcrow">¶</a>
+</div>
+<p id="section-18-3">Error codes use lowercase underscore-separated tokens:<a href="#section-18-3" class="pilcrow">¶</a></p>
+<div class="lang-abnf sourcecode" id="section-18-4">
+<pre>
+error-code = lc-token *( "_" lc-token )
+</pre><a href="#section-18-4" class="pilcrow">¶</a>
+</div>
+<p id="section-18-5">Extension identifiers <span class="bcp14">MUST</span> be absolute URIs. AEP-owned extension identifiers <span class="bcp14">SHOULD</span> use the URN form <code>urn:aep:ext:&lt;authority&gt;:&lt;name&gt;#v=&lt;version&gt;</code>.<a href="#section-18-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="iana-considerations">
+<section id="section-19">
+      <h2 id="name-iana-considerations">
+<a href="#section-19" class="section-number selfRef">19. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
+      </h2>
+<p id="section-19-1">This section requests registrations and registry creation following RFC 8126 <span>[<a href="#RFC8126" class="cite xref">RFC8126</a>]</span>.<a href="#section-19-1" class="pilcrow">¶</a></p>
+<div id="http-authentication-scheme">
+<section id="section-19.1">
+        <h3 id="name-http-authentication-scheme">
+<a href="#section-19.1" class="section-number selfRef">19.1. </a><a href="#name-http-authentication-scheme" class="section-name selfRef">HTTP Authentication Scheme</a>
+        </h3>
+<p id="section-19.1-1">IANA is requested to register the following HTTP authentication scheme in the "HTTP Authentication Schemes" registry:<a href="#section-19.1-1" class="pilcrow">¶</a></p>
+<table class="center" id="table-4">
+          <caption><a href="#table-4" class="selfRef">Table 4</a></caption>
+<thead>
+            <tr>
+              <th class="text-left" rowspan="1" colspan="1">Field</th>
+              <th class="text-left" rowspan="1" colspan="1">Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Authentication Scheme Name</td>
+              <td class="text-left" rowspan="1" colspan="1">
+                <code>AEP</code>
+</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Reference</td>
+              <td class="text-left" rowspan="1" colspan="1">This document</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Notes</td>
+              <td class="text-left" rowspan="1" colspan="1">Agent Enrollment Protocol client assertion authentication</td>
+            </tr>
+          </tbody>
+        </table>
+</section>
+</div>
+<div id="well-known-uri">
+<section id="section-19.2">
+        <h3 id="name-well-known-uri">
+<a href="#section-19.2" class="section-number selfRef">19.2. </a><a href="#name-well-known-uri" class="section-name selfRef">Well-Known URI</a>
+        </h3>
+<p id="section-19.2-1">IANA is requested to register the following URI suffix in the "Well-Known URIs" registry:<a href="#section-19.2-1" class="pilcrow">¶</a></p>
+<table class="center" id="table-5">
+          <caption><a href="#table-5" class="selfRef">Table 5</a></caption>
+<thead>
+            <tr>
+              <th class="text-left" rowspan="1" colspan="1">Field</th>
+              <th class="text-left" rowspan="1" colspan="1">Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">URI Suffix</td>
+              <td class="text-left" rowspan="1" colspan="1">
+                <code>aep</code>
+</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Change Controller</td>
+              <td class="text-left" rowspan="1" colspan="1">IETF</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Reference</td>
+              <td class="text-left" rowspan="1" colspan="1">This document</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Related Information</td>
+              <td class="text-left" rowspan="1" colspan="1">Agent Enrollment Protocol Inspect document</td>
+            </tr>
+          </tbody>
+        </table>
+</section>
+</div>
+<div id="media-type">
+<section id="section-19.3">
+        <h3 id="name-media-type">
+<a href="#section-19.3" class="section-number selfRef">19.3. </a><a href="#name-media-type" class="section-name selfRef">Media Type</a>
+        </h3>
+<p id="section-19.3-1">IANA is requested to register the following media type in the "Media Types" registry:<a href="#section-19.3-1" class="pilcrow">¶</a></p>
+<table class="center" id="table-6">
+          <caption><a href="#table-6" class="selfRef">Table 6</a></caption>
+<thead>
+            <tr>
+              <th class="text-left" rowspan="1" colspan="1">Field</th>
+              <th class="text-left" rowspan="1" colspan="1">Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Type name</td>
+              <td class="text-left" rowspan="1" colspan="1">
+                <code>application</code>
+</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Subtype name</td>
+              <td class="text-left" rowspan="1" colspan="1">
+                <code>aep+json</code>
+</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Required parameters</td>
+              <td class="text-left" rowspan="1" colspan="1">None</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Optional parameters</td>
+              <td class="text-left" rowspan="1" colspan="1">None</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Encoding considerations</td>
+              <td class="text-left" rowspan="1" colspan="1">Same as JSON <span>[<a href="#RFC8259" class="cite xref">RFC8259</a>]</span>
+</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Security considerations</td>
+              <td class="text-left" rowspan="1" colspan="1">AEP payloads can contain Agent identifiers, claims, session credentials, and other security-sensitive protocol data. Implementations need to apply the authentication, confidentiality, anti-replay, anti-enumeration, logging, and privacy requirements described in the Security Considerations and Privacy Considerations sections of this document.</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Interoperability considerations</td>
+              <td class="text-left" rowspan="1" colspan="1">None</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Published specification</td>
+              <td class="text-left" rowspan="1" colspan="1">This document</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Applications that use this media type</td>
+              <td class="text-left" rowspan="1" colspan="1">Services and Agents implementing AEP</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Fragment identifier considerations</td>
+              <td class="text-left" rowspan="1" colspan="1">Same as JSON <span>[<a href="#RFC8259" class="cite xref">RFC8259</a>]</span>
+</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Additional information</td>
+              <td class="text-left" rowspan="1" colspan="1">None</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Person and email address to contact for further information</td>
+              <td class="text-left" rowspan="1" colspan="1">IETF <a href="mailto:iesg@ietf.org">iesg@ietf.org</a>
+</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Intended usage</td>
+              <td class="text-left" rowspan="1" colspan="1">COMMON</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Restrictions on usage</td>
+              <td class="text-left" rowspan="1" colspan="1">None</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Author</td>
+              <td class="text-left" rowspan="1" colspan="1">IETF</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Change controller</td>
+              <td class="text-left" rowspan="1" colspan="1">IETF</td>
+            </tr>
+          </tbody>
+        </table>
+</section>
+</div>
+<div id="aep-command-registry">
+<section id="section-19.4">
+        <h3 id="name-aep-command-registry">
+<a href="#section-19.4" class="section-number selfRef">19.4. </a><a href="#name-aep-command-registry" class="section-name selfRef">AEP Command Registry</a>
+        </h3>
+<p id="section-19.4-1">IANA is requested to create an "AEP Commands" registry. The registration policy is Specification Required as defined by RFC 8126. Designated experts are requested to verify that new command registrations define command semantics, authentication requirements, request and response shapes, idempotency behavior for state-mutating commands, and error behavior.<a href="#section-19.4-1" class="pilcrow">¶</a></p>
+<p id="section-19.4-2">Each entry contains:<a href="#section-19.4-2" class="pilcrow">¶</a></p>
+<table class="center" id="table-7">
+          <caption><a href="#table-7" class="selfRef">Table 7</a></caption>
+<thead>
+            <tr>
+              <th class="text-left" rowspan="1" colspan="1">Field</th>
+              <th class="text-left" rowspan="1" colspan="1">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Command</td>
+              <td class="text-left" rowspan="1" colspan="1">Lowercase wire identifier.</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Description</td>
+              <td class="text-left" rowspan="1" colspan="1">Short command description.</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Reference</td>
+              <td class="text-left" rowspan="1" colspan="1">Stable specification reference.</td>
+            </tr>
+          </tbody>
+        </table>
+<p id="section-19.4-4">Initial entries are:<a href="#section-19.4-4" class="pilcrow">¶</a></p>
+<table class="center" id="table-8">
+          <caption><a href="#table-8" class="selfRef">Table 8</a></caption>
+<thead>
+            <tr>
+              <th class="text-left" rowspan="1" colspan="1">Command</th>
+              <th class="text-left" rowspan="1" colspan="1">Description</th>
+              <th class="text-left" rowspan="1" colspan="1">Reference</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">
+                <code>inspect</code>
+</td>
+              <td class="text-left" rowspan="1" colspan="1">Discover Service AEP capabilities.</td>
+              <td class="text-left" rowspan="1" colspan="1">This document</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">
+                <code>enroll</code>
+</td>
+              <td class="text-left" rowspan="1" colspan="1">Register an Agent identity with a Service.</td>
+              <td class="text-left" rowspan="1" colspan="1">This document</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">
+                <code>status</code>
+</td>
+              <td class="text-left" rowspan="1" colspan="1">Query the Agent identity's current state.</td>
+              <td class="text-left" rowspan="1" colspan="1">This document</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">
+                <code>grant</code>
+</td>
+              <td class="text-left" rowspan="1" colspan="1">Issue a session credential.</td>
+              <td class="text-left" rowspan="1" colspan="1">This document</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">
+                <code>revoke</code>
+</td>
+              <td class="text-left" rowspan="1" colspan="1">Revoke session credentials.</td>
+              <td class="text-left" rowspan="1" colspan="1">This document</td>
+            </tr>
+          </tbody>
+        </table>
+</section>
+</div>
+<div id="aep-binding-identifier-registry">
+<section id="section-19.5">
+        <h3 id="name-aep-binding-identifier-regi">
+<a href="#section-19.5" class="section-number selfRef">19.5. </a><a href="#name-aep-binding-identifier-regi" class="section-name selfRef">AEP Binding Identifier Registry</a>
+        </h3>
+<p id="section-19.5-1">IANA is requested to create an "AEP Binding Identifiers" registry. The registration policy is Specification Required as defined by RFC 8126. Designated experts are requested to verify that new binding registrations define transport semantics, endpoint discovery, authentication carriage, payload encoding, error mapping, and security considerations.<a href="#section-19.5-1" class="pilcrow">¶</a></p>
+<p id="section-19.5-2">Each entry contains:<a href="#section-19.5-2" class="pilcrow">¶</a></p>
+<table class="center" id="table-9">
+          <caption><a href="#table-9" class="selfRef">Table 9</a></caption>
+<thead>
+            <tr>
+              <th class="text-left" rowspan="1" colspan="1">Field</th>
+              <th class="text-left" rowspan="1" colspan="1">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Binding Identifier</td>
+              <td class="text-left" rowspan="1" colspan="1">Lowercase wire identifier.</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Description</td>
+              <td class="text-left" rowspan="1" colspan="1">Short binding description.</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Reference</td>
+              <td class="text-left" rowspan="1" colspan="1">Stable specification reference.</td>
+            </tr>
+          </tbody>
+        </table>
+<p id="section-19.5-4">Initial entries are:<a href="#section-19.5-4" class="pilcrow">¶</a></p>
+<table class="center" id="table-10">
+          <caption><a href="#table-10" class="selfRef">Table 10</a></caption>
+<thead>
+            <tr>
+              <th class="text-left" rowspan="1" colspan="1">Binding Identifier</th>
+              <th class="text-left" rowspan="1" colspan="1">Description</th>
+              <th class="text-left" rowspan="1" colspan="1">Reference</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">
+                <code>http</code>
+</td>
+              <td class="text-left" rowspan="1" colspan="1">HTTP binding for AEP commands.</td>
+              <td class="text-left" rowspan="1" colspan="1">This document</td>
+            </tr>
+          </tbody>
+        </table>
+</section>
+</div>
+<div id="aep-extension-identifier-registry">
+<section id="section-19.6">
+        <h3 id="name-aep-extension-identifier-re">
+<a href="#section-19.6" class="section-number selfRef">19.6. </a><a href="#name-aep-extension-identifier-re" class="section-name selfRef">AEP Extension Identifier Registry</a>
+        </h3>
+<p id="section-19.6-1">IANA is requested to create an "AEP Extension Identifiers" registry. The registration policy is Specification Required as defined by RFC 8126. Designated experts are requested to verify that new extension registrations define the extension identifier, discovery behavior, protocol fields or commands added by the extension, error behavior, and security and privacy considerations.<a href="#section-19.6-1" class="pilcrow">¶</a></p>
+<p id="section-19.6-2">Each entry contains:<a href="#section-19.6-2" class="pilcrow">¶</a></p>
+<table class="center" id="table-11">
+          <caption><a href="#table-11" class="selfRef">Table 11</a></caption>
+<thead>
+            <tr>
+              <th class="text-left" rowspan="1" colspan="1">Field</th>
+              <th class="text-left" rowspan="1" colspan="1">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Extension Identifier</td>
+              <td class="text-left" rowspan="1" colspan="1">Absolute URI identifying the extension.</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Description</td>
+              <td class="text-left" rowspan="1" colspan="1">Short extension description.</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Reference</td>
+              <td class="text-left" rowspan="1" colspan="1">Stable specification reference.</td>
+            </tr>
+          </tbody>
+        </table>
+<p id="section-19.6-4">This document creates the registry but does not register concrete extensions.<a href="#section-19.6-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="aep-error-code-registry">
+<section id="section-19.7">
+        <h3 id="name-aep-error-code-registry">
+<a href="#section-19.7" class="section-number selfRef">19.7. </a><a href="#name-aep-error-code-registry" class="section-name selfRef">AEP Error Code Registry</a>
+        </h3>
+<p id="section-19.7-1">IANA is requested to create an "AEP Error Codes" registry. The registration policy is Specification Required as defined by RFC 8126. Designated experts are requested to verify that new error codes are binding-independent, use <code>lower_snake_case</code>, avoid exposing identity-enumeration detail, and define default HTTP status mapping and remediation behavior.<a href="#section-19.7-1" class="pilcrow">¶</a></p>
+<p id="section-19.7-2">Each entry contains:<a href="#section-19.7-2" class="pilcrow">¶</a></p>
+<table class="center" id="table-12">
+          <caption><a href="#table-12" class="selfRef">Table 12</a></caption>
+<thead>
+            <tr>
+              <th class="text-left" rowspan="1" colspan="1">Field</th>
+              <th class="text-left" rowspan="1" colspan="1">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Code</td>
+              <td class="text-left" rowspan="1" colspan="1">Lowercase <code>lower_snake_case</code> error code.</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">HTTP Status</td>
+              <td class="text-left" rowspan="1" colspan="1">Default HTTP status code.</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Description</td>
+              <td class="text-left" rowspan="1" colspan="1">Short error description.</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Reference</td>
+              <td class="text-left" rowspan="1" colspan="1">Stable specification reference.</td>
+            </tr>
+          </tbody>
+        </table>
+<p id="section-19.7-4">Initial entries are:<a href="#section-19.7-4" class="pilcrow">¶</a></p>
+<table class="center" id="table-13">
+          <caption><a href="#table-13" class="selfRef">Table 13</a></caption>
+<thead>
+            <tr>
+              <th class="text-left" rowspan="1" colspan="1">Code</th>
+              <th class="text-right" rowspan="1" colspan="1">HTTP Status</th>
+              <th class="text-left" rowspan="1" colspan="1">Description</th>
+              <th class="text-left" rowspan="1" colspan="1">Reference</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">
+                <code>enrollment_failed</code>
+</td>
+              <td class="text-right" rowspan="1" colspan="1">400</td>
+              <td class="text-left" rowspan="1" colspan="1">Generic enrollment failure.</td>
+              <td class="text-left" rowspan="1" colspan="1">This document</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">
+                <code>invalid_request</code>
+</td>
+              <td class="text-right" rowspan="1" colspan="1">400</td>
+              <td class="text-left" rowspan="1" colspan="1">Malformed or invalid request.</td>
+              <td class="text-left" rowspan="1" colspan="1">This document</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">
+                <code>not_recognized</code>
+</td>
+              <td class="text-right" rowspan="1" colspan="1">401</td>
+              <td class="text-left" rowspan="1" colspan="1">Anti-enumeration recognition failure.</td>
+              <td class="text-left" rowspan="1" colspan="1">This document</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">
+                <code>identity_suspended</code>
+</td>
+              <td class="text-right" rowspan="1" colspan="1">403</td>
+              <td class="text-left" rowspan="1" colspan="1">Recognized identity is suspended.</td>
+              <td class="text-left" rowspan="1" colspan="1">This document</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">
+                <code>identity_terminated</code>
+</td>
+              <td class="text-right" rowspan="1" colspan="1">403</td>
+              <td class="text-left" rowspan="1" colspan="1">Recognized identity is terminated.</td>
+              <td class="text-left" rowspan="1" colspan="1">This document</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">
+                <code>identity_unavailable</code>
+</td>
+              <td class="text-right" rowspan="1" colspan="1">403</td>
+              <td class="text-left" rowspan="1" colspan="1">Recognized identity is temporarily unavailable.</td>
+              <td class="text-left" rowspan="1" colspan="1">This document</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">
+                <code>requirements_unmet</code>
+</td>
+              <td class="text-right" rowspan="1" colspan="1">422</td>
+              <td class="text-left" rowspan="1" colspan="1">Required claims are missing or invalid.</td>
+              <td class="text-left" rowspan="1" colspan="1">This document</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">
+                <code>verification_pending</code>
+</td>
+              <td class="text-right" rowspan="1" colspan="1">403</td>
+              <td class="text-left" rowspan="1" colspan="1">Verification has not completed.</td>
+              <td class="text-left" rowspan="1" colspan="1">This document</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">
+                <code>verification_timeout</code>
+</td>
+              <td class="text-right" rowspan="1" colspan="1">422</td>
+              <td class="text-left" rowspan="1" colspan="1">Verification did not complete in time.</td>
+              <td class="text-left" rowspan="1" colspan="1">This document</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">
+                <code>rate_limited</code>
+</td>
+              <td class="text-right" rowspan="1" colspan="1">429</td>
+              <td class="text-left" rowspan="1" colspan="1">Rate limit exceeded.</td>
+              <td class="text-left" rowspan="1" colspan="1">This document</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">
+                <code>unsupported_grant_type</code>
+</td>
+              <td class="text-right" rowspan="1" colspan="1">400</td>
+              <td class="text-left" rowspan="1" colspan="1">Unsupported Grant or Revoke grant type.</td>
+              <td class="text-left" rowspan="1" colspan="1">This document</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">
+                <code>idempotency_conflict</code>
+</td>
+              <td class="text-right" rowspan="1" colspan="1">409</td>
+              <td class="text-left" rowspan="1" colspan="1">Idempotency key reused with a different request body.</td>
+              <td class="text-left" rowspan="1" colspan="1">This document</td>
+            </tr>
+          </tbody>
+        </table>
+</section>
+</div>
+<div id="aep-grant-type-registry">
+<section id="section-19.8">
+        <h3 id="name-aep-grant-type-registry">
+<a href="#section-19.8" class="section-number selfRef">19.8. </a><a href="#name-aep-grant-type-registry" class="section-name selfRef">AEP Grant Type Registry</a>
+        </h3>
+<p id="section-19.8-1">IANA is requested to create an "AEP Grant Types" registry. The registration policy is Specification Required as defined by RFC 8126. Designated experts are requested to verify that new grant type registrations define the Grant request fields, Grant response shape, credential presentation syntax, expiry semantics, Revoke behavior, and security considerations for credential storage and leakage.<a href="#section-19.8-1" class="pilcrow">¶</a></p>
+<p id="section-19.8-2">Each entry contains:<a href="#section-19.8-2" class="pilcrow">¶</a></p>
+<table class="center" id="table-14">
+          <caption><a href="#table-14" class="selfRef">Table 14</a></caption>
+<thead>
+            <tr>
+              <th class="text-left" rowspan="1" colspan="1">Field</th>
+              <th class="text-left" rowspan="1" colspan="1">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Grant Type</td>
+              <td class="text-left" rowspan="1" colspan="1">Lowercase wire identifier.</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Description</td>
+              <td class="text-left" rowspan="1" colspan="1">Short credential description.</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Reference</td>
+              <td class="text-left" rowspan="1" colspan="1">Stable specification reference.</td>
+            </tr>
+          </tbody>
+        </table>
+<p id="section-19.8-4">This document creates the registry but does not register concrete grant types. OAuth Bearer, API-key, and Basic session credentials are defined by separate documents.<a href="#section-19.8-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="security-considerations">
+<section id="section-20">
+      <h2 id="name-security-considerations">
+<a href="#section-20" class="section-number selfRef">20. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
+      </h2>
+<p id="section-20-1">Network use of the HTTP binding defined by this document requires TLS 1.3 or later. Plaintext HTTP is out of scope.<a href="#section-20-1" class="pilcrow">¶</a></p>
+<p id="section-20-2">Client assertions are replay resistant only when Services validate the full chain: <code>aud</code>, <code>op</code>, <code>jti</code>, <code>iat</code>, and <code>exp</code>. <code>aud</code> binds the assertion to the Service DID. <code>op</code> binds the assertion to a command. <code>jti</code> prevents in-window duplicate use. <code>iat</code> and <code>exp</code> bound the usable time window. Services that skip any of these checks weaken the authentication model.<a href="#section-20-2" class="pilcrow">¶</a></p>
+<p id="section-20-3">Services <span class="bcp14">SHOULD</span> keep assertion lifetimes short. This document sets a maximum validity interval of 300 seconds. Services <span class="bcp14">MAY</span> enforce a shorter maximum.<a href="#section-20-3" class="pilcrow">¶</a></p>
+<p id="section-20-4">The <code>did:web</code> method relies on the HTTPS origin that publishes the DID document. A Service that accepts an Agent's <code>did:web</code> identity trusts the corresponding web origin to publish the correct verification method. Services <span class="bcp14">SHOULD</span> cache DID documents for operational stability but <span class="bcp14">MUST</span> ensure that cache lifetimes do not prevent timely key replacement after compromise.<a href="#section-20-4" class="pilcrow">¶</a></p>
+<p id="section-20-5">The <code>core.signing_algorithms</code> advertisement is security relevant. Services <span class="bcp14">MUST NOT</span> advertise algorithms they do not intend to accept, and <span class="bcp14">MUST NOT</span> accept algorithms that were not advertised. Agents <span class="bcp14">MUST NOT</span> use <code>none</code> or symmetric JOSE algorithms for Agent identity assertions. Implementations <span class="bcp14">SHOULD</span> follow JWT best current practices <span>[<a href="#RFC8725" class="cite xref">RFC8725</a>]</span>.<a href="#section-20-5" class="pilcrow">¶</a></p>
+<p id="section-20-6">Authentication failures are an enumeration risk. Services <span class="bcp14">MUST</span> collapse recognition failures to <code>not_recognized</code> and <span class="bcp14">MUST</span> shape timing so attackers cannot distinguish an unknown Agent, a bad signature, a wrong audience, a wrong operation, a replay, an expired assertion, or an archived identity.<a href="#section-20-6" class="pilcrow">¶</a></p>
+<p id="section-20-7">Grant issues session credentials that may be bearer credentials depending on the concrete session-credential document. Services and Agents <span class="bcp14">MUST</span> treat returned credentials as secrets. Concrete session-credential documents <span class="bcp14">MUST</span> define credential lifetime, presentation, storage guidance, and revocation semantics. Revoke <span class="bcp14">MUST</span> be available for every advertised grant type.<a href="#section-20-7" class="pilcrow">¶</a></p>
+<p id="section-20-8">If a session credential is stolen, an attacker may impersonate the Agent until the credential expires or is revoked. Agents that suspect compromise can authenticate with the baseline client assertion and invoke Revoke for the affected grant type.<a href="#section-20-8" class="pilcrow">¶</a></p>
+<p id="section-20-9">Services <span class="bcp14">SHOULD</span> rate-limit Inspect, Enroll, Grant, Revoke, and Status to reduce probing and credential-issuance abuse. Rate limits <span class="bcp14">MUST NOT</span> create distinguishable recognition errors that defeat the anti-enumeration rules above.<a href="#section-20-9" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="privacy-considerations">
+<section id="section-21">
+      <h2 id="name-privacy-considerations">
+<a href="#section-21" class="section-number selfRef">21. </a><a href="#name-privacy-considerations" class="section-name selfRef">Privacy Considerations</a>
+      </h2>
+<p id="section-21-1">AEP exposes Agent identity and claims to Services. Agents and Services should minimize disclosure by using the Inspect document as the negotiation surface: Services list required, preferred, and optional claims; Agents provide the minimum set needed for the intended interaction.<a href="#section-21-1" class="pilcrow">¶</a></p>
+<p id="section-21-2">Services <span class="bcp14">SHOULD</span> keep <code>claims.required</code> limited to data required for enrollment or legal operation. Over-declaring required claims increases privacy risk and reduces interoperability.<a href="#section-21-2" class="pilcrow">¶</a></p>
+<p id="section-21-3">Agents <span class="bcp14">SHOULD</span> avoid sending claims absent from <code>claims.required</code>, <code>claims.preferred</code>, or <code>claims.optional</code>. Services <span class="bcp14">MUST</span> ignore unknown claims unless local policy requires rejection.<a href="#section-21-3" class="pilcrow">¶</a></p>
+<p id="section-21-4">A <code>did:web</code> Agent identity can be correlatable if the same DID is reused across Services. Platforms or Agent operators that require unlinkability <span class="bcp14">SHOULD</span> use a distinct <code>did:web</code> URI and signing key per Service enrollment. The URI path component <span class="bcp14">SHOULD</span> be opaque and <span class="bcp14">SHOULD NOT</span> reveal the Agent's master identity, account identifier, or target Service.<a href="#section-21-4" class="pilcrow">¶</a></p>
+<p id="section-21-5">Services <span class="bcp14">SHOULD</span> maintain a Service-local pairwise identifier for enrolled Agents rather than using the Agent DID as the primary internal record key across all contexts. Such identifiers <span class="bcp14">SHOULD</span> be opaque and <span class="bcp14">MUST NOT</span> be disclosed as cross-Service correlators.<a href="#section-21-5" class="pilcrow">¶</a></p>
+<p id="section-21-6">Platform-hosted Agent identities introduce Platform-level visibility: the Platform can observe or reconstruct which Services an Agent enrolls with. This document does not prevent that visibility. Agents with stronger privacy requirements should account for the Platform trust relationship before using a Platform-hosted <code>did:web</code> identity.<a href="#section-21-6" class="pilcrow">¶</a></p>
+<p id="section-21-7">Session credentials can become correlation handles when reused outside the issuing Service or logged by intermediaries. Concrete session-credential documents <span class="bcp14">MUST</span> define presentation rules that avoid unnecessary disclosure and <span class="bcp14">MUST</span> prohibit logging raw credential values.<a href="#section-21-7" class="pilcrow">¶</a></p>
+<p id="section-21-8">Inspect documents may disclose Service policy and capability information to unauthenticated readers. Services <span class="bcp14">SHOULD</span> avoid publishing sensitive operational details in Inspect beyond what Agents need for interoperability.<a href="#section-21-8" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="sec-combined-references">
+<section id="section-22">
+      <h2 id="name-references">
+<a href="#section-22" class="section-number selfRef">22. </a><a href="#name-references" class="section-name selfRef">References</a>
+      </h2>
+<div id="sec-normative-references">
+<section id="section-22.1">
+        <h3 id="name-normative-references">
+<a href="#section-22.1" class="section-number selfRef">22.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+        </h3>
+<dl class="references">
+<dt id="DID-WEB">[DID-WEB]</dt>
+        <dd>
+<span class="refAuthor">W3C Credentials Community Group</span>, <span class="refTitle">"The did:web Method Specification"</span>, <span>n.d.</span>, <span>&lt;<a href="https://w3c-ccg.github.io/did-method-web/">https://w3c-ccg.github.io/did-method-web/</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC2119">[RFC2119]</dt>
+        <dd>
+<span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC3339">[RFC3339]</dt>
+        <dd>
+<span class="refAuthor">Klyne, G.</span> and <span class="refAuthor">C. Newman</span>, <span class="refTitle">"Date and Time on the Internet: Timestamps"</span>, <span class="seriesInfo">RFC 3339</span>, <span class="seriesInfo">DOI 10.17487/RFC3339</span>, <time datetime="2002-07" class="refDate">July 2002</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc3339">https://www.rfc-editor.org/rfc/rfc3339</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC5234">[RFC5234]</dt>
+        <dd>
+<span class="refAuthor">Crocker, D., Ed.</span> and <span class="refAuthor">P. Overell</span>, <span class="refTitle">"Augmented BNF for Syntax Specifications: ABNF"</span>, <span class="seriesInfo">STD 68</span>, <span class="seriesInfo">RFC 5234</span>, <span class="seriesInfo">DOI 10.17487/RFC5234</span>, <time datetime="2008-01" class="refDate">January 2008</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc5234">https://www.rfc-editor.org/rfc/rfc5234</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC6839">[RFC6839]</dt>
+        <dd>
+<span class="refAuthor">Hansen, T.</span> and <span class="refAuthor">A. Melnikov</span>, <span class="refTitle">"Additional Media Type Structured Syntax Suffixes"</span>, <span class="seriesInfo">RFC 6839</span>, <span class="seriesInfo">DOI 10.17487/RFC6839</span>, <time datetime="2013-01" class="refDate">January 2013</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc6839">https://www.rfc-editor.org/rfc/rfc6839</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC7515">[RFC7515]</dt>
+        <dd>
+<span class="refAuthor">Jones, M.</span>, <span class="refAuthor">Bradley, J.</span>, and <span class="refAuthor">N. Sakimura</span>, <span class="refTitle">"JSON Web Signature (JWS)"</span>, <span class="seriesInfo">RFC 7515</span>, <span class="seriesInfo">DOI 10.17487/RFC7515</span>, <time datetime="2015-05" class="refDate">May 2015</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7515">https://www.rfc-editor.org/rfc/rfc7515</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC7518">[RFC7518]</dt>
+        <dd>
+<span class="refAuthor">Jones, M.</span>, <span class="refTitle">"JSON Web Algorithms (JWA)"</span>, <span class="seriesInfo">RFC 7518</span>, <span class="seriesInfo">DOI 10.17487/RFC7518</span>, <time datetime="2015-05" class="refDate">May 2015</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7518">https://www.rfc-editor.org/rfc/rfc7518</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC7519">[RFC7519]</dt>
+        <dd>
+<span class="refAuthor">Jones, M.</span>, <span class="refAuthor">Bradley, J.</span>, and <span class="refAuthor">N. Sakimura</span>, <span class="refTitle">"JSON Web Token (JWT)"</span>, <span class="seriesInfo">RFC 7519</span>, <span class="seriesInfo">DOI 10.17487/RFC7519</span>, <time datetime="2015-05" class="refDate">May 2015</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7519">https://www.rfc-editor.org/rfc/rfc7519</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8037">[RFC8037]</dt>
+        <dd>
+<span class="refAuthor">Liusvaara, I.</span>, <span class="refTitle">"CFRG Elliptic Curve Diffie-Hellman (ECDH) and Signatures in JSON Object Signing and Encryption (JOSE)"</span>, <span class="seriesInfo">RFC 8037</span>, <span class="seriesInfo">DOI 10.17487/RFC8037</span>, <time datetime="2017-01" class="refDate">January 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8037">https://www.rfc-editor.org/rfc/rfc8037</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8174">[RFC8174]</dt>
+        <dd>
+<span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8174">https://www.rfc-editor.org/rfc/rfc8174</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8259">[RFC8259]</dt>
+        <dd>
+<span class="refAuthor">Bray, T., Ed.</span>, <span class="refTitle">"The JavaScript Object Notation (JSON) Data Interchange Format"</span>, <span class="seriesInfo">STD 90</span>, <span class="seriesInfo">RFC 8259</span>, <span class="seriesInfo">DOI 10.17487/RFC8259</span>, <time datetime="2017-12" class="refDate">December 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8259">https://www.rfc-editor.org/rfc/rfc8259</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8446">[RFC8446]</dt>
+        <dd>
+<span class="refAuthor">Rescorla, E.</span>, <span class="refTitle">"The Transport Layer Security (TLS) Protocol Version 1.3"</span>, <span class="seriesInfo">RFC 8446</span>, <span class="seriesInfo">DOI 10.17487/RFC8446</span>, <time datetime="2018-08" class="refDate">August 2018</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8446">https://www.rfc-editor.org/rfc/rfc8446</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8615">[RFC8615]</dt>
+        <dd>
+<span class="refAuthor">Nottingham, M.</span>, <span class="refTitle">"Well-Known Uniform Resource Identifiers (URIs)"</span>, <span class="seriesInfo">RFC 8615</span>, <span class="seriesInfo">DOI 10.17487/RFC8615</span>, <time datetime="2019-05" class="refDate">May 2019</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8615">https://www.rfc-editor.org/rfc/rfc8615</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9110">[RFC9110]</dt>
+        <dd>
+<span class="refAuthor">Fielding, R., Ed.</span>, <span class="refAuthor">Nottingham, M., Ed.</span>, and <span class="refAuthor">J. Reschke, Ed.</span>, <span class="refTitle">"HTTP Semantics"</span>, <span class="seriesInfo">STD 97</span>, <span class="seriesInfo">RFC 9110</span>, <span class="seriesInfo">DOI 10.17487/RFC9110</span>, <time datetime="2022-06" class="refDate">June 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9110">https://www.rfc-editor.org/rfc/rfc9110</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9112">[RFC9112]</dt>
+        <dd>
+<span class="refAuthor">Fielding, R., Ed.</span>, <span class="refAuthor">Nottingham, M., Ed.</span>, and <span class="refAuthor">J. Reschke, Ed.</span>, <span class="refTitle">"HTTP/1.1"</span>, <span class="seriesInfo">STD 99</span>, <span class="seriesInfo">RFC 9112</span>, <span class="seriesInfo">DOI 10.17487/RFC9112</span>, <time datetime="2022-06" class="refDate">June 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9112">https://www.rfc-editor.org/rfc/rfc9112</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9113">[RFC9113]</dt>
+        <dd>
+<span class="refAuthor">Thomson, M., Ed.</span> and <span class="refAuthor">C. Benfield, Ed.</span>, <span class="refTitle">"HTTP/2"</span>, <span class="seriesInfo">RFC 9113</span>, <span class="seriesInfo">DOI 10.17487/RFC9113</span>, <time datetime="2022-06" class="refDate">June 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9113">https://www.rfc-editor.org/rfc/rfc9113</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9114">[RFC9114]</dt>
+        <dd>
+<span class="refAuthor">Bishop, M., Ed.</span>, <span class="refTitle">"HTTP/3"</span>, <span class="seriesInfo">RFC 9114</span>, <span class="seriesInfo">DOI 10.17487/RFC9114</span>, <time datetime="2022-06" class="refDate">June 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9114">https://www.rfc-editor.org/rfc/rfc9114</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9457">[RFC9457]</dt>
+      <dd>
+<span class="refAuthor">Nottingham, M.</span>, <span class="refAuthor">Wilde, E.</span>, and <span class="refAuthor">S. Dalal</span>, <span class="refTitle">"Problem Details for HTTP APIs"</span>, <span class="seriesInfo">RFC 9457</span>, <span class="seriesInfo">DOI 10.17487/RFC9457</span>, <time datetime="2023-07" class="refDate">July 2023</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9457">https://www.rfc-editor.org/rfc/rfc9457</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</div>
+<div id="sec-informative-references">
+<section id="section-22.2">
+        <h3 id="name-informative-references">
+<a href="#section-22.2" class="section-number selfRef">22.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+        </h3>
+<dl class="references">
+<dt id="RFC8126">[RFC8126]</dt>
+        <dd>
+<span class="refAuthor">Cotton, M.</span>, <span class="refAuthor">Leiba, B.</span>, and <span class="refAuthor">T. Narten</span>, <span class="refTitle">"Guidelines for Writing an IANA Considerations Section in RFCs"</span>, <span class="seriesInfo">BCP 26</span>, <span class="seriesInfo">RFC 8126</span>, <span class="seriesInfo">DOI 10.17487/RFC8126</span>, <time datetime="2017-06" class="refDate">June 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8126">https://www.rfc-editor.org/rfc/rfc8126</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8725">[RFC8725]</dt>
+      <dd>
+<span class="refAuthor">Sheffer, Y.</span>, <span class="refAuthor">Hardt, D.</span>, and <span class="refAuthor">M. Jones</span>, <span class="refTitle">"JSON Web Token Best Current Practices"</span>, <span class="seriesInfo">BCP 225</span>, <span class="seriesInfo">RFC 8725</span>, <span class="seriesInfo">DOI 10.17487/RFC8725</span>, <time datetime="2020-02" class="refDate">February 2020</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8725">https://www.rfc-editor.org/rfc/rfc8725</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</div>
+</section>
+</div>
+<div id="authors-addresses">
+<section id="appendix-A">
+      <h2 id="name-authors-address">
+<a href="#name-authors-address" class="section-name selfRef">Author's Address</a>
+      </h2>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">N. Kavian</span></div>
+<div dir="auto" class="left"><span class="org">Jarwin, Inc. (InFlow)</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:nas@inflowpay.ai" class="email">nas@inflowpay.ai</a>
+</div>
+</address>
+</section>
+</div>
+<script>const toc = document.getElementById("toc");
+toc.querySelector("h2").addEventListener("click", e => {
+  toc.classList.toggle("active");
+});
+toc.querySelector("nav").addEventListener("click", e => {
+  toc.classList.remove("active");
+});
+</script>
+</body>
+</html>
