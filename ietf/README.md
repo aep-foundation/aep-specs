@@ -25,6 +25,7 @@ ietf/
   examples/
   governance/
   guides/
+  registry/
   schemas/
   test-vectors/
 ```
@@ -66,7 +67,8 @@ The first Internet-Draft set intentionally limits the baseline identity method t
 
 Repository-level governance lives in `../GOVERNANCE.md`. IETF-specific support
 governance, including extension registration guidance before formal IANA
-registries exist, lives in `governance/`.
+registries exist, lives in `governance/`. Repository-local machine-readable
+registry entries live in `registry/`.
 
 ## Conformance And Test Vectors
 

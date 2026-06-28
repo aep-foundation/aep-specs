@@ -25,6 +25,7 @@ MARKDOWN_TABLE_FILES ?= \
 	governance/extension-registration.md \
 	guides/README.md \
 	guides/implementer-guide.md \
+	registry/README.md \
 	schemas/README.md \
 	test-vectors/README.md \
 	templates/README.md \
@@ -33,9 +34,9 @@ MARKDOWN_TABLE_FILES ?= \
 	$(DRAFTS) \
 	$(EXAMPLES)
 
-.PHONY: check lint check-drafts check-external-section-refs check-vectors check-schemas check-published-schemas check-harness format render render-drafts render-examples render-schemas render-index idnits clean
+.PHONY: check lint check-drafts check-external-section-refs check-vectors check-schemas check-published-schemas check-harness check-registry format render render-drafts render-examples render-schemas render-index idnits clean
 
-check: lint check-vectors check-schemas check-published-schemas check-harness
+check: lint check-vectors check-schemas check-published-schemas check-harness check-registry
 
 lint: check-drafts check-external-section-refs
 
@@ -56,6 +57,9 @@ check-published-schemas:
 
 check-harness:
 	@bundle exec ruby scripts/check_conformance_harness.rb
+
+check-registry:
+	@bundle exec ruby scripts/check_registry.rb
 
 format:
 	@bundle exec ruby scripts/format_markdown_tables.rb $(MARKDOWN_TABLE_FILES)

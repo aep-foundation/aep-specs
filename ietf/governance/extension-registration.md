@@ -80,3 +80,10 @@ Until formal IANA registries exist, repository review should treat the published
 drafts and this guidance as the temporary registration process. Once IANA
 registries are created, the IANA registry contents and designated expert review
 process supersede this temporary repository guidance.
+
+Repository-local registry entries live in `ietf/registry/`. They are validated
+by:
+
+```sh
+make -C ietf check-registry
+```
