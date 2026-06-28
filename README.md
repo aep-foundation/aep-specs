@@ -1,5 +1,10 @@
 # Agent Enrollment Protocol Specifications
 
+[![CI](https://github.com/aep-foundation/aep-specs/actions/workflows/ci.yml/badge.svg)](https://github.com/aep-foundation/aep-specs/actions/workflows/ci.yml)
+[![Deploy](https://github.com/aep-foundation/aep-specs/actions/workflows/deploy.yml/badge.svg)](https://github.com/aep-foundation/aep-specs/actions/workflows/deploy.yml)
+[![IETF Draft](https://img.shields.io/badge/IETF-draft--kavian--agent--enrollment--protocol-blue)](https://datatracker.ietf.org/doc/draft-kavian-agent-enrollment-protocol/)
+[![License](https://img.shields.io/badge/license-CC0%20%2B%20Apache--2.0%2FMIT-blue)](LICENSE.md)
+
 This repository contains Internet-Draft sources and rendered specifications for
 the Agent Enrollment Protocol (AEP).
 
@@ -17,7 +22,7 @@ status.
 ```text
 aep-specs/
   docs/              # GitHub Pages site
-  docs/artifacts/    # Rendered XML, text, and HTML specifications
+  artifacts/         # Local generated spec artifacts, ignored by git
   ietf/              # Internet-Draft sources and rendering tooling
 ```
 
@@ -44,10 +49,18 @@ The core document is independently implementable. Services that support Grant
 and Revoke advertise one or more concrete grant types from companion
 session-credential specifications.
 
-Rendered specification artifacts are published under:
+Rendered specification artifacts are published as release assets:
 
 ```text
-docs/artifacts/
+https://github.com/aep-foundation/aep-specs/releases/latest
+```
+
+Conformance support files are maintained under:
+
+```text
+ietf/conformance/
+ietf/schemas/
+ietf/test-vectors/
 ```
 
 Official Internet-Draft records are published by the IETF Datatracker.
@@ -60,6 +73,12 @@ Check document structure:
 make -C ietf check
 ```
 
+Validate JSON Schemas against mapped test vectors:
+
+```sh
+make -C ietf check-schemas
+```
+
 Format Markdown tables in the Internet-Draft sources and supporting Markdown
 files:
 
@@ -67,13 +86,16 @@ files:
 make -C ietf format
 ```
 
-Render XML, text, and HTML artifacts:
+Render XML, text, HTML, and PDF artifacts:
 
 ```sh
 make -C ietf render
 ```
 
-Rendered artifacts are written directly to `docs/artifacts/`.
+Rendered artifacts are written to the ignored root-level `artifacts/`
+directory. The `latest` GitHub Release publishes the rendered specification
+artifacts for stable linking without committing generated binaries. The render
+target also updates `docs/index.html` from draft front matter.
 
 Run `idnits` against the rendered text artifacts:
 

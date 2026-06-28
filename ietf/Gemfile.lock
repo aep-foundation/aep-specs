@@ -35,7 +35,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  kramdown-rfc2629
+  kramdown-rfc2629 (= 1.7.39)
 
 BUNDLED WITH
    2.6.9

@@ -1,1 +1,1 @@
-xml2rfc>=3.20
+xml2rfc[pdf]==3.34.0
