@@ -47,6 +47,18 @@ Vectors are deterministic fixtures. They do not certify an implementation by
 themselves; they provide the inputs and expected outputs that a future harness
 can execute against Agent and Service implementations.
 
+Run the offline fixture harness with:
+
+```sh
+make -C ietf check-harness
+```
+
+The harness validates semantic relationships encoded in the fixtures, including
+endpoint construction from Inspect, media types, authentication scheme
+selection, client assertion operation binding, idempotency conflict behavior,
+and credential-profile consistency. It does not contact a live Agent or
+Service.
+
 ## Initial Harness Boundary
 
 The first harness should remain black-box and role-oriented:
