@@ -60,6 +60,7 @@ Conformance support files are maintained under:
 
 ```text
 ietf/conformance/
+ietf/governance/
 ietf/guides/
 ietf/schemas/
 ietf/test-vectors/
@@ -120,8 +121,9 @@ make -C ietf idnits
 
 ## Contributing
 
-See `CONTRIBUTING.md` for contribution guidelines and `ietf/STYLE.md` for
-Internet-Draft writing conventions.
+See `CONTRIBUTING.md` for contribution guidelines, `GOVERNANCE.md` for
+project governance, and `ietf/STYLE.md` for Internet-Draft writing
+conventions.
 
 ## License
 
