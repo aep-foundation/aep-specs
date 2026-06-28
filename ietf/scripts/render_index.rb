@@ -317,7 +317,7 @@ html = <<~HTML
               <td data-label="Description">Validation schemas for stable wire objects used by the current test vectors.</td>
               <td data-label="Source">
                 <span class="links">
-                  <a href="#{REPO_BASE}/tree/main/ietf/schemas">JSON</a>
+                  <a href="schemas/">JSON</a>
                   <a href="#{REPO_BASE}/blob/main/ietf/schemas/README.md">Markdown</a>
                 </span>
               </td>

@@ -9,21 +9,23 @@ ROOT = Pathname.new(__dir__).join("..").expand_path
 SCHEMA_ROOT = ROOT.join("schemas")
 VECTOR_ROOT = ROOT.join("test-vectors")
 
-SCHEMA_TARGETS = {
-  "inspect/minimal-http.json" => ["inspect-document.schema.json", %w[expected]],
-  "enroll/request-minimal.json" => ["enroll-request.schema.json", %w[input]],
-  "enroll/response-active.json" => ["enroll-response.schema.json", %w[expected body]],
-  "status/response-active.json" => ["status-response.schema.json", %w[expected body]],
-  "grant-revoke/grant-request-oauth-bearer.json" => ["grant-request.schema.json", %w[expected body]],
-  "grant-revoke/revoke-request-oauth-bearer.json" => ["revoke-request.schema.json", %w[expected body]],
-  "grant-revoke/revoke-request-all-grant-types.json" => ["revoke-request.schema.json", %w[expected body]],
-  "grant-revoke/revoke-response-empty.json" => ["revoke-response.schema.json", %w[expected body]],
-  "errors/not-recognized-problem.json" => ["problem.schema.json", %w[expected body]],
-  "idempotency/enroll-conflict.json" => ["problem.schema.json", %w[expected body]],
-  "credentials/oauth-bearer/grant-response.json" => ["oauth-bearer-grant-response.schema.json", %w[expected]],
-  "credentials/api-key/grant-response.json" => ["api-key-grant-response.schema.json", %w[expected]],
-  "credentials/basic/grant-response.json" => ["basic-grant-response.schema.json", %w[expected]]
-}.freeze
+SCHEMA_TARGETS = [
+  ["client-assertion/enroll-claims.json", "client-assertion-claims.schema.json", %w[expected]],
+  ["inspect/minimal-http.json", "inspect-document.schema.json", %w[expected]],
+  ["enroll/request-minimal.json", "enroll-request.schema.json", %w[input]],
+  ["enroll/response-active.json", "enroll-response.schema.json", %w[expected body]],
+  ["status/response-active.json", "status-response.schema.json", %w[expected body]],
+  ["grant-revoke/grant-request-oauth-bearer.json", "grant-request.schema.json", %w[expected body]],
+  ["grant-revoke/revoke-request-oauth-bearer.json", "revoke-request.schema.json", %w[expected body]],
+  ["grant-revoke/revoke-request-all-grant-types.json", "revoke-request.schema.json", %w[expected body]],
+  ["grant-revoke/revoke-response-empty.json", "revoke-response.schema.json", %w[expected body]],
+  ["errors/not-recognized-problem.json", "problem.schema.json", %w[expected body]],
+  ["idempotency/enroll-conflict.json", "idempotency-metadata.schema.json", %w[input]],
+  ["idempotency/enroll-conflict.json", "problem.schema.json", %w[expected body]],
+  ["credentials/oauth-bearer/grant-response.json", "oauth-bearer-grant-response.schema.json", %w[expected]],
+  ["credentials/api-key/grant-response.json", "api-key-grant-response.schema.json", %w[expected]],
+  ["credentials/basic/grant-response.json", "basic-grant-response.schema.json", %w[expected]]
+].freeze
 
 def load_json(path)
   JSON.parse(Pathname.new(path).read)
@@ -129,7 +131,7 @@ rescue StandardError => e
   errors << e.message
 end
 
-SCHEMA_TARGETS.each do |relative_path, (schema_name, data_path)|
+SCHEMA_TARGETS.each do |relative_path, schema_name, data_path|
   vector_path = VECTOR_ROOT.join(relative_path)
   schema_path = SCHEMA_ROOT.join(schema_name)
 

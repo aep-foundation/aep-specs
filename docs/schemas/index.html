@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AEP JSON Schemas</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #f8fafc;
+        --fg: #172033;
+        --muted: #5b6475;
+        --panel: #ffffff;
+        --border: #d7dce5;
+        --link: #0b5cad;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #10141c;
+          --fg: #eef2f8;
+          --muted: #aeb7c8;
+          --panel: #171d28;
+          --border: #2d3545;
+          --link: #8ab8ff;
+        }
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--fg);
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        line-height: 1.5;
+      }
+
+      main {
+        width: min(920px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 48px 0;
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: clamp(2rem, 6vw, 3.2rem);
+        line-height: 1.05;
+      }
+
+      p {
+        max-width: 760px;
+        color: var(--muted);
+      }
+
+      a {
+        color: var(--link);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+
+      th,
+      td {
+        padding: 12px;
+        border-bottom: 1px solid var(--border);
+        text-align: left;
+        vertical-align: top;
+      }
+
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      th {
+        font-size: 0.9rem;
+        color: var(--muted);
+      }
+
+      code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>AEP JSON Schemas</h1>
+      <p>
+        JSON Schemas for stable Agent Enrollment Protocol wire objects.
+        The Internet-Draft prose remains authoritative.
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Schema</th>
+            <th>Title</th>
+          </tr>
+        </thead>
+        <tbody>
+<tr>
+  <td><a href="api-key-grant-response.schema.json"><code>api-key-grant-response.schema.json</code></a></td>
+  <td>AEP API-key Grant Response</td>
+</tr>
+<tr>
+  <td><a href="basic-grant-response.schema.json"><code>basic-grant-response.schema.json</code></a></td>
+  <td>AEP Basic Grant Response</td>
+</tr>
+<tr>
+  <td><a href="client-assertion-claims.schema.json"><code>client-assertion-claims.schema.json</code></a></td>
+  <td>AEP Client Assertion Claims</td>
+</tr>
+<tr>
+  <td><a href="enroll-request.schema.json"><code>enroll-request.schema.json</code></a></td>
+  <td>AEP Enroll Request</td>
+</tr>
+<tr>
+  <td><a href="enroll-response.schema.json"><code>enroll-response.schema.json</code></a></td>
+  <td>AEP Enroll Response</td>
+</tr>
+<tr>
+  <td><a href="grant-request.schema.json"><code>grant-request.schema.json</code></a></td>
+  <td>AEP Grant Request</td>
+</tr>
+<tr>
+  <td><a href="idempotency-metadata.schema.json"><code>idempotency-metadata.schema.json</code></a></td>
+  <td>AEP Idempotency Metadata</td>
+</tr>
+<tr>
+  <td><a href="inspect-document.schema.json"><code>inspect-document.schema.json</code></a></td>
+  <td>AEP Inspect Document</td>
+</tr>
+<tr>
+  <td><a href="oauth-bearer-grant-response.schema.json"><code>oauth-bearer-grant-response.schema.json</code></a></td>
+  <td>AEP OAuth Bearer Grant Response</td>
+</tr>
+<tr>
+  <td><a href="problem.schema.json"><code>problem.schema.json</code></a></td>
+  <td>AEP Problem Details</td>
+</tr>
+<tr>
+  <td><a href="revoke-request.schema.json"><code>revoke-request.schema.json</code></a></td>
+  <td>AEP Revoke Request</td>
+</tr>
+<tr>
+  <td><a href="revoke-response.schema.json"><code>revoke-response.schema.json</code></a></td>
+  <td>AEP Revoke Response</td>
+</tr>
+<tr>
+  <td><a href="status-response.schema.json"><code>status-response.schema.json</code></a></td>
+  <td>AEP Status Response</td>
+</tr>
+
+        </tbody>
+      </table>
+    </main>
+  </body>
+</html>

@@ -4,6 +4,7 @@ EXAMPLES := \
 	examples/enroll-grant-revoke-transcript.md
 ARTIFACTS := ../artifacts
 EXAMPLE_ARTIFACTS := ../docs/examples
+SCHEMA_ARTIFACTS := ../docs/schemas
 INDEX_ARTIFACT := ../docs/index.html
 KRAMDOWN_RFC := bundle exec kramdown-rfc
 XML2RFC := .venv/bin/xml2rfc
@@ -23,9 +24,9 @@ MARKDOWN_TABLE_FILES ?= \
 	$(DRAFTS) \
 	$(EXAMPLES)
 
-.PHONY: check lint check-drafts check-external-section-refs check-vectors check-schemas format render render-drafts render-examples render-index idnits clean
+.PHONY: check lint check-drafts check-external-section-refs check-vectors check-schemas check-published-schemas format render render-drafts render-examples render-schemas render-index idnits clean
 
-check: lint check-vectors check-schemas
+check: lint check-vectors check-schemas check-published-schemas
 
 lint: check-drafts check-external-section-refs
 
@@ -41,10 +42,13 @@ check-vectors:
 check-schemas:
 	@bundle exec ruby scripts/check_schemas.rb
 
+check-published-schemas:
+	@bundle exec ruby scripts/publish_schemas.rb --check schemas "$(SCHEMA_ARTIFACTS)"
+
 format:
 	@bundle exec ruby scripts/format_markdown_tables.rb $(MARKDOWN_TABLE_FILES)
 
-render: render-drafts render-examples render-index
+render: render-drafts render-examples render-schemas render-index
 
 render-drafts:
 	@$(KRAMDOWN_RFC) --version >/dev/null || { echo "kramdown-rfc is required for render; run bundle install"; exit 1; }
@@ -62,6 +66,9 @@ render-examples:
 		name=$$(basename "$$example" .md); \
 		bundle exec ruby scripts/render_example.rb "$$example" "$(EXAMPLE_ARTIFACTS)/$$name.html"; \
 	done
+
+render-schemas:
+	@bundle exec ruby scripts/publish_schemas.rb schemas "$(SCHEMA_ARTIFACTS)"
 
 render-index:
 	@bundle exec ruby scripts/render_index.rb $(DRAFTS) "$(INDEX_ARTIFACT)"
