@@ -60,6 +60,7 @@ Conformance support files are maintained under:
 
 ```text
 ietf/conformance/
+ietf/guides/
 ietf/schemas/
 ietf/test-vectors/
 ```

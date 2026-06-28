@@ -23,6 +23,7 @@ ietf/
     extensions/
     transports/
   examples/
+  guides/
   schemas/
   test-vectors/
 ```
@@ -71,6 +72,12 @@ additional DID methods, Platform conformance, or deferred extensions.
 JSON Schemas validate stable wire objects used by the current test vectors.
 They are support artifacts derived from the Internet-Draft prose, not a
 replacement for the specifications.
+
+## Implementation Guidance
+
+The `guides/` directory contains non-normative implementation guidance. These
+documents help implementers connect the drafts, examples, vectors, schemas, and
+conformance harness without adding guidance text to the Internet-Draft sources.
 
 ## Rendering
 

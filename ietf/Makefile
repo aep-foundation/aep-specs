@@ -20,6 +20,8 @@ MARKDOWN_TABLE_FILES ?= \
 	STYLE.md \
 	specs/README.md \
 	conformance/README.md \
+	guides/README.md \
+	guides/implementer-guide.md \
 	schemas/README.md \
 	test-vectors/README.md \
 	templates/README.md \

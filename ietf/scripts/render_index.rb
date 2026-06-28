@@ -325,6 +325,28 @@ html = <<~HTML
           </tbody>
         </table>
 
+        <h2>Guides</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Guide</th>
+              <th>Description</th>
+              <th>Source</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="draft-id" data-label="Guide">Implementer guide</td>
+              <td data-label="Description">Non-normative guidance for command sequencing, idempotency, client assertions, credential choice, and revocation strategy.</td>
+              <td data-label="Source">
+                <span class="links">
+                  <a href="#{REPO_BASE}/blob/main/ietf/guides/implementer-guide.md">Markdown</a>
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
         <h2>Examples</h2>
         <table>
           <thead>
