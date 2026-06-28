@@ -85,7 +85,7 @@ Do not add a hand-written `# References` section.
 Define terms on first use and use them consistently:
 
 | Term               | Meaning                                                              |
-|--------------------|----------------------------------------------------------------------|
+| ------------------ | -------------------------------------------------------------------- |
 | Agent              | Autonomous software that initiates AEP requests.                     |
 | Service            | HTTP server that receives AEP requests.                              |
 | Inspect document   | JSON discovery document at `/.well-known/aep`.                       |

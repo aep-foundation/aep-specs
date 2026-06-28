@@ -12,10 +12,22 @@ KRAMDOWN_RFC := bundle exec kramdown-rfc
 XML2RFC := .venv/bin/xml2rfc
 XML2RFC_CACHE := .cache/xml2rfc
 IDNITS := idnits
+MARKDOWN_TABLE_FILES ?= \
+	../README.md \
+	README.md \
+	STYLE.md \
+	specs/README.md \
+	conformance/README.md \
+	test-vectors/README.md \
+	templates/README.md \
+	templates/core-template.md \
+	templates/extension-template.md \
+	$(DRAFTS) \
+	$(EXAMPLES)
 
-.PHONY: check lint render render-drafts render-examples idnits clean
+.PHONY: check lint check-vectors format render render-drafts render-examples idnits clean
 
-check: lint
+check: lint check-vectors
 
 lint:
 	@for draft in $(DRAFTS); do \
@@ -32,6 +44,12 @@ lint:
 		! grep -q 'Add normative and informative references' "$$draft"; \
 	done
 	@grep -q '^  DID-WEB:$$' "specs/core/draft-kavian-agent-enrollment-protocol-00.md"
+
+check-vectors:
+	@bundle exec ruby scripts/check_test_vectors.rb
+
+format:
+	@bundle exec ruby scripts/format_markdown_tables.rb $(MARKDOWN_TABLE_FILES)
 
 render: render-drafts render-examples
 

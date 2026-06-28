@@ -60,6 +60,13 @@ Check document structure:
 make -C ietf check
 ```
 
+Format Markdown tables in the Internet-Draft sources and supporting Markdown
+files:
+
+```sh
+make -C ietf format
+```
+
 Render XML, text, and HTML artifacts:
 
 ```sh
@@ -67,6 +74,12 @@ make -C ietf render
 ```
 
 Rendered artifacts are written directly to `docs/artifacts/`.
+
+Run `idnits` against the rendered text artifacts:
+
+```sh
+make -C ietf idnits
+```
 
 ## Contributing
 

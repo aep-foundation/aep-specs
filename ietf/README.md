@@ -17,11 +17,13 @@ The existing repository-level `specs/` directory contains the broader design cor
 ```text
 ietf/
   README.md
+  conformance/
   specs/
     core/
     extensions/
     transports/
   examples/
+  test-vectors/
 ```
 
 Rendered XML, text, and HTML outputs are published from `../docs/artifacts/`.
@@ -55,6 +57,14 @@ The three session-credential documents define the initial concrete Grant/Revoke 
 The core document is independently implementable. The session-credential documents depend on the core document, but the core document does not depend on any specific session-credential document. A Service that does not issue session credentials can implement Inspect, Enroll, and Status without implementing Grant or Revoke. A Service that supports Grant and Revoke advertises one or more concrete grant types defined by companion session-credential specifications.
 
 The first Internet-Draft set intentionally limits the baseline identity method to `did:web`.
+
+## Conformance And Test Vectors
+
+The `conformance/` and `test-vectors/` directories define the initial
+implementation-checking surface for the published draft set. They are scoped to
+the current core HTTP draft and the three published session-credential drafts.
+They do not include later lifecycle commands, additional DID methods, Platform
+conformance, or deferred extensions.
 
 ## Rendering
 
