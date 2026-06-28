@@ -22,7 +22,7 @@ Before submitting a pull request:
    make -C ietf render
    ```
 
-3. Confirm rendered specification links under `docs/artifacts/` are current.
+3. Confirm rendered specification links point to the latest release assets.
 4. Avoid hardcoded external section references unless no practical alternative
    exists.
 5. Confirm no internal roadmap, private partner context, or speculative launch
@@ -75,5 +75,6 @@ make -C ietf check
 make -C ietf render
 ```
 
-Rendered XML, text, and HTML artifacts are written to `docs/artifacts/` for
-GitHub Pages publication.
+Rendered XML, text, HTML, and PDF artifacts are written to the ignored
+root-level `artifacts/` directory. The deploy workflow publishes those files as
+GitHub Release assets for the website to link.

@@ -1,20 +1,26 @@
-name: CI
+name: Deploy
 
 on:
-  pull_request:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
+  pages: write
+  id-token: write
 
 concurrency:
-  group: ci-${{ github.event.number || github.run_id }}
+  group: deploy
   cancel-in-progress: true
 
 jobs:
-  specs:
-    name: Specs
+  build-release-deploy:
+    name: Build, Release, Deploy
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
 
@@ -54,5 +60,25 @@ jobs:
       - name: Render release artifacts
         run: make -C ietf render
 
-      - name: Check committed generated site files
-        run: git diff --exit-code -- docs/index.html docs/examples
+      - name: Publish latest release artifacts
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release delete latest --yes --cleanup-tag 2>/dev/null || true
+          gh release create latest artifacts/draft-*.html artifacts/draft-*.txt artifacts/draft-*.xml artifacts/draft-*.pdf \
+            --title "Latest AEP specification artifacts" \
+            --notes "Auto-published AEP specification artifacts from commit ${{ github.sha }}." \
+            --latest
+
+      - name: Prepare GitHub Pages
+        run: |
+          mkdir -p _site
+          cp -R docs/. _site/
+          rm -rf _site/artifacts
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

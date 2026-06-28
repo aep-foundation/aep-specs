@@ -1,13 +1,10 @@
-DRAFTS := \
-	specs/core/draft-kavian-agent-enrollment-protocol-00.md \
-	specs/extensions/draft-kavian-aep-oauth-session-credential-00.md \
-	specs/extensions/draft-kavian-aep-api-key-session-credential-00.md \
-	specs/extensions/draft-kavian-aep-basic-session-credential-00.md
+DRAFTS := $(shell find specs -name 'draft-*.md' -type f | sort)
 EXAMPLES := \
 	examples/inspect-document.md \
 	examples/enroll-grant-revoke-transcript.md
-ARTIFACTS := ../docs/artifacts
+ARTIFACTS := ../artifacts
 EXAMPLE_ARTIFACTS := ../docs/examples
+INDEX_ARTIFACT := ../docs/index.html
 KRAMDOWN_RFC := bundle exec kramdown-rfc
 XML2RFC := .venv/bin/xml2rfc
 XML2RFC_CACHE := .cache/xml2rfc
@@ -18,6 +15,7 @@ MARKDOWN_TABLE_FILES ?= \
 	STYLE.md \
 	specs/README.md \
 	conformance/README.md \
+	schemas/README.md \
 	test-vectors/README.md \
 	templates/README.md \
 	templates/core-template.md \
@@ -25,33 +23,28 @@ MARKDOWN_TABLE_FILES ?= \
 	$(DRAFTS) \
 	$(EXAMPLES)
 
-.PHONY: check lint check-vectors format render render-drafts render-examples idnits clean
+.PHONY: check lint check-drafts check-external-section-refs check-vectors check-schemas format render render-drafts render-examples render-index idnits clean
 
-check: lint check-vectors
+check: lint check-vectors check-schemas
 
-lint:
-	@for draft in $(DRAFTS); do \
-		test -f "$$draft"; \
-		grep -q '^docname: draft-' "$$draft"; \
-		grep -q '^# Introduction$$' "$$draft"; \
-		grep -q '^# IANA Considerations$$' "$$draft"; \
-		grep -q '^# Security Considerations$$' "$$draft"; \
-		grep -q '^# Privacy Considerations$$' "$$draft"; \
-		grep -q '^normative:$$' "$$draft"; \
-		grep -q '^informative:$$' "$$draft"; \
-		grep -q '{{RFC9110}}' "$$draft"; \
-		! grep -q '^# References$$' "$$draft"; \
-		! grep -q 'Add normative and informative references' "$$draft"; \
-	done
-	@grep -q '^  DID-WEB:$$' "specs/core/draft-kavian-agent-enrollment-protocol-00.md"
+lint: check-drafts check-external-section-refs
+
+check-drafts:
+	@bundle exec ruby scripts/check_drafts.rb $(DRAFTS)
+
+check-external-section-refs:
+	@bundle exec ruby scripts/check_external_section_refs.rb $(DRAFTS)
 
 check-vectors:
 	@bundle exec ruby scripts/check_test_vectors.rb
 
+check-schemas:
+	@bundle exec ruby scripts/check_schemas.rb
+
 format:
 	@bundle exec ruby scripts/format_markdown_tables.rb $(MARKDOWN_TABLE_FILES)
 
-render: render-drafts render-examples
+render: render-drafts render-examples render-index
 
 render-drafts:
 	@$(KRAMDOWN_RFC) --version >/dev/null || { echo "kramdown-rfc is required for render; run bundle install"; exit 1; }
@@ -60,7 +53,7 @@ render-drafts:
 	@for draft in $(DRAFTS); do \
 		docname=$$(basename "$$draft" .md); \
 		$(KRAMDOWN_RFC) "$$draft" > "$(ARTIFACTS)/$$docname.xml"; \
-		$(XML2RFC) --cache "$(XML2RFC_CACHE)" --text --html --path "$(ARTIFACTS)" "$(ARTIFACTS)/$$docname.xml"; \
+		$(XML2RFC) --cache "$(XML2RFC_CACHE)" --text --html --pdf --path "$(ARTIFACTS)" "$(ARTIFACTS)/$$docname.xml"; \
 	done
 
 render-examples:
@@ -69,6 +62,9 @@ render-examples:
 		name=$$(basename "$$example" .md); \
 		bundle exec ruby scripts/render_example.rb "$$example" "$(EXAMPLE_ARTIFACTS)/$$name.html"; \
 	done
+
+render-index:
+	@bundle exec ruby scripts/render_index.rb $(DRAFTS) "$(INDEX_ARTIFACT)"
 
 idnits: render-drafts
 	@command -v "$(IDNITS)" >/dev/null || { echo "idnits is required"; exit 1; }
@@ -85,8 +81,5 @@ clean:
 		rm -f "$(ARTIFACTS)/$$docname.xml"; \
 		rm -f "$(ARTIFACTS)/$$docname.txt"; \
 		rm -f "$(ARTIFACTS)/$$docname.html"; \
-	done
-	@for example in $(EXAMPLES); do \
-		name=$$(basename "$$example" .md); \
-		rm -f "$(EXAMPLE_ARTIFACTS)/$$name.html"; \
+		rm -f "$(ARTIFACTS)/$$docname.pdf"; \
 	done

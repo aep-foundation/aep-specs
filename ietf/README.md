@@ -23,10 +23,12 @@ ietf/
     extensions/
     transports/
   examples/
+  schemas/
   test-vectors/
 ```
 
-Rendered XML, text, and HTML outputs are published from `../docs/artifacts/`.
+Rendered XML, text, HTML, and PDF outputs are written to the ignored
+`../artifacts/` directory.
 
 ## Initial Document Set
 
@@ -60,15 +62,19 @@ The first Internet-Draft set intentionally limits the baseline identity method t
 
 ## Conformance And Test Vectors
 
-The `conformance/` and `test-vectors/` directories define the initial
-implementation-checking surface for the published draft set. They are scoped to
-the current core HTTP draft and the three published session-credential drafts.
-They do not include later lifecycle commands, additional DID methods, Platform
-conformance, or deferred extensions.
+The `conformance/`, `test-vectors/`, and `schemas/` directories define the
+initial implementation-checking surface for the published draft set. They are
+scoped to the current core HTTP draft and the three published
+session-credential drafts. They do not include later lifecycle commands,
+additional DID methods, Platform conformance, or deferred extensions.
+
+JSON Schemas validate stable wire objects used by the current test vectors.
+They are support artifacts derived from the Internet-Draft prose, not a
+replacement for the specifications.
 
 ## Rendering
 
-Internet-Draft sources render to XML, text, and HTML artifacts with:
+Internet-Draft sources render to XML, text, HTML, and PDF artifacts with:
 
 ```sh
 bundle config set path vendor/bundle
@@ -78,5 +84,7 @@ python3 -m venv .venv
 make -C . render
 ```
 
-The render target writes artifacts directly to `docs/artifacts/` for GitHub
-Pages publication.
+The render target writes artifacts to `../artifacts/` and regenerates
+`../docs/index.html` from draft front matter. The repository does not commit
+rendered specification artifacts; the deploy workflow publishes them on the
+`latest` GitHub Release.
