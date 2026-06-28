@@ -505,11 +505,12 @@ WWW-Authenticate: AEP reason="not_recognized"
 {
   "code": "not_recognized",
   "status": 401,
-  "type": "https://aep.example/errors/not_recognized"
+  "title": "Not recognized",
+  "type": "urn:aep:error:not_recognized"
 }
 ~~~
 
-The `code` field is the canonical machine-readable AEP error code. `type` SHOULD identify stable documentation for the error class. `title` MAY be omitted from production responses.
+The `code` field is the canonical machine-readable AEP error code. `type` identifies the AEP error class using the form `urn:aep:error:<code>`. `title` MAY be omitted from production responses.
 
 This document defines the following HTTP error codes:
 
