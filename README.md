@@ -22,6 +22,7 @@ status.
 ```text
 aep-specs/
   docs/              # GitHub Pages site
+  docs/schemas/      # Published JSON Schemas
   artifacts/         # Local generated spec artifacts, ignored by git
   ietf/              # Internet-Draft sources and rendering tooling
 ```
@@ -63,6 +64,12 @@ ietf/schemas/
 ietf/test-vectors/
 ```
 
+JSON Schemas are also published at stable `www.aep.foundation` URLs:
+
+```text
+https://www.aep.foundation/schemas/
+```
+
 Official Internet-Draft records are published by the IETF Datatracker.
 
 ## Building
@@ -77,6 +84,12 @@ Validate JSON Schemas against mapped test vectors:
 
 ```sh
 make -C ietf check-schemas
+```
+
+Verify published schema copies match `ietf/schemas/`:
+
+```sh
+make -C ietf check-published-schemas
 ```
 
 Format Markdown tables in the Internet-Draft sources and supporting Markdown
@@ -95,7 +108,8 @@ make -C ietf render
 Rendered artifacts are written to the ignored root-level `artifacts/`
 directory. The `latest` GitHub Release publishes the rendered specification
 artifacts for stable linking without committing generated binaries. The render
-target also updates `docs/index.html` from draft front matter.
+target also updates `docs/index.html` from draft front matter and refreshes
+published JSON Schemas under `docs/schemas/`.
 
 Run `idnits` against the rendered text artifacts:
 

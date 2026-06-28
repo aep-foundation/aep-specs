@@ -12,19 +12,21 @@ should be corrected.
 The initial schema set covers the stable core HTTP objects and the three
 published session-credential Grant responses:
 
-| Schema                                    | Validates                         |
-| ----------------------------------------- | --------------------------------- |
-| `inspect-document.schema.json`            | Inspect document response body    |
-| `enroll-request.schema.json`              | Enroll request body               |
-| `enroll-response.schema.json`             | Enroll response body              |
-| `status-response.schema.json`             | Status response body              |
-| `grant-request.schema.json`               | Grant request body                |
-| `revoke-request.schema.json`              | Revoke request body               |
-| `revoke-response.schema.json`             | Revoke response body              |
-| `problem.schema.json`                     | AEP Problem Details response body |
-| `oauth-bearer-grant-response.schema.json` | OAuth Bearer Grant response body  |
-| `api-key-grant-response.schema.json`      | API-key Grant response body       |
-| `basic-grant-response.schema.json`        | HTTP Basic Grant response body    |
+| Schema                                    | Validates                                 |
+| ----------------------------------------- | ----------------------------------------- |
+| `client-assertion-claims.schema.json`     | Client assertion JWT claim set            |
+| `inspect-document.schema.json`            | Inspect document response body            |
+| `enroll-request.schema.json`              | Enroll request body                       |
+| `enroll-response.schema.json`             | Enroll response body                      |
+| `status-response.schema.json`             | Status response body                      |
+| `grant-request.schema.json`               | Grant request body                        |
+| `revoke-request.schema.json`              | Revoke request body                       |
+| `revoke-response.schema.json`             | Revoke response body                      |
+| `problem.schema.json`                     | AEP Problem Details response body         |
+| `idempotency-metadata.schema.json`        | Idempotency key and request hash metadata |
+| `oauth-bearer-grant-response.schema.json` | OAuth Bearer Grant response body          |
+| `api-key-grant-response.schema.json`      | API-key Grant response body               |
+| `basic-grant-response.schema.json`        | HTTP Basic Grant response body            |
 
 ## Validation
 
