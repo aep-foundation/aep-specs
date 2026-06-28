@@ -23,6 +23,7 @@ ietf/
     extensions/
     transports/
   examples/
+  governance/
   guides/
   schemas/
   test-vectors/
@@ -60,6 +61,12 @@ The three session-credential documents define the initial concrete Grant/Revoke 
 The core document is independently implementable. The session-credential documents depend on the core document, but the core document does not depend on any specific session-credential document. A Service that does not issue session credentials can implement Inspect, Enroll, and Status without implementing Grant or Revoke. A Service that supports Grant and Revoke advertises one or more concrete grant types defined by companion session-credential specifications.
 
 The first Internet-Draft set intentionally limits the baseline identity method to `did:web`.
+
+## Governance
+
+Repository-level governance lives in `../GOVERNANCE.md`. IETF-specific support
+governance, including extension registration guidance before formal IANA
+registries exist, lives in `governance/`.
 
 ## Conformance And Test Vectors
 

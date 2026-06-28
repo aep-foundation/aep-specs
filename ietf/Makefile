@@ -16,10 +16,13 @@ XML2RFC_CACHE := .cache/xml2rfc
 IDNITS := idnits
 MARKDOWN_TABLE_FILES ?= \
 	../README.md \
+	../GOVERNANCE.md \
 	README.md \
 	STYLE.md \
 	specs/README.md \
 	conformance/README.md \
+	governance/README.md \
+	governance/extension-registration.md \
 	guides/README.md \
 	guides/implementer-guide.md \
 	schemas/README.md \

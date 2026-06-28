@@ -347,6 +347,37 @@ html = <<~HTML
           </tbody>
         </table>
 
+        <h2>Governance</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Resource</th>
+              <th>Description</th>
+              <th>Source</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="draft-id" data-label="Resource">Project governance</td>
+              <td data-label="Description">Versioning, compatibility, artifact publication, review, and change management guidance.</td>
+              <td data-label="Source">
+                <span class="links">
+                  <a href="#{REPO_BASE}/blob/main/GOVERNANCE.md">Markdown</a>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td class="draft-id" data-label="Resource">Extension registration</td>
+              <td data-label="Description">Non-normative guidance for extension identifiers, grant types, and support artifacts before formal IANA registries exist.</td>
+              <td data-label="Source">
+                <span class="links">
+                  <a href="#{REPO_BASE}/blob/main/ietf/governance/extension-registration.md">Markdown</a>
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
         <h2>Examples</h2>
         <table>
           <thead>
