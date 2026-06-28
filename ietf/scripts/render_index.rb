@@ -355,6 +355,46 @@ html = <<~HTML
                 </span>
               </td>
             </tr>
+            <tr>
+              <td class="draft-id" data-label="Example">Pending Enroll and Status polling</td>
+              <td data-label="Description">A pending enrollment flow followed by Status polling until the identity becomes active.</td>
+              <td data-label="Source">
+                <span class="links">
+                  <a href="examples/pending-enroll-status.html">HTML</a>
+                  <a href="#{REPO_BASE}/blob/main/ietf/examples/pending-enroll-status.md">Markdown</a>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td class="draft-id" data-label="Example">Status states</td>
+              <td data-label="Description">Representative Status responses for pending, unavailable, suspended, terminated, and rejected identities.</td>
+              <td data-label="Source">
+                <span class="links">
+                  <a href="examples/status-states.html">HTML</a>
+                  <a href="#{REPO_BASE}/blob/main/ietf/examples/status-states.md">Markdown</a>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td class="draft-id" data-label="Example">API-key Grant and Revoke</td>
+              <td data-label="Description">API-key session credential issuance, presentation, per-credential Revoke, and grant-type Revoke.</td>
+              <td data-label="Source">
+                <span class="links">
+                  <a href="examples/api-key-grant-revoke.html">HTML</a>
+                  <a href="#{REPO_BASE}/blob/main/ietf/examples/api-key-grant-revoke.md">Markdown</a>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td class="draft-id" data-label="Example">Basic Grant and Revoke</td>
+              <td data-label="Description">Basic session credential issuance, presentation, per-credential Revoke, and grant-type Revoke.</td>
+              <td data-label="Source">
+                <span class="links">
+                  <a href="examples/basic-grant-revoke.html">HTML</a>
+                  <a href="#{REPO_BASE}/blob/main/ietf/examples/basic-grant-revoke.md">Markdown</a>
+                </span>
+              </td>
+            </tr>
           </tbody>
         </table>
 

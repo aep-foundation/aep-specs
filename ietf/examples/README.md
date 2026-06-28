@@ -6,3 +6,9 @@ document set.
 - `inspect-document.md`: complete minimal Inspect document.
 - `enroll-grant-revoke-transcript.md`: end-to-end Enroll, Grant, Revoke, and
   revoke-all transcript.
+- `pending-enroll-status.md`: pending Enroll response followed by Status
+  polling.
+- `status-states.md`: representative Status responses beyond `active`.
+- `api-key-grant-revoke.md`: API-key Grant, credential presentation, and
+  Revoke.
+- `basic-grant-revoke.md`: Basic Grant, credential presentation, and Revoke.

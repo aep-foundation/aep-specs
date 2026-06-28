@@ -1,7 +1,11 @@
 DRAFTS := $(shell find specs -name 'draft-*.md' -type f | sort)
 EXAMPLES := \
 	examples/inspect-document.md \
-	examples/enroll-grant-revoke-transcript.md
+	examples/enroll-grant-revoke-transcript.md \
+	examples/pending-enroll-status.md \
+	examples/status-states.md \
+	examples/api-key-grant-revoke.md \
+	examples/basic-grant-revoke.md
 ARTIFACTS := ../artifacts
 EXAMPLE_ARTIFACTS := ../docs/examples
 SCHEMA_ARTIFACTS := ../docs/schemas
