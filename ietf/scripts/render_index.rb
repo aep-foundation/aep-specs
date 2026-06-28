@@ -375,6 +375,16 @@ html = <<~HTML
                 </span>
               </td>
             </tr>
+            <tr>
+              <td class="draft-id" data-label="Resource">Extension registry</td>
+              <td data-label="Description">Repository-local machine-readable registry entries for current AEP grant-type extensions.</td>
+              <td data-label="Source">
+                <span class="links">
+                  <a href="#{REPO_BASE}/tree/main/ietf/registry">JSON</a>
+                  <a href="#{REPO_BASE}/blob/main/ietf/registry/README.md">Markdown</a>
+                </span>
+              </td>
+            </tr>
           </tbody>
         </table>
 

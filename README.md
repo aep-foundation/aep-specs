@@ -62,6 +62,7 @@ Conformance support files are maintained under:
 ietf/conformance/
 ietf/governance/
 ietf/guides/
+ietf/registry/
 ietf/schemas/
 ietf/test-vectors/
 ```
