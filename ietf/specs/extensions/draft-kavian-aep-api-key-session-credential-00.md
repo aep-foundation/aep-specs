@@ -185,11 +185,11 @@ This extension uses the AEP error vocabulary defined by the core protocol.  An A
 
 This document requests registration of `api-key` in the AEP Grant Types registry.
 
-| Field | Value |
-|---|---|
-| Grant Type | `api-key` |
+| Field       | Value                                   |
+| ----------- | --------------------------------------- |
+| Grant Type  | `api-key`                               |
 | Description | Opaque API key issued through AEP Grant |
-| Reference | This document |
+| Reference   | This document                           |
 
 # Security Considerations
 

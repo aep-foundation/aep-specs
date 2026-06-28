@@ -182,11 +182,11 @@ This extension uses the AEP error vocabulary defined by the core protocol.  A Ba
 
 This document requests registration of `basic` in the AEP Grant Types registry.
 
-| Field | Value |
-|---|---|
-| Grant Type | `basic` |
+| Field       | Value                                          |
+| ----------- | ---------------------------------------------- |
+| Grant Type  | `basic`                                        |
 | Description | HTTP Basic credential issued through AEP Grant |
-| Reference | This document |
+| Reference   | This document                                  |
 
 # Security Considerations
 

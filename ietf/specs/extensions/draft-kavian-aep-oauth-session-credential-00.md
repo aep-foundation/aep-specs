@@ -186,11 +186,11 @@ This extension uses the AEP error vocabulary defined by the core protocol.  A to
 
 This document requests registration of `oauth-bearer` in the AEP Grant Types registry.
 
-| Field | Value |
-|---|---|
-| Grant Type | `oauth-bearer` |
+| Field       | Value                                              |
+| ----------- | -------------------------------------------------- |
+| Grant Type  | `oauth-bearer`                                     |
 | Description | OAuth Bearer access token issued through AEP Grant |
-| Reference | This document |
+| Reference   | This document                                      |
 
 # Security Considerations
 

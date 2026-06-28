@@ -113,13 +113,13 @@ This document defines an HTTP binding using HTTP semantics {{RFC9110}} over HTTP
 
 The binding uses only `GET` and `POST`:
 
-| Command | Method | Endpoint |
-|---|---|---|
-| Inspect | `GET` | `/.well-known/aep` |
-| Enroll | `POST` | `enroll` relative to `endpoint_base` |
-| Status | `GET` | `status` relative to `endpoint_base` |
-| Grant | `POST` | `grant` relative to `endpoint_base` |
-| Revoke | `POST` | `revoke` relative to `endpoint_base` |
+| Command | Method | Endpoint                             |
+| ------- | ------ | ------------------------------------ |
+| Inspect | `GET`  | `/.well-known/aep`                   |
+| Enroll  | `POST` | `enroll` relative to `endpoint_base` |
+| Status  | `GET`  | `status` relative to `endpoint_base` |
+| Grant   | `POST` | `grant` relative to `endpoint_base`  |
+| Revoke  | `POST` | `revoke` relative to `endpoint_base` |
 
 The `endpoint_base` value is published in the Inspect document under `http.endpoint_base`. If omitted, Agents MUST use `/aep/`. Agents construct command URLs by appending the command's relative path to `endpoint_base` with exactly one `/` separator, regardless of whether `endpoint_base` includes a trailing slash. For example, both `/aep` and `/aep/` produce `/aep/enroll` for Enroll.
 
@@ -398,14 +398,14 @@ Successful Status responses use `200 OK`:
 
 `status` describes the Agent identity's state at the Service:
 
-| Value | Meaning |
-|---|---|
-| `active` | The identity is enrolled and operational. |
-| `pending` | Enrollment is awaiting asynchronous verification. |
+| Value         | Meaning                                                                           |
+| ------------- | --------------------------------------------------------------------------------- |
+| `active`      | The identity is enrolled and operational.                                         |
+| `pending`     | Enrollment is awaiting asynchronous verification.                                 |
 | `unavailable` | The identity is temporarily unavailable for Service-defined non-punitive reasons. |
-| `suspended` | The identity is temporarily disabled by Service action. |
-| `terminated` | The identity is permanently de-registered. |
-| `rejected` | Asynchronous verification failed. |
+| `suspended`   | The identity is temporarily disabled by Service action.                           |
+| `terminated`  | The identity is permanently de-registered.                                        |
+| `rejected`    | Asynchronous verification failed.                                                 |
 
 `since` is the RFC 3339 {{RFC3339}} timestamp of the last state transition.
 
@@ -513,20 +513,20 @@ The `code` field is the canonical machine-readable AEP error code. `type` SHOULD
 
 This document defines the following HTTP error codes:
 
-| AEP code | HTTP status | Meaning |
-|---|---:|---|
-| `enrollment_failed` | 400 | Generic enrollment failure where the Service suppresses precise detail. |
-| `invalid_request` | 400 | The request body, parameters, or field combination is malformed or invalid. |
-| `not_recognized` | 401 | Umbrella anti-enumeration error for failed identity, signature, audience, operation, replay, time-window, archived-identity, or unsupported-method checks. |
-| `identity_suspended` | 403 | The recognized identity is temporarily disabled by Service action. |
-| `identity_terminated` | 403 | The recognized identity is permanently de-registered. |
-| `identity_unavailable` | 403 | The recognized identity is temporarily unavailable for Service-defined reasons. |
-| `requirements_unmet` | 422 | Required claims are missing or invalid. |
-| `verification_pending` | 403 | Enrollment or required verification has not completed. |
-| `verification_timeout` | 422 | Required asynchronous verification did not complete in the Service's policy window. |
-| `rate_limited` | 429 | The Agent exceeded a Service rate limit. |
-| `unsupported_grant_type` | 400 | Grant or Revoke requested a `grant_type` not advertised by the Service. |
-| `idempotency_conflict` | 409 | An idempotency key was reused with a different request body. |
+| AEP code                 | HTTP status | Meaning                                                                                                                                                    |
+| ------------------------ | ----------: | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `enrollment_failed`      | 400         | Generic enrollment failure where the Service suppresses precise detail.                                                                                    |
+| `invalid_request`        | 400         | The request body, parameters, or field combination is malformed or invalid.                                                                                |
+| `not_recognized`         | 401         | Umbrella anti-enumeration error for failed identity, signature, audience, operation, replay, time-window, archived-identity, or unsupported-method checks. |
+| `identity_suspended`     | 403         | The recognized identity is temporarily disabled by Service action.                                                                                         |
+| `identity_terminated`    | 403         | The recognized identity is permanently de-registered.                                                                                                      |
+| `identity_unavailable`   | 403         | The recognized identity is temporarily unavailable for Service-defined reasons.                                                                            |
+| `requirements_unmet`     | 422         | Required claims are missing or invalid.                                                                                                                    |
+| `verification_pending`   | 403         | Enrollment or required verification has not completed.                                                                                                     |
+| `verification_timeout`   | 422         | Required asynchronous verification did not complete in the Service's policy window.                                                                        |
+| `rate_limited`           | 429         | The Agent exceeded a Service rate limit.                                                                                                                   |
+| `unsupported_grant_type` | 400         | Grant or Revoke requested a `grant_type` not advertised by the Service.                                                                                    |
+| `idempotency_conflict`   | 409         | An idempotency key was reused with a different request body.                                                                                               |
 
 Services MUST use `not_recognized` for bad signatures, unknown Agent identities, wrong `aud`, wrong `op`, replayed `jti`, time-window violations, archived identities, unsupported identity methods during authenticated contact, and unknown or revoked session credentials. Services MUST NOT reveal which of these checks failed.
 
@@ -584,45 +584,45 @@ This section requests registrations and registry creation following RFC 8126 {{R
 
 IANA is requested to register the following HTTP authentication scheme in the "HTTP Authentication Schemes" registry:
 
-| Field | Value |
-|---|---|
-| Authentication Scheme Name | `AEP` |
-| Reference | This document |
-| Notes | Agent Enrollment Protocol client assertion authentication |
+| Field                      | Value                                                     |
+| -------------------------- | --------------------------------------------------------- |
+| Authentication Scheme Name | `AEP`                                                     |
+| Reference                  | This document                                             |
+| Notes                      | Agent Enrollment Protocol client assertion authentication |
 
 ## Well-Known URI
 
 IANA is requested to register the following URI suffix in the "Well-Known URIs" registry:
 
-| Field | Value |
-|---|---|
-| URI Suffix | `aep` |
-| Change Controller | IETF |
-| Reference | This document |
+| Field               | Value                                      |
+| ------------------- | ------------------------------------------ |
+| URI Suffix          | `aep`                                      |
+| Change Controller   | IETF                                       |
+| Reference           | This document                              |
 | Related Information | Agent Enrollment Protocol Inspect document |
 
 ## Media Type
 
 IANA is requested to register the following media type in the "Media Types" registry:
 
-| Field | Value |
-|---|---|
-| Type name | `application` |
-| Subtype name | `aep+json` |
-| Required parameters | None |
-| Optional parameters | None |
-| Encoding considerations | Same as JSON {{RFC8259}} |
-| Security considerations | AEP payloads can contain Agent identifiers, claims, session credentials, and other security-sensitive protocol data. Implementations need to apply the authentication, confidentiality, anti-replay, anti-enumeration, logging, and privacy requirements described in the Security Considerations and Privacy Considerations sections of this document. |
-| Interoperability considerations | None |
-| Published specification | This document |
-| Applications that use this media type | Services and Agents implementing AEP |
-| Fragment identifier considerations | Same as JSON {{RFC8259}} |
-| Additional information | None |
-| Person and email address to contact for further information | IETF <iesg@ietf.org> |
-| Intended usage | COMMON |
-| Restrictions on usage | None |
-| Author | IETF |
-| Change controller | IETF |
+| Field                                                       | Value                                                                                                                                                                                                                                                                                                                                                   |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Type name                                                   | `application`                                                                                                                                                                                                                                                                                                                                           |
+| Subtype name                                                | `aep+json`                                                                                                                                                                                                                                                                                                                                              |
+| Required parameters                                         | None                                                                                                                                                                                                                                                                                                                                                    |
+| Optional parameters                                         | None                                                                                                                                                                                                                                                                                                                                                    |
+| Encoding considerations                                     | Same as JSON {{RFC8259}}                                                                                                                                                                                                                                                                                                                                |
+| Security considerations                                     | AEP payloads can contain Agent identifiers, claims, session credentials, and other security-sensitive protocol data. Implementations need to apply the authentication, confidentiality, anti-replay, anti-enumeration, logging, and privacy requirements described in the Security Considerations and Privacy Considerations sections of this document. |
+| Interoperability considerations                             | None                                                                                                                                                                                                                                                                                                                                                    |
+| Published specification                                     | This document                                                                                                                                                                                                                                                                                                                                           |
+| Applications that use this media type                       | Services and Agents implementing AEP                                                                                                                                                                                                                                                                                                                    |
+| Fragment identifier considerations                          | Same as JSON {{RFC8259}}                                                                                                                                                                                                                                                                                                                                |
+| Additional information                                      | None                                                                                                                                                                                                                                                                                                                                                    |
+| Person and email address to contact for further information | IETF <iesg@ietf.org>                                                                                                                                                                                                                                                                                                                                    |
+| Intended usage                                              | COMMON                                                                                                                                                                                                                                                                                                                                                  |
+| Restrictions on usage                                       | None                                                                                                                                                                                                                                                                                                                                                    |
+| Author                                                      | IETF                                                                                                                                                                                                                                                                                                                                                    |
+| Change controller                                           | IETF                                                                                                                                                                                                                                                                                                                                                    |
 
 ## AEP Command Registry
 
@@ -630,21 +630,21 @@ IANA is requested to create an "AEP Commands" registry. The registration policy 
 
 Each entry contains:
 
-| Field | Description |
-|---|---|
-| Command | Lowercase wire identifier. |
-| Description | Short command description. |
-| Reference | Stable specification reference. |
+| Field       | Description                     |
+| ----------- | ------------------------------- |
+| Command     | Lowercase wire identifier.      |
+| Description | Short command description.      |
+| Reference   | Stable specification reference. |
 
 Initial entries are:
 
-| Command | Description | Reference |
-|---|---|---|
-| `inspect` | Discover Service AEP capabilities. | This document |
-| `enroll` | Register an Agent identity with a Service. | This document |
-| `status` | Query the Agent identity's current state. | This document |
-| `grant` | Issue a session credential. | This document |
-| `revoke` | Revoke session credentials. | This document |
+| Command   | Description                                | Reference     |
+| --------- | ------------------------------------------ | ------------- |
+| `inspect` | Discover Service AEP capabilities.         | This document |
+| `enroll`  | Register an Agent identity with a Service. | This document |
+| `status`  | Query the Agent identity's current state.  | This document |
+| `grant`   | Issue a session credential.                | This document |
+| `revoke`  | Revoke session credentials.                | This document |
 
 ## AEP Binding Identifier Registry
 
@@ -652,17 +652,17 @@ IANA is requested to create an "AEP Binding Identifiers" registry. The registrat
 
 Each entry contains:
 
-| Field | Description |
-|---|---|
-| Binding Identifier | Lowercase wire identifier. |
-| Description | Short binding description. |
-| Reference | Stable specification reference. |
+| Field              | Description                     |
+| ------------------ | ------------------------------- |
+| Binding Identifier | Lowercase wire identifier.      |
+| Description        | Short binding description.      |
+| Reference          | Stable specification reference. |
 
 Initial entries are:
 
-| Binding Identifier | Description | Reference |
-|---|---|---|
-| `http` | HTTP binding for AEP commands. | This document |
+| Binding Identifier | Description                    | Reference     |
+| ------------------ | ------------------------------ | ------------- |
+| `http`             | HTTP binding for AEP commands. | This document |
 
 ## AEP Extension Identifier Registry
 
@@ -670,11 +670,11 @@ IANA is requested to create an "AEP Extension Identifiers" registry. The registr
 
 Each entry contains:
 
-| Field | Description |
-|---|---|
+| Field                | Description                             |
+| -------------------- | --------------------------------------- |
 | Extension Identifier | Absolute URI identifying the extension. |
-| Description | Short extension description. |
-| Reference | Stable specification reference. |
+| Description          | Short extension description.            |
+| Reference            | Stable specification reference.         |
 
 This document creates the registry but does not register concrete extensions.
 
@@ -684,29 +684,29 @@ IANA is requested to create an "AEP Error Codes" registry. The registration poli
 
 Each entry contains:
 
-| Field | Description |
-|---|---|
-| Code | Lowercase `lower_snake_case` error code. |
-| HTTP Status | Default HTTP status code. |
-| Description | Short error description. |
-| Reference | Stable specification reference. |
+| Field       | Description                              |
+| ----------- | ---------------------------------------- |
+| Code        | Lowercase `lower_snake_case` error code. |
+| HTTP Status | Default HTTP status code.                |
+| Description | Short error description.                 |
+| Reference   | Stable specification reference.          |
 
 Initial entries are:
 
-| Code | HTTP Status | Description | Reference |
-|---|---:|---|---|
-| `enrollment_failed` | 400 | Generic enrollment failure. | This document |
-| `invalid_request` | 400 | Malformed or invalid request. | This document |
-| `not_recognized` | 401 | Anti-enumeration recognition failure. | This document |
-| `identity_suspended` | 403 | Recognized identity is suspended. | This document |
-| `identity_terminated` | 403 | Recognized identity is terminated. | This document |
-| `identity_unavailable` | 403 | Recognized identity is temporarily unavailable. | This document |
-| `requirements_unmet` | 422 | Required claims are missing or invalid. | This document |
-| `verification_pending` | 403 | Verification has not completed. | This document |
-| `verification_timeout` | 422 | Verification did not complete in time. | This document |
-| `rate_limited` | 429 | Rate limit exceeded. | This document |
-| `unsupported_grant_type` | 400 | Unsupported Grant or Revoke grant type. | This document |
-| `idempotency_conflict` | 409 | Idempotency key reused with a different request body. | This document |
+| Code                     | HTTP Status | Description                                           | Reference     |
+| ------------------------ | ----------: | ----------------------------------------------------- | ------------- |
+| `enrollment_failed`      | 400         | Generic enrollment failure.                           | This document |
+| `invalid_request`        | 400         | Malformed or invalid request.                         | This document |
+| `not_recognized`         | 401         | Anti-enumeration recognition failure.                 | This document |
+| `identity_suspended`     | 403         | Recognized identity is suspended.                     | This document |
+| `identity_terminated`    | 403         | Recognized identity is terminated.                    | This document |
+| `identity_unavailable`   | 403         | Recognized identity is temporarily unavailable.       | This document |
+| `requirements_unmet`     | 422         | Required claims are missing or invalid.               | This document |
+| `verification_pending`   | 403         | Verification has not completed.                       | This document |
+| `verification_timeout`   | 422         | Verification did not complete in time.                | This document |
+| `rate_limited`           | 429         | Rate limit exceeded.                                  | This document |
+| `unsupported_grant_type` | 400         | Unsupported Grant or Revoke grant type.               | This document |
+| `idempotency_conflict`   | 409         | Idempotency key reused with a different request body. | This document |
 
 ## AEP Grant Type Registry
 
@@ -714,11 +714,11 @@ IANA is requested to create an "AEP Grant Types" registry. The registration poli
 
 Each entry contains:
 
-| Field | Description |
-|---|---|
-| Grant Type | Lowercase wire identifier. |
-| Description | Short credential description. |
-| Reference | Stable specification reference. |
+| Field       | Description                     |
+| ----------- | ------------------------------- |
+| Grant Type  | Lowercase wire identifier.      |
+| Description | Short credential description.   |
+| Reference   | Stable specification reference. |
 
 This document creates the registry but does not register concrete grant types. OAuth Bearer, API-key, and Basic session credentials are defined by separate documents.
 

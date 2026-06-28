@@ -114,7 +114,7 @@ This document requests registration of
 `urn:aep:ext:aep-foundation:[name]#v=1.0.0` in the AEP Extension Registry.
 
 | Field                | Value                                       |
-|----------------------|---------------------------------------------|
+| -------------------- | ------------------------------------------- |
 | Extension Identifier | `urn:aep:ext:aep-foundation:[name]#v=1.0.0` |
 | Description          | [Short description]                         |
 | Reference            | This document                               |
