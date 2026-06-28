@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Basic Grant and Revoke - AEP Foundation</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --border: #d7dde5;
+        --code: #f4f7fb;
+        --fg: #17202a;
+        --link: #0f5e9c;
+        --muted: #5c6b7a;
+      }
+
+      body {
+        color: var(--fg);
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        line-height: 1.55;
+        margin: 0;
+      }
+
+      main {
+        margin: 0 auto;
+        max-width: 960px;
+        padding: 40px 20px 64px;
+      }
+
+      a {
+        color: var(--link);
+      }
+
+      h1 {
+        font-size: 2rem;
+        line-height: 1.2;
+        margin: 0 0 20px;
+      }
+
+      h2 {
+        border-top: 1px solid var(--border);
+        font-size: 1.25rem;
+        margin-top: 32px;
+        padding-top: 24px;
+      }
+
+      p {
+        max-width: 760px;
+      }
+
+      pre {
+        background: var(--code);
+        border: 1px solid var(--border);
+        overflow-x: auto;
+        padding: 14px;
+      }
+
+      code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 0.92em;
+      }
+
+      .back {
+        color: var(--muted);
+        display: inline-block;
+        margin-bottom: 24px;
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <a class="back" href="../">AEP Foundation Specifications</a>
+      <h1 id="basic-grant-and-revoke">Basic Grant and Revoke</h1>
+
+<p>This example shows Basic session credential issuance, presentation on a later<br />
+HTTP request, per-credential Revoke, and grant-type Revoke.</p>
+
+<h2 id="1-grant-basic-credential">1. Grant Basic Credential</h2>
+
+<pre><code class="language-http">POST /aep/grant HTTP/1.1
+Host: api.example.com
+Content-Type: application/aep+json
+Accept: application/aep+json
+Authorization: AEP eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9...
+Idempotency-Key: 46ac413b-3a29-4c8e-a95d-c3ffad46a474
+</code></pre>
+
+<pre><code class="language-json">{
+  "grant_type": "basic",
+  "label": "legacy-basic-prod",
+  "requested_scopes": ["read"]
+}
+</code></pre>
+
+<pre><code class="language-http">HTTP/1.1 200 OK
+Content-Type: application/aep+json
+</code></pre>
+
+<pre><code class="language-json">{
+  "credential_id": "bas_01HZY8W7Q2F8J7D3P9G9Z1N6TT",
+  "expires_at": "2026-12-01T00:00:00Z",
+  "password": "s3cr3tExample",
+  "realm": "api.example.com",
+  "scopes": ["read"],
+  "username": "aep_agent_abc123"
+}
+</code></pre>
+
+<h2 id="2-present-basic-credential">2. Present Basic Credential</h2>
+
+<pre><code class="language-http">GET /v1/orders HTTP/1.1
+Host: api.example.com
+Authorization: Basic YWVwX2FnZW50X2FiYzEyMzpzM2NyM3RFeGFtcGxl
+</code></pre>
+
+<h2 id="3-revoke-one-basic-credential">3. Revoke One Basic Credential</h2>
+
+<pre><code class="language-http">POST /aep/revoke HTTP/1.1
+Host: api.example.com
+Content-Type: application/aep+json
+Accept: application/aep+json
+Authorization: AEP eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9...
+Idempotency-Key: 98ebaaac-a6f0-4a94-98f0-61d74679b00e
+</code></pre>
+
+<pre><code class="language-json">{
+  "credential_id": "bas_01HZY8W7Q2F8J7D3P9G9Z1N6TT",
+  "grant_type": "basic"
+}
+</code></pre>
+
+<pre><code class="language-http">HTTP/1.1 200 OK
+Content-Type: application/aep+json
+</code></pre>
+
+<pre><code class="language-json">{}
+</code></pre>
+
+<h2 id="4-revoke-all-basic-credentials">4. Revoke All Basic Credentials</h2>
+
+<pre><code class="language-http">POST /aep/revoke HTTP/1.1
+Host: api.example.com
+Content-Type: application/aep+json
+Accept: application/aep+json
+Authorization: AEP eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9...
+Idempotency-Key: ba49f86f-f6b1-40aa-a088-1349fe6b7903
+</code></pre>
+
+<pre><code class="language-json">{
+  "grant_type": "basic"
+}
+</code></pre>
+
+<pre><code class="language-http">HTTP/1.1 200 OK
+Content-Type: application/aep+json
+</code></pre>
+
+<pre><code class="language-json">{}
+</code></pre>
+
+    </main>
+  </body>
+</html>
