@@ -27,10 +27,6 @@
     "all_grant_types": {
       "type": "string",
       "enum": ["true"]
-    },
-    "idempotency_key": {
-      "type": "string",
-      "minLength": 1
     }
   }
 }
