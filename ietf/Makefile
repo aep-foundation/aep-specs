@@ -24,9 +24,9 @@ MARKDOWN_TABLE_FILES ?= \
 	$(DRAFTS) \
 	$(EXAMPLES)
 
-.PHONY: check lint check-drafts check-external-section-refs check-vectors check-schemas check-published-schemas format render render-drafts render-examples render-schemas render-index idnits clean
+.PHONY: check lint check-drafts check-external-section-refs check-vectors check-schemas check-published-schemas check-harness format render render-drafts render-examples render-schemas render-index idnits clean
 
-check: lint check-vectors check-schemas check-published-schemas
+check: lint check-vectors check-schemas check-published-schemas check-harness
 
 lint: check-drafts check-external-section-refs
 
@@ -44,6 +44,9 @@ check-schemas:
 
 check-published-schemas:
 	@bundle exec ruby scripts/publish_schemas.rb --check schemas "$(SCHEMA_ARTIFACTS)"
+
+check-harness:
+	@bundle exec ruby scripts/check_conformance_harness.rb
 
 format:
 	@bundle exec ruby scripts/format_markdown_tables.rb $(MARKDOWN_TABLE_FILES)
