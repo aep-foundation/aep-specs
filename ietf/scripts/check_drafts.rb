@@ -77,7 +77,7 @@ drafts.each do |draft|
   errors << "#{draft}: must reference RFC9110" unless text.include?("{{RFC9110}}")
 end
 
-core_path = ROOT.join("specs/core/draft-kavian-agent-enrollment-protocol-00.md")
+core_path = ROOT.join("specs/core/draft-kavian-agent-enrollment-protocol-01.md")
 if core_path.file?
   core = core_path.read
   errors << "#{core_path.relative_path_from(ROOT)}: missing identity method registry" unless core.include?("AEP Identity Methods")

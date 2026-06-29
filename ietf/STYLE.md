@@ -165,7 +165,7 @@ organization, and repository references when such names are needed.
 Individual draft source names use author-style Internet-Draft naming until a working group adopts the document:
 
 ```text
-draft-kavian-agent-enrollment-protocol-00.md
+draft-kavian-agent-enrollment-protocol-01.md
 ```
 
 If a working group adopts the draft, the name changes to:
