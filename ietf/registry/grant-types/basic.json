@@ -1,5 +1,5 @@
 {
-  "id": "urn:aep:ext:aep:basic#v=1.0.0",
+  "id": "urn:aep:grant-type:aep:basic#v=1.0.0",
   "kind": "grant_type",
   "name": "Basic Session Credential",
   "status": "active",
@@ -7,7 +7,7 @@
   "wire_identifier": "basic",
   "specification": {
     "draft": "draft-kavian-aep-basic-session-credential-00",
-    "path": "ietf/specs/extensions/draft-kavian-aep-basic-session-credential-00.md",
+    "path": "ietf/specs/grant-types/draft-kavian-aep-basic-session-credential-00.md",
     "datatracker": "https://datatracker.ietf.org/doc/draft-kavian-aep-basic-session-credential/"
   },
   "summary": "HTTP Basic username and password issued through AEP Grant and revoked through AEP Revoke.",

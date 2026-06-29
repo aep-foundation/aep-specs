@@ -5,14 +5,16 @@ Internet-Draft set.
 
 The current conformance scope is limited to:
 
-- `draft-kavian-agent-enrollment-protocol-00`
 - `draft-kavian-aep-api-key-session-credential-00`
 - `draft-kavian-aep-basic-session-credential-00`
+- `draft-kavian-aep-did-web-identity-method-00`
 - `draft-kavian-aep-oauth-session-credential-00`
+- `draft-kavian-agent-enrollment-protocol-00`
 
-This scope covers the HTTP binding, `did:web` identity, Inspect, Enroll,
-Status, Grant, Revoke, baseline `Authorization: AEP <jwt>` authentication,
-error handling, idempotency, and the three initial session-credential formats.
+This scope covers the HTTP binding, identity-method substrate, the initial
+`did:web` identity method feature, Inspect, Enroll, Status, Grant, Revoke,
+baseline `Authorization: AEP <jwt>` authentication, error handling,
+idempotency, and the three initial session-credential formats.
 
 ## Roles
 
@@ -31,10 +33,10 @@ attestation drafts require it.
 
 | Profile                 | Requirement                                                                    |
 | ----------------------- | ------------------------------------------------------------------------------ |
-| Core HTTP               | Implements the core AEP draft over HTTP with `did:web`.                        |
-| OAuth Bearer Credential | Implements the OAuth Bearer session-credential draft in addition to Core HTTP. |
+| Core HTTP               | Implements the core AEP draft over HTTP with an enabled identity method.       |
 | API-Key Credential      | Implements the API-key session-credential draft in addition to Core HTTP.      |
 | Basic Credential        | Implements the Basic session-credential draft in addition to Core HTTP.        |
+| OAuth Bearer Credential | Implements the OAuth Bearer session-credential draft in addition to Core HTTP. |
 
 An implementation may claim one or more credential profiles. A Service that
 does not advertise `grant` and `revoke` does not need to claim a credential

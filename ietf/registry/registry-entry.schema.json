@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://www.aep.foundation/registry/extension-entry.schema.json",
-  "title": "AEP Extension Registry Entry",
+  "$id": "https://www.aep.foundation/registry/registry-entry.schema.json",
+  "title": "AEP Registry Entry",
   "type": "object",
   "required": [
     "id",
@@ -19,7 +19,7 @@
   "properties": {
     "id": {
       "type": "string",
-      "pattern": "^urn:aep:ext:[a-z0-9][a-z0-9-]*:[a-z0-9][a-z0-9-]*(?:-[a-z0-9]+)*#v=[0-9]+\\.[0-9]+\\.[0-9]+$"
+      "pattern": "^urn:aep:(?:grant-type|ext|binding|identity-method|command|policy|proof|attestation|other):[a-z0-9][a-z0-9-]*:[a-z0-9][a-z0-9-]*(?::[a-z0-9][a-z0-9-]*)*(?:-[a-z0-9]+)*#v=[0-9]+\\.[0-9]+\\.[0-9]+$"
     },
     "kind": {
       "type": "string",
@@ -39,7 +39,7 @@
     },
     "wire_identifier": {
       "type": "string",
-      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+      "pattern": "^[a-z0-9]+(?::[a-z0-9]+)*(?:-[a-z0-9]+)*$"
     },
     "specification": {
       "type": "object",

@@ -20,7 +20,8 @@ ietf/
   conformance/
   specs/
     core/
-    extensions/
+    grant-types/
+    identity-methods/
     transports/
   examples/
   governance/
@@ -37,10 +38,11 @@ Rendered XML, text, HTML, and PDF outputs are written to the ignored
 
 The first Internet-Draft document set is:
 
+- [`draft-kavian-aep-api-key-session-credential-00`](https://datatracker.ietf.org/doc/draft-kavian-aep-api-key-session-credential/): `ietf/specs/grant-types/draft-kavian-aep-api-key-session-credential-00.md`
+- [`draft-kavian-aep-basic-session-credential-00`](https://datatracker.ietf.org/doc/draft-kavian-aep-basic-session-credential/): `ietf/specs/grant-types/draft-kavian-aep-basic-session-credential-00.md`
+- [`draft-kavian-aep-did-web-identity-method-00`](https://datatracker.ietf.org/doc/draft-kavian-aep-did-web-identity-method/): `ietf/specs/identity-methods/draft-kavian-aep-did-web-identity-method-00.md`
+- [`draft-kavian-aep-oauth-session-credential-00`](https://datatracker.ietf.org/doc/draft-kavian-aep-oauth-session-credential/): `ietf/specs/grant-types/draft-kavian-aep-oauth-session-credential-00.md`
 - [`draft-kavian-agent-enrollment-protocol-00`](https://datatracker.ietf.org/doc/draft-kavian-agent-enrollment-protocol/): `ietf/specs/core/draft-kavian-agent-enrollment-protocol-00.md`
-- [`draft-kavian-aep-oauth-session-credential-00`](https://datatracker.ietf.org/doc/draft-kavian-aep-oauth-session-credential/): `ietf/specs/extensions/draft-kavian-aep-oauth-session-credential-00.md`
-- [`draft-kavian-aep-api-key-session-credential-00`](https://datatracker.ietf.org/doc/draft-kavian-aep-api-key-session-credential/): `ietf/specs/extensions/draft-kavian-aep-api-key-session-credential-00.md`
-- [`draft-kavian-aep-basic-session-credential-00`](https://datatracker.ietf.org/doc/draft-kavian-aep-basic-session-credential/): `ietf/specs/extensions/draft-kavian-aep-basic-session-credential-00.md`
 
 The core document defines the baseline HTTP binding, including:
 
@@ -50,18 +52,18 @@ The core document defines the baseline HTTP binding, including:
 - `/.well-known/aep` discovery.
 - Inspect, Enroll, Grant, Revoke, and Status semantics.
 - Client assertion JWT requirements.
-- Baseline `did:web` requirements.
+- Identity method substrate.
 - HTTP request and response behavior.
 - Error handling.
 - Security considerations.
 - Privacy considerations.
 - IANA considerations.
 
-The three session-credential documents define the initial concrete Grant/Revoke credential formats: OAuth Bearer, API-key, and Basic. Follow-on documents may define additional lifecycle commands, additional transports, policy disclosures, privacy preferences, attestation profiles, and other extensions.
+The three session-credential documents define the initial concrete Grant/Revoke credential formats: OAuth Bearer, API-key, and Basic. The `did:web` identity-method document defines the initial concrete identity method. Follow-on documents may define additional lifecycle commands, additional transports, policy disclosures, privacy preferences, attestation profiles, and other extensions.
 
 The core document is independently implementable. The session-credential documents depend on the core document, but the core document does not depend on any specific session-credential document. A Service that does not issue session credentials can implement Inspect, Enroll, and Status without implementing Grant or Revoke. A Service that supports Grant and Revoke advertises one or more concrete grant types defined by companion session-credential specifications.
 
-The first Internet-Draft set intentionally limits the baseline identity method to `did:web`.
+The first Internet-Draft set includes `did:web` as the initial AEP-defined identity method feature.
 
 ## Governance
 
@@ -76,7 +78,7 @@ The `conformance/`, `test-vectors/`, and `schemas/` directories define the
 initial implementation-checking surface for the published draft set. They are
 scoped to the current core HTTP draft and the three published
 session-credential drafts. They do not include later lifecycle commands,
-additional DID methods, Platform conformance, or deferred extensions.
+additional identity methods beyond `did:web`, Platform conformance, or deferred extensions.
 
 JSON Schemas validate stable wire objects used by the current test vectors.
 They are support artifacts derived from the Internet-Draft prose, not a
@@ -96,7 +98,9 @@ Internet-Draft sources render to XML, text, HTML, and PDF artifacts with:
 bundle config set path vendor/bundle
 bundle install
 python3 -m venv .venv
+.venv/bin/python -m pip install -U pip
 .venv/bin/python -m pip install -r requirements.txt
+.venv/bin/python -m pip install -U "xml2rfc[pdf]" weasyprint
 make -C . render
 ```
 
@@ -104,3 +108,15 @@ The render target writes artifacts to `../artifacts/` and regenerates
 `../docs/index.html` from draft front matter. The repository does not commit
 rendered specification artifacts; the deploy workflow publishes them on the
 `latest` GitHub Release.
+
+PDF rendering requires WeasyPrint and native font/text libraries. On macOS,
+install the Homebrew dependencies before running the full render target:
+
+```sh
+brew install glib pango cairo gdk-pixbuf libffi fontconfig weasyprint
+```
+
+Use a Python environment that can load Homebrew native libraries. If PDF
+rendering reports missing libraries such as `libgobject-2.0-0`, recreate the
+virtual environment with Homebrew Python or another system Python instead of a
+Conda-managed Python.

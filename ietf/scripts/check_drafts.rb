@@ -80,7 +80,7 @@ end
 core_path = ROOT.join("specs/core/draft-kavian-agent-enrollment-protocol-00.md")
 if core_path.file?
   core = core_path.read
-  errors << "#{core_path.relative_path_from(ROOT)}: missing DID-WEB normative reference" unless core.match?(/^  DID-WEB:$/)
+  errors << "#{core_path.relative_path_from(ROOT)}: missing identity method registry" unless core.include?("AEP Identity Methods")
 end
 
 if errors.empty?

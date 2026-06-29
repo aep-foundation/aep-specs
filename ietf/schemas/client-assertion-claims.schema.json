@@ -8,15 +8,15 @@
   "properties": {
     "iss": {
       "type": "string",
-      "pattern": "^did:web:"
+      "minLength": 1
     },
     "sub": {
       "type": "string",
-      "pattern": "^did:web:"
+      "minLength": 1
     },
     "aud": {
       "type": "string",
-      "pattern": "^did:web:"
+      "minLength": 1
     },
     "op": {
       "type": "string",

@@ -9,7 +9,10 @@ or Service.
 Use the current Internet-Draft set as the protocol authority:
 
 - Core protocol: Inspect, Enroll, Status, Grant, Revoke, HTTP binding,
-  `did:web`, client assertions, errors, idempotency, and IANA registrations.
+  identity-method substrate, client assertions, errors, idempotency, and IANA
+  registrations.
+- did:web identity method draft: `did:web` resolution and client assertion
+  verification material.
 - OAuth Bearer credential draft: `oauth-bearer` Grant and Revoke behavior.
 - API-key credential draft: `api-key` Grant and Revoke behavior.
 - Basic credential draft: `basic` Grant and Revoke behavior.
@@ -23,7 +26,8 @@ A typical Agent flow is:
 
 1. Fetch Inspect from `/.well-known/aep`.
 2. Confirm that `bindings.supported` contains `http`.
-3. Confirm that `identity.methods` contains `did:web`.
+3. Confirm that `identity.methods` contains at least one identity method the
+   implementation supports.
 4. Resolve required claim names from `claims.required`.
 5. Enroll with `Authorization: AEP <jwt>` and `op` equal to `enroll`.
 6. If Enroll returns `pending`, poll Status with `op` equal to `status`.

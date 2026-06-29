@@ -24,7 +24,8 @@ This repository maintains:
 | Support artifact  | Examples, guides, schemas, vectors, harness checks                                                  | Verify with `make -C ietf check`                         |
 | Clarification     | Resolves ambiguous draft text without changing intended behavior                                    | Check examples, schemas, and vectors for alignment       |
 | Protocol behavior | Adds or changes command behavior, wire fields, error handling, registries, or security requirements | Requires careful draft review and compatibility analysis |
-| Extension         | Adds a grant type, binding, identity method, policy model, or other extension                       | Requires extension registration review                   |
+| Feature           | Adds an AEP-defined grant type, binding, identity method, or other optional capability              | Requires registry review when a registry exists          |
+| Extension         | Adds a policy model, attestation model, proof model, third-party capability, or other large module  | Requires extension registration review                   |
 
 ## Versioning And Compatibility
 
