@@ -6,8 +6,8 @@ require "pathname"
 
 ROOT = Pathname.new(__dir__).join("..").expand_path
 REGISTRY_ROOT = ROOT.join("registry")
-SCHEMA_PATH = REGISTRY_ROOT.join("extension-entry.schema.json")
-ENTRY_PATHS = Dir[REGISTRY_ROOT.join("grant-types/*.json")].sort.map { |path| Pathname.new(path) }
+SCHEMA_PATH = REGISTRY_ROOT.join("registry-entry.schema.json")
+ENTRY_PATHS = Dir[REGISTRY_ROOT.join("{grant-types,identity-methods}/*.json")].sort.map { |path| Pathname.new(path) }
 
 def load_json(path)
   JSON.parse(path.read)
@@ -90,7 +90,8 @@ ENTRY_PATHS.each do |path|
   seen_ids[id] = rel if id
   seen_wire_identifiers[wire_identifier] = rel if wire_identifier
 
-  errors << "#{rel}: filename must match wire_identifier" if wire_identifier && path.basename.to_s != "#{wire_identifier}.json"
+  expected_filename = "#{wire_identifier.tr(':', '-')}.json" if wire_identifier
+  errors << "#{rel}: filename must match wire_identifier" if expected_filename && path.basename.to_s != expected_filename
   errors << "#{rel}: id version must match version" if id && version && !id.end_with?("#v=#{version}")
 
   if entry["kind"] == "grant_type"

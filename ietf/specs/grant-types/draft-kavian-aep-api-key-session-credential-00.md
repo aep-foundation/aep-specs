@@ -1,5 +1,5 @@
 ---
-title: "API-Key Session Credentials for the Agent Enrollment Protocol"
+title: "API-Key Session Credential Grant Type for the Agent Enrollment Protocol"
 abbrev: "AEP API Key"
 docname: draft-kavian-aep-api-key-session-credential-00
 category: std
@@ -37,15 +37,15 @@ informative:
 
 --- abstract
 
-This document defines an API-key session-credential extension for the Agent Enrollment Protocol (AEP).  The extension lets an AEP Service issue an opaque API key through the AEP Grant command for deployments that already operate header-based API-key authentication.
+This document defines the API-key session-credential grant type for the Agent Enrollment Protocol (AEP).  The grant type lets an AEP Service issue an opaque API key through the AEP Grant command for deployments that already operate header-based API-key authentication.
 
 --- middle
 
 # Introduction
 
-AEP session credentials allow a Service to issue a stateful credential after an Agent authenticates with a baseline AEP client assertion {{AEP-CORE}}.  This document defines the `api-key` grant type for Services that want to reuse existing API-key middleware while preserving AEP key possession as the issuance root.  Extension request and response bodies are JSON objects {{RFC8259}} carried over HTTP semantics {{RFC9110}} as defined by AEP.
+AEP session credentials allow a Service to issue a stateful credential after an Agent authenticates with a baseline AEP client assertion {{AEP-CORE}}.  This document defines the `api-key` grant type for Services that want to reuse existing API-key middleware while preserving AEP key possession as the issuance root.  Grant type request and response bodies are JSON objects {{RFC8259}} carried over HTTP semantics {{RFC9110}} as defined by AEP.
 
-This extension does not replace baseline AEP authentication.  Services that implement this extension MUST continue to accept baseline AEP authentication on authenticated AEP commands.
+This grant type does not replace baseline AEP authentication.  Services that implement this grant type MUST continue to accept baseline AEP authentication on authenticated AEP commands.
 
 # Requirements Language
 
@@ -59,7 +59,7 @@ The grant type identifier is:
 api-key
 ~~~
 
-A Service that supports this extension lists `api-key` in `commands.grant_types` and lists `grant` and `revoke` in `commands.supported` in its AEP Inspect document.
+A Service that enables this grant type lists `api-key` in `commands.grant_types` and lists `grant` and `revoke` in `commands.supported` in its AEP Inspect document.
 
 # Inspect Configuration
 
@@ -179,7 +179,7 @@ To revoke all session credentials of every grant type, Agents use the core `all_
 
 # Error Handling
 
-This extension uses the AEP error vocabulary defined by the core protocol.  An API key that is expired, malformed, revoked, unknown, or bound to a different Agent fails as `not_recognized`.
+This grant type uses the AEP error vocabulary defined by the core protocol.  An API key that is expired, malformed, revoked, unknown, or bound to a different Agent fails as `not_recognized`.
 
 # IANA Considerations
 
@@ -195,7 +195,7 @@ This document requests registration of `api-key` in the AEP Grant Types registry
 
 API keys are bearer secrets.  Services MUST store only salted hashes or equivalent one-way verifiers.  Services MUST NOT log raw API-key values, and Services MUST support AEP Revoke for every advertised grant type.  Agents that suspect key disclosure SHOULD call AEP Revoke using baseline AEP authentication and then fall back to per-request signed client assertions until a new key is issued.
 
-Services MUST validate only the configured API-key header for this extension.  Services SHOULD reject ambiguous requests that present multiple API-key headers or multiple non-baseline bearer credentials when that ambiguity would affect authorization semantics.
+Services MUST validate only the configured API-key header for this grant type.  Services SHOULD reject ambiguous requests that present multiple API-key headers or multiple non-baseline bearer credentials when that ambiguity would affect authorization semantics.
 
 # Privacy Considerations
 

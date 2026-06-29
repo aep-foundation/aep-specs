@@ -1,5 +1,5 @@
 ---
-title: "Basic Session Credentials for the Agent Enrollment Protocol"
+title: "Basic Session Credential Grant Type for the Agent Enrollment Protocol"
 abbrev: "AEP Basic"
 docname: draft-kavian-aep-basic-session-credential-00
 category: std
@@ -37,15 +37,15 @@ informative:
 
 --- abstract
 
-This document defines a Basic session-credential extension for the Agent Enrollment Protocol (AEP).  The extension lets an AEP Service issue an HTTP Basic credential through the AEP Grant command for deployments that already integrate with Basic authentication middleware.
+This document defines the Basic session-credential grant type for the Agent Enrollment Protocol (AEP).  The grant type lets an AEP Service issue an HTTP Basic credential through the AEP Grant command for deployments that already integrate with Basic authentication middleware.
 
 --- middle
 
 # Introduction
 
-AEP session credentials allow a Service to issue a stateful credential after an Agent authenticates with a baseline AEP client assertion {{AEP-CORE}}.  This document defines the `basic` grant type for Services that want to reuse HTTP Basic authentication {{RFC7617}} while preserving AEP key possession as the issuance root.  Extension request and response bodies are JSON objects {{RFC8259}} carried over HTTP semantics {{RFC9110}} as defined by AEP.
+AEP session credentials allow a Service to issue a stateful credential after an Agent authenticates with a baseline AEP client assertion {{AEP-CORE}}.  This document defines the `basic` grant type for Services that want to reuse HTTP Basic authentication {{RFC7617}} while preserving AEP key possession as the issuance root.  Grant type request and response bodies are JSON objects {{RFC8259}} carried over HTTP semantics {{RFC9110}} as defined by AEP.
 
-This extension does not replace baseline AEP authentication.  Services that implement this extension MUST continue to accept baseline AEP authentication on authenticated AEP commands.
+This grant type does not replace baseline AEP authentication.  Services that implement this grant type MUST continue to accept baseline AEP authentication on authenticated AEP commands.
 
 # Requirements Language
 
@@ -59,7 +59,7 @@ The grant type identifier is:
 basic
 ~~~
 
-A Service that supports this extension lists `basic` in `commands.grant_types` and lists `grant` and `revoke` in `commands.supported` in its AEP Inspect document.
+A Service that enables this grant type lists `basic` in `commands.grant_types` and lists `grant` and `revoke` in `commands.supported` in its AEP Inspect document.
 
 # Inspect Configuration
 
@@ -84,7 +84,7 @@ A Service MAY publish configuration under `commands.grant_types_config.basic`:
 
 `default_lifetime_seconds` is an AEP-owned numeric value and is therefore represented as a JSON string.
 
-`realm`, when present, identifies the HTTP Basic realm associated with credentials issued by this extension.
+`realm`, when present, identifies the HTTP Basic realm associated with credentials issued by this grant type.
 
 `scopes_supported`, when present, lists Service-defined scope strings an Agent can request.
 
@@ -176,7 +176,7 @@ To revoke all session credentials of every grant type, Agents use the core `all_
 
 # Error Handling
 
-This extension uses the AEP error vocabulary defined by the core protocol.  A Basic credential that is expired, malformed, revoked, unknown, or bound to a different Agent fails as `not_recognized`.
+This grant type uses the AEP error vocabulary defined by the core protocol.  A Basic credential that is expired, malformed, revoked, unknown, or bound to a different Agent fails as `not_recognized`.
 
 # IANA Considerations
 

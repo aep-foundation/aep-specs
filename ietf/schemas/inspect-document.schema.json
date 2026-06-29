@@ -116,7 +116,7 @@
           "minItems": 1,
           "items": {
             "type": "string",
-            "enum": ["did:web"]
+            "pattern": "^[a-z0-9]+(?::[a-z0-9]+)*(?:-[a-z0-9]+)*$"
           }
         }
       }
@@ -128,7 +128,7 @@
       "properties": {
         "did": {
           "type": "string",
-          "pattern": "^did:web:"
+          "pattern": "^did:"
         }
       }
     }

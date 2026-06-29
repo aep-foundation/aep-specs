@@ -33,12 +33,6 @@ normative:
   RFC9113:
   RFC9114:
   RFC9457:
-  DID-WEB:
-    title: "The did:web Method Specification"
-    target: https://w3c-ccg.github.io/did-method-web/
-    author:
-      - org: W3C Credentials Community Group
-
 informative:
   RFC8126:
   RFC8725:
@@ -54,7 +48,7 @@ The Agent Enrollment Protocol (AEP) defines an HTTP-based mechanism for autonomo
 
 Autonomous agents increasingly interact with internet services without a human directly completing registration forms, email confirmations, password setup, or dashboard-based API-key provisioning. Existing HTTP authentication mechanisms can authenticate an already-provisioned client, but they do not define a machine-first enrollment flow by which an autonomous agent discovers a service's requirements, presents a cryptographic identity, and becomes recognized by that service.
 
-The Agent Enrollment Protocol (AEP) defines that enrollment substrate. AEP lets an Agent discover what a Service requires, enroll a `did:web` identity, authenticate AEP commands with a per-request client assertion JWT, optionally obtain a session credential, revoke issued session credentials, and query enrollment status.
+The Agent Enrollment Protocol (AEP) defines that enrollment substrate. AEP lets an Agent discover what a Service requires, enroll a supported identity method, authenticate AEP commands with a per-request client assertion JWT, optionally obtain a session credential, revoke issued session credentials, and query enrollment status.
 
 AEP is deliberately narrow. It does not define payment settlement, checkout semantics, action authorization, KYC execution, or legal policy. Those functions can compose above or beside AEP. This document defines only the minimum HTTP protocol needed for interoperable Agent enrollment and session-credential bootstrapping.
 
@@ -98,7 +92,7 @@ Grant type:
 The baseline AEP flow is:
 
 1. The Agent fetches the Service's Inspect document.
-2. The Agent evaluates whether it can satisfy the Service's `did:web` and claim requirements.
+2. The Agent evaluates whether it can satisfy the Service's identity-method and claim requirements.
 3. The Agent constructs a client assertion JWT with `aud` equal to the Service DID and `op` equal to the command being invoked.
 4. The Agent invokes Enroll.
 5. The Agent calls Status when enrollment is pending or when it needs current state.
@@ -155,7 +149,7 @@ LCALPHA = %x61-7A
 
 The `LCALPHA` rule is defined here. The `DIGIT` rule is defined by RFC 5234 {{RFC5234}}.
 
-The Inspect document shown here contains only the fields required for the HTTP binding, `did:web`, Inspect, Enroll, Grant, Revoke, and Status:
+The Inspect document shown here contains only the fields required for the HTTP binding, Inspect, Enroll, Grant, Revoke, Status, and an example identity method:
 
 ~~~ json
 {
@@ -194,15 +188,28 @@ The Inspect document shown here contains only the fields required for the HTTP b
 
 `commands.grant_types` lists concrete session-credential formats the Service can issue and revoke. If this array is empty or absent, the Service MUST NOT list `grant` or `revoke` in `commands.supported`.
 
-`identity.methods` MUST contain `did:web` when the Service accepts this document's identity method. Other DID methods are out of scope for this document.
+`identity.methods` lists identity method identifiers the Service accepts for authenticated AEP commands. The values are lower-case identifiers registered in the AEP Identity Methods registry. A Service that advertises Enroll, Grant, Revoke, or Status MUST advertise at least one identity method.
 
 `service.did` identifies the Service. Agents use this value as the `aud` claim in client assertion JWTs.
 
 Services SHOULD send HTTP cache metadata, including `Cache-Control` and `ETag`, on Inspect responses. A default freshness lifetime of 300 seconds is RECOMMENDED when the Service does not need a shorter policy window.
 
-# DID Method: did:web
+# Identity Methods
 
-This document defines `did:web` {{DID-WEB}} as the only required identity method. A Service that supports this document advertises:
+Authenticated AEP commands require an Agent identity method that can bind a stable Agent identifier to verification material for the client assertion signature.
+
+This document defines the identity-method substrate but does not define a concrete identity method. Concrete identity method documents define:
+
+1. The identity method identifier used in `identity.methods`.
+2. The Agent identifier syntax.
+3. How a Service resolves or otherwise obtains verification material for the Agent identifier.
+4. How the JWT `kid` header identifies the verification method.
+5. Any caching, rotation, revocation, or trust-anchor requirements.
+6. Security and privacy considerations specific to that identity method.
+
+A Service enables the identity methods it accepts and advertises only those identifiers in `identity.methods`. A Service that advertises no identity methods MUST NOT advertise authenticated commands.
+
+For example, a Service that enables the separately specified `did:web` identity method advertises:
 
 ~~~ json
 {
@@ -211,15 +218,6 @@ This document defines `did:web` {{DID-WEB}} as the only required identity method
   }
 }
 ~~~
-
-An Agent using this document identifies itself with a `did:web` URI. The Service resolves the DID to obtain the Agent's public verification key:
-
-* `did:web:<host>` resolves to `https://<host>/.well-known/did.json`.
-* `did:web:<host>:<path>` resolves to `https://<host>/<path>/did.json`.
-
-The resolved DID document MUST contain a verification method referenced by the JWT `kid` header. The verification method MUST expose a public key in a form the Service can validate against the selected JOSE signing algorithm.
-
-Services MUST resolve `did:web` documents over HTTPS. Services SHOULD cache resolved DID documents and SHOULD honor upstream cache metadata. A default cache lifetime of 300 seconds is RECOMMENDED when no shorter upstream lifetime is provided.
 
 If the Agent presents an identity method not listed in the Service's `identity.methods` array, the Service MUST reject the request as `not_recognized`.
 
@@ -542,6 +540,7 @@ When a request fails for multiple reasons, the Service MUST choose the least rev
 This document defines the extension points needed by the core protocol:
 
 * `extensions.supported` advertises extension identifiers implemented by the Service.
+* `identity.methods` advertises concrete identity methods accepted for authenticated AEP commands.
 * `commands.grant_types` advertises concrete session-credential formats available through Grant and Revoke.
 * `commands.grant_types_config` MAY carry per-grant-type configuration defined by a concrete session-credential document.
 * `claims.required`, `claims.preferred`, and `claims.optional` MAY contain claim names defined by other documents.
@@ -574,6 +573,8 @@ Error codes use lowercase underscore-separated tokens:
 ~~~ abnf
 error-code = lc-token *( "_" lc-token )
 ~~~
+
+Identity method identifiers use either an existing DID method identifier, such as `did:web`, or a lowercase hyphenated token registered for AEP-specific non-DID identity methods.
 
 Extension identifiers MUST be absolute URIs. AEP-owned extension identifiers SHOULD use the URN form `urn:aep:ext:<authority>:<name>#v=<version>`.
 
@@ -723,6 +724,20 @@ Each entry contains:
 
 This document creates the registry but does not register concrete grant types. OAuth Bearer, API-key, and Basic session credentials are defined by separate documents.
 
+## AEP Identity Method Registry
+
+IANA is requested to create an "AEP Identity Methods" registry. The registration policy is Specification Required as defined by RFC 8126. Designated experts are requested to verify that new identity method registrations define identifier syntax, verification-material resolution, JWT `kid` handling, trust anchors, caching behavior, key rotation behavior, and security and privacy considerations.
+
+Each entry contains:
+
+| Field           | Description                     |
+| --------------- | ------------------------------- |
+| Identity Method | Lowercase identity method name. |
+| Description     | Short method description.       |
+| Reference       | Stable specification reference. |
+
+This document creates the registry but does not register concrete identity methods. The `did:web` identity method is defined by a separate document.
+
 # Security Considerations
 
 Network use of the HTTP binding defined by this document requires TLS 1.3 or later. Plaintext HTTP is out of scope.
@@ -731,7 +746,7 @@ Client assertions are replay resistant only when Services validate the full chai
 
 Services SHOULD keep assertion lifetimes short. This document sets a maximum validity interval of 300 seconds. Services MAY enforce a shorter maximum.
 
-The `did:web` method relies on the HTTPS origin that publishes the DID document. A Service that accepts an Agent's `did:web` identity trusts the corresponding web origin to publish the correct verification method. Services SHOULD cache DID documents for operational stability but MUST ensure that cache lifetimes do not prevent timely key replacement after compromise.
+Identity methods define how Services obtain verification material for Agent identities. Services MUST apply the resolution, trust-anchor, caching, and key-rotation requirements of each enabled identity method. A Service MUST NOT accept an Agent identity method that was not advertised in `identity.methods`.
 
 The `core.signing_algorithms` advertisement is security relevant. Services MUST NOT advertise algorithms they do not intend to accept, and MUST NOT accept algorithms that were not advertised. Agents MUST NOT use `none` or symmetric JOSE algorithms for Agent identity assertions. Implementations SHOULD follow JWT best current practices {{RFC8725}}.
 
@@ -751,11 +766,11 @@ Services SHOULD keep `claims.required` limited to data required for enrollment o
 
 Agents SHOULD avoid sending claims absent from `claims.required`, `claims.preferred`, or `claims.optional`. Services MUST ignore unknown claims unless local policy requires rejection.
 
-A `did:web` Agent identity can be correlatable if the same DID is reused across Services. Platforms or Agent operators that require unlinkability SHOULD use a distinct `did:web` URI and signing key per Service enrollment. The URI path component SHOULD be opaque and SHOULD NOT reveal the Agent's master identity, account identifier, or target Service.
+Agent identities can become correlatable if the same identifier is reused across Services. Platforms or Agent operators that require unlinkability SHOULD use a distinct Agent identifier and signing key per Service enrollment when the selected identity method allows it.
 
 Services SHOULD maintain a Service-local pairwise identifier for enrolled Agents rather than using the Agent DID as the primary internal record key across all contexts. Such identifiers SHOULD be opaque and MUST NOT be disclosed as cross-Service correlators.
 
-Platform-hosted Agent identities introduce Platform-level visibility: the Platform can observe or reconstruct which Services an Agent enrolls with. This document does not prevent that visibility. Agents with stronger privacy requirements should account for the Platform trust relationship before using a Platform-hosted `did:web` identity.
+Platform-hosted Agent identities introduce Platform-level visibility: the Platform can observe or reconstruct which Services an Agent enrolls with. This document does not prevent that visibility. Agents with stronger privacy requirements should account for the Platform trust relationship before using a Platform-hosted identity.
 
 Session credentials can become correlation handles when reused outside the issuing Service or logged by intermediaries. Concrete session-credential documents MUST define presentation rules that avoid unnecessary disclosure and MUST prohibit logging raw credential values.
 

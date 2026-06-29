@@ -14,7 +14,7 @@ interoperability:
 - HTTP binding behavior with TLS protection.
 - Inspect, Enroll, Grant, Revoke, and Status.
 - Baseline client assertion authentication.
-- `did:web` identity resolution.
+- Identity method resolution.
 - HTTP Problem Details error handling.
 - IANA registrations needed by the core.
 

@@ -1,5 +1,5 @@
 {
-  "id": "urn:aep:ext:aep:oauth-bearer#v=1.0.0",
+  "id": "urn:aep:grant-type:aep:oauth-bearer#v=1.0.0",
   "kind": "grant_type",
   "name": "OAuth Bearer Session Credential",
   "status": "active",
@@ -7,7 +7,7 @@
   "wire_identifier": "oauth-bearer",
   "specification": {
     "draft": "draft-kavian-aep-oauth-session-credential-00",
-    "path": "ietf/specs/extensions/draft-kavian-aep-oauth-session-credential-00.md",
+    "path": "ietf/specs/grant-types/draft-kavian-aep-oauth-session-credential-00.md",
     "datatracker": "https://datatracker.ietf.org/doc/draft-kavian-aep-oauth-session-credential/"
   },
   "summary": "OAuth Bearer access token issued through AEP Grant and revoked through AEP Revoke.",

@@ -32,13 +32,16 @@ is the GitHub Pages publishing root.
 
 ## Current Draft Set
 
-The current draft set is organized as one core protocol document and three
-companion session-credential documents:
+The current draft set is organized as one core protocol document, one identity
+method feature document, and three companion session-credential grant type
+documents:
 
 - [`draft-kavian-agent-enrollment-protocol-00`](https://datatracker.ietf.org/doc/draft-kavian-agent-enrollment-protocol/):
   the baseline AEP protocol, including Inspect, Enroll, Grant, Revoke, Status,
-  HTTP transport, discovery, `did:web` identity, client assertion
+  HTTP transport, discovery, identity-method substrate, client assertion
   authentication, errors, security, privacy, and IANA registrations.
+- [`draft-kavian-aep-did-web-identity-method-00`](https://datatracker.ietf.org/doc/draft-kavian-aep-did-web-identity-method/):
+  the initial AEP-defined identity method feature.
 - [`draft-kavian-aep-oauth-session-credential-00`](https://datatracker.ietf.org/doc/draft-kavian-aep-oauth-session-credential/):
   OAuth Bearer credentials issued and revoked through AEP Grant and Revoke.
 - [`draft-kavian-aep-api-key-session-credential-00`](https://datatracker.ietf.org/doc/draft-kavian-aep-api-key-session-credential/):
@@ -113,6 +116,8 @@ directory. The `latest` GitHub Release publishes the rendered specification
 artifacts for stable linking without committing generated binaries. The render
 target also updates `docs/index.html` from draft front matter and refreshes
 published JSON Schemas under `docs/schemas/`.
+
+Rendering prerequisites and troubleshooting are documented in `ietf/README.md`.
 
 Run `idnits` against the rendered text artifacts:
 

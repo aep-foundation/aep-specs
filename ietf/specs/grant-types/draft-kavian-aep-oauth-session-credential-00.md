@@ -1,5 +1,5 @@
 ---
-title: "OAuth Bearer Session Credentials for the Agent Enrollment Protocol"
+title: "OAuth Bearer Session Credential Grant Type for the Agent Enrollment Protocol"
 abbrev: "AEP OAuth"
 docname: draft-kavian-aep-oauth-session-credential-00
 category: std
@@ -39,7 +39,7 @@ informative:
 
 --- abstract
 
-This document defines an OAuth Bearer session-credential extension for the Agent Enrollment Protocol (AEP).  The extension lets an AEP Service issue an OAuth-style Bearer access token through the AEP Grant command while preserving baseline AEP client assertion authentication as the root of trust.
+This document defines the OAuth Bearer session-credential grant type for the Agent Enrollment Protocol (AEP).  The grant type lets an AEP Service issue an OAuth-style Bearer access token through the AEP Grant command while preserving baseline AEP client assertion authentication as the root of trust.
 
 --- middle
 
@@ -47,7 +47,7 @@ This document defines an OAuth Bearer session-credential extension for the Agent
 
 The Agent Enrollment Protocol (AEP) defines Grant and Revoke commands for optional session credentials {{AEP-CORE}}.  Session credentials are an optimization for deployments that want to reuse existing authentication middleware after an Agent has proven possession of its AEP identity key.
 
-This document defines the `oauth-bearer` grant type.  The grant type issues an OAuth Bearer access token {{RFC6750}} through the AEP Grant command.  Extension request and response bodies are JSON objects {{RFC8259}} carried over HTTP semantics {{RFC9110}} as defined by AEP.  This extension does not redefine OAuth authorization grants, refresh tokens, token introspection, or token revocation.  When a Service exposes standard OAuth token introspection {{RFC7662}} or revocation {{RFC7009}} endpoints, it advertises those endpoints as extension configuration.
+This document defines the `oauth-bearer` grant type.  The grant type issues an OAuth Bearer access token {{RFC6750}} through the AEP Grant command.  Grant type request and response bodies are JSON objects {{RFC8259}} carried over HTTP semantics {{RFC9110}} as defined by AEP.  This grant type does not redefine OAuth authorization grants, refresh tokens, token introspection, or token revocation.  When a Service exposes standard OAuth token introspection {{RFC7662}} or revocation {{RFC7009}} endpoints, it advertises those endpoints as grant type configuration.
 
 # Requirements Language
 
@@ -61,7 +61,7 @@ The grant type identifier is:
 oauth-bearer
 ~~~
 
-A Service that supports this extension lists `oauth-bearer` in `commands.grant_types` and lists `grant` and `revoke` in `commands.supported` in its AEP Inspect document.
+A Service that enables this grant type lists `oauth-bearer` in `commands.grant_types` and lists `grant` and `revoke` in `commands.supported` in its AEP Inspect document.
 
 # Inspect Configuration
 
@@ -180,7 +180,7 @@ To revoke all session credentials of every grant type, Agents use the core `all_
 
 # Error Handling
 
-This extension uses the AEP error vocabulary defined by the core protocol.  A token that is expired, malformed, revoked, unknown, or bound to a different Agent fails as `not_recognized`.
+This grant type uses the AEP error vocabulary defined by the core protocol.  A token that is expired, malformed, revoked, unknown, or bound to a different Agent fails as `not_recognized`.
 
 # IANA Considerations
 

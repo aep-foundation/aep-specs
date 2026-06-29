@@ -34,7 +34,7 @@ Before submitting a pull request:
 |---------------------------|-------------------------------------------------------------------|
 | Typo or editorial fix     | Pull request to `main`.                                           |
 | Core protocol change      | Open an issue or discussion first.                                |
-| Session credential change | Update the relevant document under `ietf/specs/extensions/`.      |
+| Session credential change | Update the relevant document under `ietf/specs/grant-types/`.     |
 | New extension draft       | Use `ietf/templates/extension-template.md`.                       |
 | Build or website change   | Include generated output only when it is intentionally published. |
 
