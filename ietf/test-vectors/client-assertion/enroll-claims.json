@@ -3,7 +3,7 @@
   "title": "Client assertion claims for Enroll",
   "description": "A valid baseline AEP client assertion claim set for an Enroll command.",
   "drafts": [
-    "draft-kavian-agent-enrollment-protocol-00"
+    "draft-kavian-agent-enrollment-protocol-01"
   ],
   "category": "client-assertion",
   "applies_to": ["agent", "service"],

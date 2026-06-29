@@ -1,7 +1,7 @@
 ---
 title: "OAuth Bearer Session Credential Grant Type for the Agent Enrollment Protocol"
 abbrev: "AEP OAuth"
-docname: draft-kavian-aep-oauth-session-credential-00
+docname: draft-kavian-aep-oauth-session-credential-01
 category: std
 ipr: trust200902
 submissiontype: IETF
@@ -27,7 +27,7 @@ normative:
     target: https://datatracker.ietf.org/doc/draft-kavian-agent-enrollment-protocol/
     date: 2026-06-27
     seriesinfo:
-      Internet-Draft: draft-kavian-agent-enrollment-protocol-00
+      Internet-Draft: draft-kavian-agent-enrollment-protocol-01
     author:
       - ins: N. Kavian
         name: N. Kavian

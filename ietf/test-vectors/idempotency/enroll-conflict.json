@@ -3,7 +3,7 @@
   "title": "Enroll idempotency conflict",
   "description": "A repeated idempotency key with a different request body yields idempotency_conflict.",
   "drafts": [
-    "draft-kavian-agent-enrollment-protocol-00"
+    "draft-kavian-agent-enrollment-protocol-01"
   ],
   "category": "idempotency",
   "applies_to": ["service"],

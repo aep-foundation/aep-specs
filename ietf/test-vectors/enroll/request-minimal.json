@@ -3,7 +3,7 @@
   "title": "Minimal Enroll request",
   "description": "A minimal Enroll request body with the required Agent DID, required claim, and body-carried idempotency key.",
   "drafts": [
-    "draft-kavian-agent-enrollment-protocol-00"
+    "draft-kavian-agent-enrollment-protocol-01"
   ],
   "category": "enroll",
   "applies_to": ["agent", "service"],
