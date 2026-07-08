@@ -12,6 +12,7 @@ ALLOWED_DRAFTS = %w[
   draft-kavian-aep-oauth-session-credential-01
   draft-kavian-aep-api-key-session-credential-01
   draft-kavian-aep-basic-session-credential-01
+  draft-kavian-aep-platform-hosted-identity-00
 ].freeze
 
 ALLOWED_CATEGORIES = %w[
@@ -22,13 +23,14 @@ ALLOWED_CATEGORIES = %w[
   enroll
   status
   grant-revoke
+  platform
   credentials/oauth-bearer
   credentials/api-key
   credentials/basic
 ].freeze
 
-ALLOWED_ROLES = %w[agent service].freeze
-ALLOWED_PROFILES = %w[core-http oauth-bearer api-key basic].freeze
+ALLOWED_ROLES = %w[agent platform service].freeze
+ALLOWED_PROFILES = %w[core-http platform-hosted-identity oauth-bearer api-key basic].freeze
 ID_RE = /\A[a-z0-9]+(?:-[a-z0-9]+)*\z/
 
 errors = []

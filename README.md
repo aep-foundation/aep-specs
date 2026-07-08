@@ -33,8 +33,8 @@ is the GitHub Pages publishing root.
 ## Current Draft Set
 
 The current draft set is organized as one core protocol document, one identity
-method feature document, and three companion session-credential grant type
-documents:
+method feature document, one Platform specification document, and three companion
+session-credential grant type documents:
 
 - [`draft-kavian-agent-enrollment-protocol-01`](https://datatracker.ietf.org/doc/draft-kavian-agent-enrollment-protocol/):
   the baseline AEP protocol, including Inspect, Enroll, Grant, Revoke, Status,
@@ -42,6 +42,10 @@ documents:
   authentication, errors, security, privacy, and IANA registrations.
 - [`draft-kavian-aep-did-web-identity-method-00`](https://datatracker.ietf.org/doc/draft-kavian-aep-did-web-identity-method/):
   the initial AEP-defined identity method feature.
+- [`draft-kavian-aep-platform-hosted-identity-00`](https://datatracker.ietf.org/doc/draft-kavian-aep-platform-hosted-identity/):
+  the hosted identity Platform specification, including Platform discovery,
+  Service-scoped Agent DID provisioning, delegated signing, key custody, DID
+  publication, lifecycle, and hosted verification.
 - [`draft-kavian-aep-oauth-session-credential-01`](https://datatracker.ietf.org/doc/draft-kavian-aep-oauth-session-credential/):
   OAuth Bearer credentials issued and revoked through AEP Grant and Revoke.
 - [`draft-kavian-aep-api-key-session-credential-01`](https://datatracker.ietf.org/doc/draft-kavian-aep-api-key-session-credential/):

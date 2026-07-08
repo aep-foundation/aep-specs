@@ -6,6 +6,7 @@ Extension drafts should remain separate from the core unless they are required f
 
 Current extension draft sources:
 
-- `draft-kavian-aep-api-key-session-credential-01.md`
-- `draft-kavian-aep-basic-session-credential-01.md`
-- `draft-kavian-aep-oauth-session-credential-01.md`
+None.
+
+Grant type, identity method, Platform, and transport specifications live in
+their respective `specs/` subdirectories rather than in `extensions/`.
