@@ -28,6 +28,11 @@ Before submitting a pull request:
 5. Confirm no internal roadmap, private partner context, or speculative launch
    language appears in public specification files.
 
+For a new Internet-Draft or a draft being prepared for IETF posting, follow
+`ietf/guides/internet-draft-addition-guide.md` before treating the work as
+publication-ready. Temporary active work may also have a root `_TASKS.md` queue
+under `ietf/`.
+
 ## Types of Changes
 
 | Change Type               | Process                                                           |
@@ -36,6 +41,7 @@ Before submitting a pull request:
 | Core protocol change      | Open an issue or discussion first.                                |
 | Session credential change | Update the relevant document under `ietf/specs/grant-types/`.     |
 | New extension draft       | Use `ietf/templates/extension-template.md`.                       |
+| New Internet-Draft        | Complete `ietf/_TASKS.md` before posting or publication review.   |
 | Build or website change   | Include generated output only when it is intentionally published. |
 
 ## Writing Style

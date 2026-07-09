@@ -22,6 +22,7 @@ ietf/
     core/
     grant-types/
     identity-methods/
+    platforms/
     transports/
   examples/
   governance/
@@ -34,6 +35,10 @@ ietf/
 Rendered XML, text, HTML, and PDF outputs are written to the ignored
 `../artifacts/` directory.
 
+Use `guides/internet-draft-addition-guide.md` when adding or preparing an
+Internet-Draft for IETF posting. Use `_TASKS.md` only as the active task queue
+for the current bounded delivery track.
+
 ## Initial Document Set
 
 The first Internet-Draft document set is:
@@ -42,6 +47,7 @@ The first Internet-Draft document set is:
 - [`draft-kavian-aep-basic-session-credential-01`](https://datatracker.ietf.org/doc/draft-kavian-aep-basic-session-credential/): `ietf/specs/grant-types/draft-kavian-aep-basic-session-credential-01.md`
 - [`draft-kavian-aep-did-web-identity-method-00`](https://datatracker.ietf.org/doc/draft-kavian-aep-did-web-identity-method/): `ietf/specs/identity-methods/draft-kavian-aep-did-web-identity-method-00.md`
 - [`draft-kavian-aep-oauth-session-credential-01`](https://datatracker.ietf.org/doc/draft-kavian-aep-oauth-session-credential/): `ietf/specs/grant-types/draft-kavian-aep-oauth-session-credential-01.md`
+- [`draft-kavian-aep-platform-hosted-identity-00`](https://datatracker.ietf.org/doc/draft-kavian-aep-platform-hosted-identity/): `ietf/specs/platforms/draft-kavian-aep-platform-hosted-identity-00.md`
 - [`draft-kavian-agent-enrollment-protocol-01`](https://datatracker.ietf.org/doc/draft-kavian-agent-enrollment-protocol/): `ietf/specs/core/draft-kavian-agent-enrollment-protocol-01.md`
 
 The core document defines the baseline HTTP binding, including:
@@ -59,11 +65,11 @@ The core document defines the baseline HTTP binding, including:
 - Privacy considerations.
 - IANA considerations.
 
-The three session-credential documents define the initial concrete Grant/Revoke credential formats: OAuth Bearer, API-key, and Basic. The `did:web` identity-method document defines the initial concrete identity method. Follow-on documents may define additional lifecycle commands, additional transports, policy disclosures, privacy preferences, attestation profiles, and other extensions.
+The three session-credential documents define the initial concrete Grant/Revoke credential formats: OAuth Bearer, API-key, and Basic. The `did:web` identity-method document defines the initial concrete identity method. The Platform document defines the initial hosted identity Platform API. Follow-on documents may define additional lifecycle commands, additional transports, policy disclosures, privacy preferences, attestation profiles, and other extensions.
 
 The core document is independently implementable. The session-credential documents depend on the core document, but the core document does not depend on any specific session-credential document. A Service that does not issue session credentials can implement Inspect, Enroll, and Status without implementing Grant or Revoke. A Service that supports Grant and Revoke advertises one or more concrete grant types defined by companion session-credential specifications.
 
-The first Internet-Draft set includes `did:web` as the initial AEP-defined identity method feature.
+The first Internet-Draft set includes `did:web` as the initial AEP-defined identity method feature and the hosted identity Platform specification as the initial AEP-defined Platform specification.
 
 ## Governance
 
@@ -77,8 +83,9 @@ registry entries live in `registry/`.
 The `conformance/`, `test-vectors/`, and `schemas/` directories define the
 initial implementation-checking surface for the published draft set. They are
 scoped to the current core HTTP draft and the three published
-session-credential drafts. They do not include later lifecycle commands,
-additional identity methods beyond `did:web`, Platform conformance, or deferred extensions.
+session-credential drafts, and Platform Hosted Identity. They do not
+include later lifecycle commands, additional identity methods beyond `did:web`,
+or deferred extensions.
 
 JSON Schemas validate stable wire objects used by the current test vectors.
 They are support artifacts derived from the Internet-Draft prose, not a

@@ -9,24 +9,34 @@ should be corrected.
 
 ## Scope
 
-The initial schema set covers the stable core HTTP objects and the three
-published session-credential Grant responses:
+The initial schema set covers the stable core HTTP objects, the three published
+session-credential Grant responses, and the hosted identity Platform specification:
 
-| Schema                                    | Validates                                 |
-| ----------------------------------------- | ----------------------------------------- |
-| `client-assertion-claims.schema.json`     | Client assertion JWT claim set            |
-| `inspect-document.schema.json`            | Inspect document response body            |
-| `enroll-request.schema.json`              | Enroll request body                       |
-| `enroll-response.schema.json`             | Enroll response body                      |
-| `status-response.schema.json`             | Status response body                      |
-| `grant-request.schema.json`               | Grant request body                        |
-| `revoke-request.schema.json`              | Revoke request body                       |
-| `revoke-response.schema.json`             | Revoke response body                      |
-| `problem.schema.json`                     | AEP Problem Details response body         |
-| `idempotency-metadata.schema.json`        | Idempotency key and request hash metadata |
-| `oauth-bearer-grant-response.schema.json` | OAuth Bearer Grant response body          |
-| `api-key-grant-response.schema.json`      | API-key Grant response body               |
-| `basic-grant-response.schema.json`        | HTTP Basic Grant response body            |
+| Schema                                              | Validates                                  |
+| --------------------------------------------------- | ------------------------------------------ |
+| `client-assertion-claims.schema.json`               | Client assertion JWT claim set             |
+| `inspect-document.schema.json`                      | Inspect document response body             |
+| `enroll-request.schema.json`                        | Enroll request body                        |
+| `enroll-response.schema.json`                       | Enroll response body                       |
+| `status-response.schema.json`                       | Status response body                       |
+| `grant-request.schema.json`                         | Grant request body                         |
+| `revoke-request.schema.json`                        | Revoke request body                        |
+| `revoke-response.schema.json`                       | Revoke response body                       |
+| `problem.schema.json`                               | AEP Problem Details response body          |
+| `idempotency-metadata.schema.json`                  | Idempotency key and request hash metadata  |
+| `oauth-bearer-grant-response.schema.json`           | OAuth Bearer Grant response body           |
+| `api-key-grant-response.schema.json`                | API-key Grant response body                |
+| `basic-grant-response.schema.json`                  | HTTP Basic Grant response body             |
+| `platform-discovery.schema.json`                    | Platform discovery document                |
+| `platform-provision-request.schema.json`            | Platform provisioning request body         |
+| `platform-agent-identity.schema.json`               | Platform Agent identity response body      |
+| `platform-agent-identity-list-response.schema.json` | Platform Agent identity list response body |
+| `platform-sign-request.schema.json`                 | Platform delegated signing request body    |
+| `platform-sign-response.schema.json`                | Platform delegated signing response body   |
+| `platform-lifecycle-request.schema.json`            | Platform lifecycle update request body     |
+| `platform-lifecycle-response.schema.json`           | Platform lifecycle update response body    |
+| `platform-verification-request.schema.json`         | Platform hosted verification request body  |
+| `platform-verification-response.schema.json`        | Platform hosted verification response body |
 
 ## Validation
 

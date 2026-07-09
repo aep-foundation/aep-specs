@@ -24,7 +24,18 @@ SCHEMA_TARGETS = [
   ["idempotency/enroll-conflict.json", "problem.schema.json", %w[expected body]],
   ["credentials/oauth-bearer/grant-response.json", "oauth-bearer-grant-response.schema.json", %w[expected]],
   ["credentials/api-key/grant-response.json", "api-key-grant-response.schema.json", %w[expected]],
-  ["credentials/basic/grant-response.json", "basic-grant-response.schema.json", %w[expected]]
+  ["credentials/basic/grant-response.json", "basic-grant-response.schema.json", %w[expected]],
+  ["platform/discovery.json", "platform-discovery.schema.json", %w[expected]],
+  ["platform/provision-request.json", "platform-provision-request.schema.json", %w[input]],
+  ["platform/provision-response.json", "platform-agent-identity.schema.json", %w[expected]],
+  ["platform/list-response.json", "platform-agent-identity-list-response.schema.json", %w[expected]],
+  ["platform/lifecycle-request.json", "platform-lifecycle-request.schema.json", %w[input]],
+  ["platform/lifecycle-response.json", "platform-lifecycle-response.schema.json", %w[expected]],
+  ["platform/sign-request.json", "platform-sign-request.schema.json", %w[input]],
+  ["platform/sign-response.json", "platform-sign-response.schema.json", %w[expected]],
+  ["platform/verification-request.json", "platform-verification-request.schema.json", %w[input]],
+  ["platform/verification-response-recognized.json", "platform-verification-response.schema.json", %w[expected]],
+  ["platform/verification-response-unrecognized.json", "platform-verification-response.schema.json", %w[expected]]
 ].freeze
 
 def load_json(path)
@@ -95,6 +106,14 @@ def validate_schema(schema, value, location, errors)
 
   if schema.key?("minItems") && value.is_a?(Array) && value.length < schema["minItems"]
     errors << "#{location}: must contain at least #{schema['minItems']} item(s)"
+  end
+
+  if schema.key?("minimum") && value.is_a?(Numeric) && value < schema["minimum"]
+    errors << "#{location}: must be at least #{schema['minimum']}"
+  end
+
+  if schema.key?("maximum") && value.is_a?(Numeric) && value > schema["maximum"]
+    errors << "#{location}: must be at most #{schema['maximum']}"
   end
 
   validate_format(value, schema["format"], location, errors) if schema.key?("format")

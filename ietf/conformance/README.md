@@ -8,39 +8,40 @@ The current conformance scope is limited to:
 - `draft-kavian-aep-api-key-session-credential-01`
 - `draft-kavian-aep-basic-session-credential-01`
 - `draft-kavian-aep-did-web-identity-method-00`
+- `draft-kavian-aep-platform-hosted-identity-00`
 - `draft-kavian-aep-oauth-session-credential-01`
 - `draft-kavian-agent-enrollment-protocol-01`
 
 This scope covers the HTTP binding, identity-method substrate, the initial
 `did:web` identity method feature, Inspect, Enroll, Status, Grant, Revoke,
 baseline `Authorization: AEP <jwt>` authentication, error handling,
-idempotency, and the three initial session-credential formats.
+idempotency, the three initial session-credential formats, and the optional
+Platform Hosted Identity API.
 
 ## Roles
 
-The initial conformance model defines two implementation roles:
+The conformance model defines these implementation roles:
 
-| Role    | Scope                                                                                                                                                                 |
-| ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Agent   | Consumes Inspect, constructs client assertions, invokes AEP commands, handles errors, and uses issued session credentials.                                            |
-| Service | Publishes Inspect, validates client assertions, processes AEP commands, returns defined errors, enforces idempotency, and issues/revokes advertised credential types. |
-
-Platform conformance is out of scope for the current published draft set. A
-future document can define Platform behavior if additional identity-hosting or
-attestation drafts require it.
+| Role     | Scope                                                                                                                                                                                    |
+| -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Agent    | Consumes Inspect, constructs client assertions, invokes AEP commands, handles errors, and uses issued session credentials.                                                               |
+| Platform | Publishes Platform discovery, provisions Service-scoped Agent DIDs, hosts DID documents, performs delegated signing, exposes lifecycle state, and optionally verifies hosted assertions. |
+| Service  | Publishes Inspect, validates client assertions, processes AEP commands, returns defined errors, enforces idempotency, and issues/revokes advertised credential types.                    |
 
 ## Profiles
 
-| Profile                 | Requirement                                                                    |
-| ----------------------- | ------------------------------------------------------------------------------ |
-| Core HTTP               | Implements the core AEP draft over HTTP with an enabled identity method.       |
-| API-Key Credential      | Implements the API-key session-credential draft in addition to Core HTTP.      |
-| Basic Credential        | Implements the Basic session-credential draft in addition to Core HTTP.        |
-| OAuth Bearer Credential | Implements the OAuth Bearer session-credential draft in addition to Core HTTP. |
+| Profile                  | Requirement                                                                         |
+| ------------------------ | ----------------------------------------------------------------------------------- |
+| Core HTTP                | Implements the core AEP draft over HTTP with an enabled identity method.            |
+| API-Key Credential       | Implements the API-key session-credential draft in addition to Core HTTP.           |
+| Basic Credential         | Implements the Basic session-credential draft in addition to Core HTTP.             |
+| OAuth Bearer Credential  | Implements the OAuth Bearer session-credential draft in addition to Core HTTP.      |
+| Platform Hosted Identity | Implements the Platform Hosted Identity draft as an optional Platform role profile. |
 
 An implementation may claim one or more credential profiles. A Service that
 does not advertise `grant` and `revoke` does not need to claim a credential
-profile.
+profile. A Platform Hosted Identity claim is independent of Agent and Service
+claims.
 
 ## Test Vector Relationship
 
@@ -58,8 +59,10 @@ make -C ietf check-harness
 The harness validates semantic relationships encoded in the fixtures, including
 endpoint construction from Inspect, media types, authentication scheme
 selection, client assertion operation binding, idempotency conflict behavior,
-and credential-profile consistency. It does not contact a live Agent or
-Service.
+credential-profile consistency, Platform discovery shape, Platform assertion
+lifetime limits, Service-scoped Agent DID uniqueness, hosted verification
+non-disclosure behavior, and the absence of Platform key-rotation endpoints. It
+does not contact a live Agent, Platform, or Service.
 
 ## Initial Harness Boundary
 
@@ -67,6 +70,8 @@ The first harness should remain black-box and role-oriented:
 
 - Agent tests drive an Agent with synthetic Inspect documents and verify the
   requests it constructs.
+- Platform tests drive a Platform with synthetic provisioning, signing,
+  lifecycle, and verification fixtures.
 - Service tests drive a Service with synthetic requests and verify responses,
   error behavior, and state changes.
 - Credential-profile tests run only when the implementation claims the

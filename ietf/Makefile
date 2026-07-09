@@ -34,9 +34,9 @@ MARKDOWN_TABLE_FILES ?= \
 	$(DRAFTS) \
 	$(EXAMPLES)
 
-.PHONY: check lint check-drafts check-external-section-refs check-vectors check-schemas check-published-schemas check-harness check-registry format render render-drafts render-examples render-schemas render-index idnits clean
+.PHONY: check lint check-drafts check-external-section-refs check-vectors check-schemas check-published-schemas check-harness check-registry check-platform-guardrails format render render-drafts render-examples render-schemas render-index idnits clean
 
-check: lint check-vectors check-schemas check-published-schemas check-harness check-registry
+check: lint check-vectors check-schemas check-published-schemas check-harness check-registry check-platform-guardrails
 
 lint: check-drafts check-external-section-refs
 
@@ -60,6 +60,9 @@ check-harness:
 
 check-registry:
 	@bundle exec ruby scripts/check_registry.rb
+
+check-platform-guardrails:
+	@bundle exec ruby scripts/check_platform_guardrails.rb
 
 format:
 	@bundle exec ruby scripts/format_markdown_tables.rb $(MARKDOWN_TABLE_FILES)

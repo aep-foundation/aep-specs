@@ -32,6 +32,7 @@ CREDENTIAL_PROFILES = {
     required_fields: %w[expires_at password scopes username]
   }
 }.freeze
+PLATFORM_LIFECYCLE_STATES = %w[active revoked suspended terminated].freeze
 
 def vector(path)
   JSON.parse(VECTOR_ROOT.join(path).read)
@@ -125,6 +126,59 @@ POST_COMMANDS.each do |command|
   vector_path = command == "enroll" ? "enroll/request-minimal.json" : "grant-revoke/#{command}-request-oauth-bearer.json"
   expected = vector(vector_path).fetch("expected")
   expect(errors, expected["method"] == "POST", "#{command} must remain a POST command")
+end
+
+platform_discovery = vector("platform/discovery.json").fetch("expected")
+platform_endpoints = platform_discovery.fetch("endpoints")
+expect(errors, platform_discovery.fetch("aep_version") == "1.0", "Platform discovery must advertise AEP version 1.0")
+expect(errors, platform_discovery.dig("identity", "did_methods") == ["did:web"], "Platform discovery must advertise did:web")
+expect(errors, platform_discovery.dig("platform", "hosted_verification") == true, "Platform hosted_verification vector must advertise support")
+expect(errors, platform_endpoints.key?("hosted_verification"), "Platform hosted verification support must include an endpoint")
+expect(errors, !platform_endpoints.key?("rotate_key"), "Platform discovery must not advertise rotate_key")
+expect(errors, !platform_endpoints.key?("rotate-key"), "Platform discovery must not advertise rotate-key")
+platform_lifetime = platform_discovery.dig("signing", "default_lifetime_seconds")
+expect(errors, platform_lifetime.is_a?(String) && platform_lifetime.match?(/\A[1-9][0-9]*\z/), "Platform default_lifetime_seconds must be a positive numeric string")
+expect(errors, platform_lifetime.to_i <= 300, "Platform default_lifetime_seconds must be at most 300 seconds")
+
+platform_provision = vector("platform/provision-response.json").fetch("expected")
+expect(errors, platform_provision.fetch("agent_did").start_with?("did:web:"), "Platform provision response agent_did must be did:web")
+expect(errors, platform_provision.fetch("service_did").start_with?("did:web:"), "Platform provision response service_did must be did:web")
+expect(errors, PLATFORM_LIFECYCLE_STATES.include?(platform_provision.fetch("status")), "Platform provision response status must be a lifecycle state")
+expect(errors, platform_provision.fetch("key_id") == platform_provision.fetch("agent_did"), "Platform key_id must equal the did:web Agent DID")
+
+platform_distinct = vector("platform/provision-response-distinct-services.json").fetch("expected")
+first_platform_identity = platform_distinct.fetch("first_response")
+second_platform_identity = platform_distinct.fetch("second_response")
+expect(errors, first_platform_identity.fetch("service_did") != second_platform_identity.fetch("service_did"), "Distinct-Service vector must use two Service DIDs")
+expect(errors, first_platform_identity.fetch("agent_did") != second_platform_identity.fetch("agent_did"), "Platform must use distinct Agent DIDs for unrelated Services")
+expect(errors, first_platform_identity.fetch("key_id") == first_platform_identity.fetch("agent_did"), "First distinct-Service key_id must equal its did:web Agent DID")
+expect(errors, second_platform_identity.fetch("key_id") == second_platform_identity.fetch("agent_did"), "Second distinct-Service key_id must equal its did:web Agent DID")
+
+platform_list = vector("platform/list-response.json").fetch("expected")
+expect(errors, platform_list.fetch("count").is_a?(String), "Platform list count must be a numeric string")
+expect(errors, platform_list.fetch("total").is_a?(String), "Platform list total must be a numeric string")
+expect(errors, platform_list.fetch("count").match?(/\A(?:0|[1-9][0-9]*)\z/), "Platform list count must be non-negative")
+expect(errors, platform_list.fetch("total").match?(/\A(?:0|[1-9][0-9]*)\z/), "Platform list total must be non-negative")
+
+platform_sign = vector("platform/sign-request.json").fetch("input")
+sign_lifetime = platform_sign.fetch("lifetime_seconds")
+expect(errors, sign_lifetime.is_a?(String) && sign_lifetime.match?(/\A[1-9][0-9]*\z/), "Platform sign lifetime_seconds must be a positive numeric string")
+expect(errors, sign_lifetime.to_i <= 300, "Platform sign lifetime_seconds must be at most 300 seconds")
+expect(errors, AUTHENTICATED_COMMANDS.include?(platform_sign.fetch("op")), "Platform sign op must be an authenticated AEP command")
+
+platform_lifecycle = vector("platform/lifecycle-response.json").fetch("expected")
+expect(errors, PLATFORM_LIFECYCLE_STATES.include?(platform_lifecycle.fetch("status")), "Platform lifecycle response status must be a lifecycle state")
+
+platform_verification = vector("platform/verification-response-recognized.json").fetch("expected")
+expect(errors, platform_verification.fetch("verified") == true, "Platform recognized verification must set verified true")
+expect(errors, platform_verification.fetch("reason") == "verified", "Platform recognized verification reason must be verified")
+expect(errors, AUTHENTICATED_COMMANDS.include?(platform_verification.fetch("op")), "Platform verification op must be an authenticated AEP command")
+
+platform_unrecognized = vector("platform/verification-response-unrecognized.json").fetch("expected")
+expect(errors, platform_unrecognized.fetch("verified") == false, "Platform unrecognized verification must set verified false")
+expect(errors, platform_unrecognized.fetch("reason") == "not_recognized", "Platform unrecognized verification reason must be not_recognized")
+%w[agent_did agent_identity_id op status].each do |field|
+  expect(errors, !platform_unrecognized.key?(field), "Platform unrecognized verification must not disclose #{field}")
 end
 
 if errors.empty?
