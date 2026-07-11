@@ -3,7 +3,7 @@
   "title": "Active Status response",
   "description": "A successful Status response for an active enrolled Agent identity.",
   "drafts": [
-    "draft-kavian-agent-enrollment-protocol-01"
+    "draft-kavian-agent-enrollment-protocol-02"
   ],
   "category": "status",
   "applies_to": ["agent", "service"],
@@ -15,8 +15,6 @@
     "status": 200,
     "content_type": "application/aep+json",
     "body": {
-      "owner_action_required": "false",
-      "requirements_pending": [],
       "since": "2026-05-28T12:00:00Z",
       "status": "active"
     }

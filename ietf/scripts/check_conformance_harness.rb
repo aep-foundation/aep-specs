@@ -16,6 +16,7 @@ COMMAND_PATHS = {
 
 POST_COMMANDS = %w[enroll grant revoke].freeze
 AUTHENTICATED_COMMANDS = %w[enroll grant revoke status].freeze
+AUTHENTICATED_OPERATIONS = (AUTHENTICATED_COMMANDS + ["authenticate"]).freeze
 GRANT_TYPES = %w[oauth-bearer api-key basic].freeze
 CREDENTIAL_PROFILES = {
   "oauth-bearer" => {
@@ -57,6 +58,10 @@ expect(errors, inspect.dig("identity", "methods") == ["did:web"], "Inspect must 
 expect(errors, commands.fetch("supported").sort == %w[enroll grant inspect revoke status], "Inspect command set must match current v00 command set")
 expect(errors, commands.fetch("grant_types").sort == GRANT_TYPES.sort, "Inspect grant_types must advertise the three published credential profiles")
 expect(errors, inspect.dig("service", "did").start_with?("did:web:"), "Inspect service.did must be did:web")
+expect(errors, inspect.dig("authentication", "methods") == %w[aep-jwt oauth-bearer api-key basic], "Inspect authentication methods must preserve preference order")
+expect(errors, !commands.fetch("supported").include?("authenticate"), "authenticate must not appear as a Service command")
+expect(errors, inspect.dig("http", "openapi", "url") == "/openapi.json", "Inspect must advertise an OpenAPI URI-reference")
+expect(errors, inspect.dig("http", "openapi", "path_matching", "trailing_slash") == "strict", "Inspect OpenAPI vector must declare strict slash matching")
 
 COMMAND_PATHS.each do |command, path|
   expect(errors, endpoint(endpoint_base, command) == path, "endpoint_base must construct #{path} for #{command}")
@@ -88,8 +93,17 @@ expect(errors, enroll.dig("input", "idempotency_key") == enroll.dig("expected", 
 
 status = vector("status/response-active.json").dig("expected", "body")
 expect(errors, status.fetch("status") == "active", "Status active vector must return active")
-expect(errors, status.fetch("owner_action_required") == "false", "Status owner_action_required must use string boolean")
-expect(errors, status.fetch("requirements_pending").is_a?(Array), "Status requirements_pending must be an array")
+expect(errors, !status.key?("owner_action_required"), "Canonical active Status must omit false owner_action_required")
+expect(errors, !status.key?("requirements_pending"), "Canonical active Status must omit empty requirements_pending")
+
+pending_enroll = vector("enroll/response-pending-verification-owner-action.json").dig("expected", "body")
+expect(errors, pending_enroll.fetch("verification_pending").is_a?(Array), "Pending Enroll must expose verification_pending")
+expect(errors, pending_enroll.fetch("owner_action_required") == "true", "Owner action signal must be independent and string true")
+expect(errors, !pending_enroll.key?("requirements_pending"), "Pending Enroll verification vector must not alias requirements_pending")
+
+pending_status = vector("status/response-pending-requirements.json").dig("expected", "body")
+expect(errors, pending_status.fetch("requirements_pending").is_a?(Array), "Pending Status must expose requirements_pending")
+expect(errors, !pending_status.key?("verification_pending"), "Pending Status requirements vector must not alias verification_pending")
 
 revoke_all = vector("grant-revoke/revoke-request-all-grant-types.json").fetch("expected")
 expect(errors, revoke_all.dig("body", "all_grant_types") == "true", "Revoke-all body must set all_grant_types to string true")
@@ -110,6 +124,9 @@ problem = vector("errors/not-recognized-problem.json").fetch("expected")
 expect(errors, problem.fetch("status") == 401, "not_recognized problem must use HTTP 401")
 expect(errors, problem.dig("body", "type") == "urn:aep:error:not_recognized", "not_recognized problem type must use AEP error URN")
 expect(errors, problem.dig("body", "code") == "not_recognized", "not_recognized problem code must be not_recognized")
+%w[verification_pending requirements_pending owner_action_required].each do |field|
+  expect(errors, !problem.fetch("body").key?(field), "not_recognized must not disclose #{field}")
+end
 
 CREDENTIAL_PROFILES.each do |grant_type, config|
   expected = vector("#{config[:category]}/grant-response.json").fetch("expected")
@@ -127,6 +144,81 @@ POST_COMMANDS.each do |command|
   expected = vector(vector_path).fetch("expected")
   expect(errors, expected["method"] == "POST", "#{command} must remain a POST command")
 end
+
+resource_auth = vector("protected-resource/authenticate-assertion.json").fetch("expected")
+resource_claims = resource_auth.fetch("claims")
+expect(errors, resource_claims.fetch("op") == "authenticate", "Protected-resource JWT must use authenticate")
+expect(errors, resource_claims.fetch("aud") == inspect.dig("service", "did"), "Protected-resource JWT audience must equal Service DID")
+expect(errors, resource_claims.fetch("resource").start_with?("https://"), "Protected-resource JWT must bind an HTTPS resource")
+expect(errors, resource_claims.fetch("exp") - resource_claims.fetch("iat") <= 300, "Protected-resource JWT lifetime must be at most 300 seconds")
+expect(errors, resource_auth.dig("challenge", "scheme") == "AEP", "Protected-resource challenge must use AEP scheme")
+expect(errors, resource_auth.dig("challenge", "service_did") == resource_claims.fetch("aud"), "Challenge Service DID must match assertion audience")
+
+substitution = vector("protected-resource/operation-substitution-rejected.json")
+expect(errors, substitution.dig("input", "operations").sort == AUTHENTICATED_OPERATIONS.sort, "Substitution vector must cover every registered authenticated operation")
+expect(errors, substitution.dig("expected", "allowed").length == AUTHENTICATED_OPERATIONS.length, "Only one target is allowed per operation")
+
+presentations = vector("protected-resource/credential-presentations.json").fetch("expected")
+expect(errors, presentations.dig("oauth-bearer", "scheme") == "Bearer", "OAuth presentation must use Bearer")
+expect(errors, presentations.dig("basic", "scheme") == "Basic", "Basic presentation must use Basic")
+expect(errors, presentations.dig("api-key", "header") != "X-API-KEY", "API-key presentation must use issued header, not a protocol default")
+
+carriers = vector("protected-resource/authorization-carriers.json").fetch("expected")
+%w[jwt bearer basic].each do |method|
+  standard = carriers.fetch("standard_#{method}")
+  dedicated = carriers.fetch("dedicated_#{method}")
+  expect(errors, standard.fetch("carrier") == "Authorization", "#{method} standard carrier must be Authorization")
+  expect(errors, dedicated.fetch("carrier") == "AEP-Authorization", "#{method} dedicated carrier must be AEP-Authorization")
+  expect(errors, standard.fetch("scheme") == dedicated.fetch("scheme"), "#{method} scheme must be preserved across carriers")
+end
+
+ambiguity = vector("protected-resource/authorization-ambiguity.json").fetch("expected")
+expect(errors, ambiguity.fetch("code") == "not_recognized", "Carrier ambiguity must use non-disclosing not_recognized")
+expect(errors, ambiguity.fetch("fallback") == false, "Invalid dedicated credentials must not fall back")
+
+composition = vector("protected-resource/authorization-payment-composition.json").fetch("expected")
+expect(errors, composition.dig("mpp", "ambiguous") == false, "Dedicated AEP plus MPP Payment authorization must be valid")
+expect(errors, composition.dig("x402", "ambiguous") == false, "Dedicated AEP plus x402 signature must be valid")
+expect(errors, composition.fetch("payment_advertised_after_aep") == true, "Payment must be advertised only after AEP succeeds")
+
+field_safety = vector("protected-resource/authorization-field-safety.json").fetch("expected")
+expect(errors, field_safety.fetch("field_name_match") == "case-insensitive", "AEP-Authorization field-name matching must be case-insensitive")
+%w[Authorization AEP-Authorization PAYMENT-SIGNATURE api-key-header].each do |field|
+  expect(errors, field_safety.fetch("strip_on_disallowed_redirect").include?(field), "Redirect stripping must include #{field}")
+end
+
+wrong_header = vector("protected-resource/api-key-wrong-header-rejected.json")
+expect(errors, wrong_header.dig("input", "issued_header").downcase != wrong_header.dig("input", "presented_header").downcase, "Wrong-header vector must use distinct header names")
+expect(errors, wrong_header.dig("expected", "accepted") == false, "API key under wrong header must be rejected")
+
+redirects = vector("protected-resource/redirect-safety.json").fetch("expected")
+expect(errors, redirects.dig("same_origin", "credential_forwarded") == false, "Same-origin changed resource must use a new assertion")
+expect(errors, redirects.dig("cross_origin", "anonymous_restart") == true, "Cross-origin redirect must restart anonymously")
+%w[assertion_forwarded session_credential_forwarded api_key_header_forwarded].each do |field|
+  expect(errors, redirects.dig("cross_origin", field) == false, "Cross-origin redirect must not forward #{field}")
+end
+
+cache = vector("caching/public-discovery-cache.json").fetch("expected")
+expect(errors, cache.fetch("default_freshness_seconds") == "300", "Public discovery default freshness must be 300 seconds")
+expect(errors, cache.fetch("no_cache") == "revalidate", "no-cache must require revalidation")
+expect(errors, cache.fetch("no_store") == "do-not-persist", "no-store must prohibit persistence")
+
+openapi_url = vector("openapi/url-resolution.json").fetch("expected")
+expect(errors, openapi_url.fetch("forwarded_headers") == [], "OpenAPI retrieval must be anonymous")
+expect(errors, openapi_url.fetch("cross_origin_https") == "allowed-anonymous", "Cross-origin HTTPS OpenAPI retrieval must remain anonymous")
+
+openapi_security = vector("openapi/security-inheritance.json")
+expect(errors, openapi_security.dig("input", "security_scheme", "x-aep-authentication-method") == "aep-jwt", "OpenAPI extension must bind a registered AEP authentication method")
+expect(errors, openapi_security.dig("expected", "multiple_schemes_one_object") == "all-required", "OpenAPI compound requirements must require every scheme")
+
+openapi_paths = vector("openapi/path-matching.json").fetch("expected")
+expect(errors, openapi_paths.fetch("method") == "GET", "OpenAPI request methods must be uppercase")
+expect(errors, openapi_paths.fetch("query_selects_operation") == false, "Query parameters must not select OpenAPI operations")
+expect(errors, openapi_paths.fetch("similar_templates") == "contradiction", "Similar applicable templates must fail closed")
+
+grant_before_enroll = vector("grant-revoke/grant-before-enroll-rejected.json").fetch("expected")
+expect(errors, grant_before_enroll.fetch("code") == "not_recognized", "Grant before enrollment must be rejected as not_recognized")
+expect(errors, grant_before_enroll.fetch("implicit_enrollment") == false, "Grant must never implicitly enroll")
 
 platform_discovery = vector("platform/discovery.json").fetch("expected")
 platform_endpoints = platform_discovery.fetch("endpoints")
@@ -165,6 +257,18 @@ sign_lifetime = platform_sign.fetch("lifetime_seconds")
 expect(errors, sign_lifetime.is_a?(String) && sign_lifetime.match?(/\A[1-9][0-9]*\z/), "Platform sign lifetime_seconds must be a positive numeric string")
 expect(errors, sign_lifetime.to_i <= 300, "Platform sign lifetime_seconds must be at most 300 seconds")
 expect(errors, AUTHENTICATED_COMMANDS.include?(platform_sign.fetch("op")), "Platform sign op must be an authenticated AEP command")
+expect(errors, platform_sign.fetch("platform_context").is_a?(Hash), "Platform sign platform_context must be an opaque object")
+
+platform_sign_completed = vector("platform/sign-response.json").fetch("expected")
+expect(errors, platform_sign_completed.fetch("status") == "completed", "Completed Platform Sign must use completed status")
+expect(errors, platform_sign_completed.fetch("platform_context") == platform_sign.fetch("platform_context"), "Opaque Platform context must round trip")
+platform_sign_pending = vector("platform/sign-response-pending.json").fetch("expected")
+expect(errors, platform_sign_pending.fetch("status") == "pending", "Pending Platform Sign must use pending status")
+expect(errors, platform_sign_pending.fetch("retry_after_seconds").to_i.between?(1, 300), "Pending Platform Sign retry cadence must be 1 through 300")
+
+platform_idempotency = vector("platform/idempotency-replay-conflict.json")
+expect(errors, platform_idempotency.dig("expected", "retention_seconds_minimum").to_i >= 3600, "Platform idempotency retention must be at least one hour")
+expect(errors, platform_idempotency.dig("input", "initial_sign_key") != platform_idempotency.dig("input", "final_sign_key"), "Initial and final Sign must use separate idempotency keys")
 
 platform_lifecycle = vector("platform/lifecycle-response.json").fetch("expected")
 expect(errors, PLATFORM_LIFECYCLE_STATES.include?(platform_lifecycle.fetch("status")), "Platform lifecycle response status must be a lifecycle state")

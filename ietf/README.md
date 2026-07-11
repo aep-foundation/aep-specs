@@ -43,12 +43,12 @@ for the current bounded delivery track.
 
 The first Internet-Draft document set is:
 
-- [`draft-kavian-aep-api-key-session-credential-01`](https://datatracker.ietf.org/doc/draft-kavian-aep-api-key-session-credential/): `ietf/specs/grant-types/draft-kavian-aep-api-key-session-credential-01.md`
-- [`draft-kavian-aep-basic-session-credential-01`](https://datatracker.ietf.org/doc/draft-kavian-aep-basic-session-credential/): `ietf/specs/grant-types/draft-kavian-aep-basic-session-credential-01.md`
+- [`draft-kavian-aep-api-key-session-credential-02`](https://datatracker.ietf.org/doc/draft-kavian-aep-api-key-session-credential/): `ietf/specs/grant-types/draft-kavian-aep-api-key-session-credential-02.md`
+- [`draft-kavian-aep-basic-session-credential-02`](https://datatracker.ietf.org/doc/draft-kavian-aep-basic-session-credential/): `ietf/specs/grant-types/draft-kavian-aep-basic-session-credential-02.md`
 - [`draft-kavian-aep-did-web-identity-method-00`](https://datatracker.ietf.org/doc/draft-kavian-aep-did-web-identity-method/): `ietf/specs/identity-methods/draft-kavian-aep-did-web-identity-method-00.md`
-- [`draft-kavian-aep-oauth-session-credential-01`](https://datatracker.ietf.org/doc/draft-kavian-aep-oauth-session-credential/): `ietf/specs/grant-types/draft-kavian-aep-oauth-session-credential-01.md`
+- [`draft-kavian-aep-oauth-session-credential-02`](https://datatracker.ietf.org/doc/draft-kavian-aep-oauth-session-credential/): `ietf/specs/grant-types/draft-kavian-aep-oauth-session-credential-02.md`
 - [`draft-kavian-aep-platform-hosted-identity-00`](https://datatracker.ietf.org/doc/draft-kavian-aep-platform-hosted-identity/): `ietf/specs/platforms/draft-kavian-aep-platform-hosted-identity-00.md`
-- [`draft-kavian-agent-enrollment-protocol-01`](https://datatracker.ietf.org/doc/draft-kavian-agent-enrollment-protocol/): `ietf/specs/core/draft-kavian-agent-enrollment-protocol-01.md`
+- [`draft-kavian-agent-enrollment-protocol-02`](https://datatracker.ietf.org/doc/draft-kavian-agent-enrollment-protocol/): `ietf/specs/core/draft-kavian-agent-enrollment-protocol-02.md`
 
 The core document defines the baseline HTTP binding, including:
 

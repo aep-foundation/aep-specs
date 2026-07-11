@@ -1,7 +1,7 @@
 ---
 title: "The Agent Enrollment Protocol"
 abbrev: "AEP"
-docname: draft-kavian-agent-enrollment-protocol-01
+docname: draft-kavian-agent-enrollment-protocol-02
 category: std
 ipr: trust200902
 submissiontype: IETF
@@ -26,7 +26,7 @@ normative:
   RFC7519:
   RFC8259:
   RFC8037:
-  RFC8446:
+  RFC9846:
   RFC8615:
   RFC9110:
   RFC9112:
@@ -79,13 +79,16 @@ Inspect document:
 : The JSON discovery document published by a Service at `/.well-known/aep`. It advertises AEP version, supported commands, accepted identity methods, requested claims, endpoint configuration, and extension support.
 
 Client assertion:
-: A JWT signed by the Agent's private key and presented on authenticated AEP commands. The assertion binds the Agent identity, Service identity, command name, issuance time, expiration time, and replay identifier.
+: A JWT signed by the Agent's private key and presented on an authenticated AEP command or protected Service resource. The assertion binds the Agent identity, Service identity, operation, issuance time, expiration time, replay identifier, and, for protected resources, the resource URI.
 
 Session credential:
 : A stateful credential issued by the Grant command and presented on later requests according to a separate session-credential specification.
 
 Grant type:
 : A string identifier for a concrete session-credential format supported by the Service, such as an OAuth Bearer, API-key, or Basic credential specification.
+
+Authentication method:
+: A wire identifier advertised by a Service for authenticating protected resources. `aep-jwt` identifies an AEP client assertion; registered Grant Type identifiers identify session credentials.
 
 # Protocol Overview
 
@@ -103,7 +106,7 @@ Inspect is unauthenticated. Enroll, Grant, Revoke, and Status are authenticated 
 
 # HTTP Binding
 
-This document defines an HTTP binding using HTTP semantics {{RFC9110}} over HTTP/1.1 {{RFC9112}}, HTTP/2 {{RFC9113}}, or HTTP/3 {{RFC9114}}. Network use of this binding requires TLS 1.3 or later {{RFC8446}}. Plaintext HTTP is out of scope.
+This document defines an HTTP binding using HTTP semantics {{RFC9110}} over HTTP/1.1 {{RFC9112}}, HTTP/2 {{RFC9113}}, or HTTP/3 {{RFC9114}}. Network use of this binding requires TLS 1.3 or later {{RFC9846}}. Plaintext HTTP is out of scope.
 
 The binding uses only `GET` and `POST`:
 
@@ -154,6 +157,9 @@ The Inspect document shown here contains only the fields required for the HTTP b
 ~~~ json
 {
   "aep_version": "1.0",
+  "authentication": {
+    "methods": ["aep-jwt", "oauth-bearer"]
+  },
   "bindings": {
     "supported": ["http"]
   },
@@ -173,7 +179,11 @@ The Inspect document shown here contains only the fields required for the HTTP b
     "supported": []
   },
   "http": {
-    "endpoint_base": "/aep/"
+    "endpoint_base": "/aep/",
+    "openapi": {
+      "path_matching": {"trailing_slash": "strict"},
+      "url": "/openapi.json"
+    }
   },
   "identity": {
     "methods": ["did:web"]
@@ -188,11 +198,41 @@ The Inspect document shown here contains only the fields required for the HTTP b
 
 `commands.grant_types` lists concrete session-credential formats the Service can issue and revoke. If this array is empty or absent, the Service MUST NOT list `grant` or `revoke` in `commands.supported`.
 
+`authentication.methods` lists, in preference order, the authentication methods accepted by protected resources belonging to the Service. `aep-jwt` identifies an AEP client assertion with `op` equal to `authenticate`. Other values MUST be registered Grant Type wire identifiers and use that grant type's credential presentation rules. The field is OPTIONAL; if it is absent, the Service advertises no protected-resource authentication method. When present, it MUST be non-empty and contain no duplicates. An absent or empty `commands.grant_types` array does not imply support for `aep-jwt` or any other method. `authenticate` MUST NOT appear in `commands.supported` because it is an assertion operation, not a Service command endpoint.
+
 `identity.methods` lists identity method identifiers the Service accepts for authenticated AEP commands. The values are lower-case identifiers registered in the AEP Identity Methods registry. A Service that advertises Enroll, Grant, Revoke, or Status MUST advertise at least one identity method.
 
 `service.did` identifies the Service. Agents use this value as the `aud` claim in client assertion JWTs.
 
 Services SHOULD send HTTP cache metadata, including `Cache-Control` and `ETag`, on Inspect responses. A default freshness lifetime of 300 seconds is RECOMMENDED when the Service does not need a shorter policy window.
+
+Agents MUST honor usable HTTP caching metadata on Inspect, including `Cache-Control`, `ETag`, and `Last-Modified`, and MUST process successful conditional revalidation through `304 Not Modified`. `no-cache` requires revalidation before reuse. `no-store` prohibits persistent or transient reuse beyond the current fetch. When no shorter usable freshness policy is supplied, Agents SHOULD use 300 seconds. The cache key is the requested advertised URL and MUST be updated to the final URL after an accepted redirect so revalidation targets the representation that produced the cached document.
+
+Agents MUST require the media-type essence of a successful Inspect response to be `application/aep+json`. Comparison is case-insensitive and ignores valid media-type parameters. A missing, malformed, or different media type MUST be rejected.
+
+An Agent following an Inspect redirect MUST require each redirect target to have the same scheme, host, and effective port as the preceding request URL. Cross-origin redirects and scheme downgrades MUST be rejected. This restriction applies to the unauthenticated Inspect command and does not prevent a future extension from defining a signed Inspect response.
+
+Agents MAY enforce documented bounds on the decoded response size and total completion time. An Agent that enforces such bounds MUST fail closed when a bound is exceeded and MUST NOT process a partial Inspect document.
+
+## OpenAPI Advertisement
+
+`http.openapi`, when present, advertises an OpenAPI 3.1 document for protected Service resources. It contains required `url` and `path_matching.trailing_slash` fields. `url` is a URI-reference. A relative reference resolves against the final Inspect response URL. An absolute HTTPS URL MAY be cross-origin. Plaintext HTTP is prohibited except when the URL host is syntactically exactly `localhost`, `127.0.0.1`, or `[::1]` for development; resolving another name to a loopback address does not qualify. User-information components and HTTPS-to-HTTP downgrade are prohibited.
+
+`path_matching.trailing_slash` is `strict` or `equivalent`. Under `strict`, paths that differ by a terminal slash are distinct. Under `equivalent`, exactly one terminal slash is ignored except for `/`. The canonical behavior when processing older compatible cached data that lacks this member is `strict`; new documents using `http.openapi` MUST include it.
+
+OpenAPI retrieval is anonymous. An Agent MUST NOT send resource credentials, AEP assertions, Platform credentials, cookies, caller authorization headers, or other headers copied from the triggering request. Agents MUST enforce documented redirect-count, decoded-byte, and total-completion-time bounds. Redirects MUST NOT downgrade transport or introduce user information. A cross-origin HTTPS redirect remains anonymous and is permitted within the bound.
+
+Agents MUST accept OpenAPI 3.1 JSON represented as `application/vnd.oai.openapi+json` with a `version=3.1` parameter or as `application/json`. Media-type comparison is case-insensitive and permits unrelated valid parameters. Agents MUST reject missing, malformed, or other media types, non-JSON bodies, documents whose `openapi` version is not `3.1.x`, and partial or over-bound documents.
+
+## OpenAPI Security Mapping
+
+Agents use standard OpenAPI root and operation `security` inheritance and `components.securitySchemes`. An operation-level `security` replaces the root value. An empty security array makes the operation public. An empty requirement object permits anonymous access as one alternative. Multiple requirement objects are alternatives; multiple schemes within one requirement are a compound requirement and all must be satisfied.
+
+The `x-aep-authentication-method` Security Scheme Object extension binds an arbitrary OpenAPI security-scheme name to `aep-jwt` or a registered AEP Grant Type wire identifier. Its value is one registered authentication method identifier. A referenced scheme without this extension is not an AEP method. An Agent MUST treat a compound requirement as unsupported when it cannot satisfy every member and MAY select another complete alternative. It MUST NOT silently reduce a compound requirement to one scheme.
+
+To select an operation, Agents uppercase the concrete HTTP method and match the request path using OpenAPI path-template rules. Literal path segments take precedence over templated segments. Query parameters never select an operation. Under `strict`, terminal slash variants differ. Under `equivalent`, one terminal slash is ignored except for `/`. Multiple equally applicable templates, structurally equivalent templates with different variable names, or another ambiguous match are contradictions.
+
+A fresh, definitive operation match MAY be used to plan authentication without first probing the protected resource. An undocumented operation, unsupported or ambiguous mapping, stale document, or contradiction between OpenAPI and a live response requires fallback to anonymous live challenge discovery and document revalidation. OpenAPI never authorizes a request and never permits credentials to bypass the redirect-safety rules.
 
 # Identity Methods
 
@@ -232,17 +272,24 @@ base64url       = 1*( ALPHA / DIGIT / "-" / "_" )
 
 AEP-challenge        = "AEP" [ 1*SP AEP-challenge-param
                        *( OWS "," OWS AEP-challenge-param ) ]
-AEP-challenge-param  = reason-param / auth-param
+AEP-challenge-param  = reason-param / service-param /
+                       inspect-param / auth-param
 reason-param         = "reason" BWS "=" BWS DQUOTE error-code DQUOTE
+service-param        = "service_did" BWS "=" BWS
+                       DQUOTE did-value DQUOTE
+inspect-param        = "inspect" BWS "=" BWS
+                       DQUOTE absolute-uri DQUOTE
+did-value            = 1*(%x21 / %x23-5B / %x5D-7E)
+absolute-uri         = 1*(%x21 / %x23-5B / %x5D-7E)
 error-code           = lc-token *( "_" lc-token )
 lc-token             = LCALPHA *( LCALPHA / DIGIT )
 ~~~
 
-The `AEP-credentials` form is used in the `Authorization` header field. The `AEP-challenge` form is used in the `WWW-Authenticate` header field. The `reason` parameter, when present, carries an AEP error code.
+The `AEP-credentials` form is used in the `Authorization` field on command endpoints and in either `Authorization` or `AEP-Authorization` on protected resources. The `AEP-challenge` form is used in the `WWW-Authenticate` field. Parameter and field names are case-insensitive and each parameter MUST occur at most once. The `reason` parameter carries an AEP error code. A protected resource advertising AEP support MUST include `service_did` and `inspect`; `service_did` identifies the Service and `inspect` is the absolute HTTPS URI of that Service's Inspect document. Agents MUST require the challenged Service DID to match the fetched Inspect document. Challenges without the `AEP` scheme, or without both discovery parameters, do not initiate AEP discovery.
 
 # Client Assertion JWT
 
-Enroll, Grant, Revoke, and Status use a signed client assertion JWT for Agent authentication. Inspect is unauthenticated and does not use a client assertion.
+Enroll, Grant, Revoke, Status, and protected-resource authentication use a signed client assertion JWT. Inspect is unauthenticated and does not use a client assertion.
 
 The client assertion JWT is carried as:
 
@@ -286,7 +333,9 @@ The JWT claims set MUST contain:
 
 `aud` MUST equal the Service DID advertised as `service.did` in the Inspect document.
 
-`op` MUST equal the command being invoked. The values defined by this document are `enroll`, `grant`, `revoke`, and `status`.
+`op` MUST equal the operation being invoked. The values defined by this document are `enroll`, `grant`, `revoke`, `status`, and `authenticate`. The four command operations are valid only at their corresponding AEP command endpoint. `authenticate` is valid only at a protected resource and is never valid at an AEP command endpoint.
+
+An assertion with `op` equal to `authenticate` MUST also contain `resource`, an absolute HTTPS URI identifying the protected resource target. The value MUST equal the request target URI after URI normalization that does not change resource identity; fragments are prohibited. A protected resource MUST reject an assertion whose `resource` does not identify that target. Redirect targets require a newly issued assertion when the normalized resource URI changes.
 
 `iat` and `exp` are NumericDate values as defined by JWT {{RFC7519}}: seconds since the Unix epoch represented as JSON numbers. These claims are an exception to AEP-owned JSON payload numeric-string encoding. Services MUST reject assertions where `exp - iat` is greater than 300 seconds. Services SHOULD allow no more than 30 seconds of local clock skew.
 
@@ -299,7 +348,7 @@ To verify a client assertion, the Service MUST:
 3. Resolve the DID identified by `kid`.
 4. Select the referenced verification method.
 5. Verify the JWS signature.
-6. Verify `iss`, `sub`, `aud`, `op`, `iat`, `exp`, and `jti` according to this section.
+6. Verify `iss`, `sub`, `aud`, `op`, `resource` when required, `iat`, `exp`, and `jti` according to this section.
 
 Any verification failure MUST use the common `not_recognized` error defined in this document's error handling section.
 
@@ -349,6 +398,13 @@ Request body:
 
 `idempotency_key` is an opaque retry key. When both the HTTP `Idempotency-Key` header and body field are present, they MUST contain the same value.
 
+When the authenticated Agent DID already has an enrollment record, the Service
+MUST return the current enrollment lifecycle representation. It MUST NOT treat
+the request as renewal or replacement, rerun enrollment policy, reset lifecycle
+timestamps, or replace the existing record. This requirement applies when the
+request uses a new idempotency key and is distinct from replaying a request with
+the same idempotency key.
+
 Successful Enroll responses use `200 OK`. A synchronous enrollment returns:
 
 ~~~ json
@@ -361,13 +417,17 @@ If enrollment requires asynchronous verification, the Service returns:
 
 ~~~ json
 {
-  "owner_action_required": "false",
+  "owner_action_required": "true",
   "status": "pending",
   "verification_pending": ["contact.email"]
 }
 ~~~
 
 The Agent polls Status to learn whether a pending enrollment has become `active` or `rejected`.
+
+Enroll and Status lifecycle responses have two distinct optional dimensions. `verification_pending` lists submitted claim names whose asynchronous verification has not completed. `requirements_pending` lists requirement names the Agent still needs to satisfy. Either field can appear on either response, and the fields MUST NOT be treated as aliases. Empty arrays MUST be omitted; absence means that the corresponding set is empty. Claim values MUST NOT appear in either array.
+
+`owner_action_required` is independent of both pending dimensions and can accompany either, both, or neither. Canonical serialization MUST omit `owner_action_required` unless its value is `"true"`. Consumers MUST accept an explicit `"false"` for compatibility.
 
 # The Status Command
 
@@ -387,8 +447,6 @@ Successful Status responses use `200 OK`:
 
 ~~~ json
 {
-  "owner_action_required": "false",
-  "requirements_pending": [],
   "since": "2026-05-28T12:00:00Z",
   "status": "active"
 }
@@ -407,13 +465,13 @@ Successful Status responses use `200 OK`:
 
 `since` is the RFC 3339 {{RFC3339}} timestamp of the last state transition.
 
-`requirements_pending` lists claim names the Agent should provide to satisfy current Service requirements.
-
-`owner_action_required` is a JSON string boolean. A value of `"true"` indicates that the Agent's Owner must complete an out-of-band action before the identity can become or remain active.
+The lifecycle fields defined for Enroll apply identically to Status. `owner_action_required` equal to `"true"` indicates that the Agent's Owner must complete an out-of-band action before the identity can become or remain active.
 
 # The Grant Command
 
 Grant exchanges a baseline client assertion for a session credential. The request uses the baseline client assertion with `op` equal to `grant`. A session credential MUST NOT be used to authenticate Grant.
+
+Grant requires an existing enrollment recognized by the Service. When current enrollment is not already authoritative, an Agent SHOULD call Status before beginning an approval, signing, or credential-issuance workflow. The Service remains authoritative and MUST reject Grant for an unrecognized Agent with `not_recognized`; it MUST NOT implicitly enroll the Agent.
 
 Endpoint:
 
@@ -479,6 +537,46 @@ Successful Revoke responses use `200 OK` and an empty JSON object:
 
 The Service MUST return success regardless of whether any matching credentials existed.
 
+# Protected-Resource Authentication
+
+`authenticate` authenticates an Agent to an arbitrary protected Service resource; it does not identify a Service command and defines no new command endpoint. An Agent using `aep-jwt` sends an `AEP <jwt>` field value with `op` equal to `authenticate`, `aud` equal to the Service DID, and `resource` equal to the protected request target. A protected resource MUST reject assertions carrying `enroll`, `grant`, `revoke`, or `status`. Each AEP command endpoint likewise MUST reject `authenticate` and every non-matching command operation.
+
+Protected resources accept AEP credentials in either the standard `Authorization` field or the dedicated `AEP-Authorization` field. Generic Agents default to `Authorization` for compatibility. A caller MAY explicitly select `AEP-Authorization`; Agents composing AEP with MPP or x402 SHOULD select it before the first authenticated retry and preserve that selection for the operation, including newly issued assertions after safe redirects.
+
+The dedicated field preserves the complete normal field value, including its authentication scheme:
+
+~~~ http-message
+AEP-Authorization: AEP <client-assertion>
+AEP-Authorization: Bearer <token>
+AEP-Authorization: Basic <credentials>
+~~~
+
+Services MUST accept both carriers for `aep-jwt` and every registered Grant Type whose normal presentation uses `Authorization`. Registered Grant Type specifications define that mapping. API-key credentials continue to use exactly the Service-selected `header` returned in the Grant response and have no second generic representation.
+
+An Agent MUST use at most one AEP carrier per request. A Service inspects `AEP-Authorization` first and falls back to `Authorization` only when the dedicated field is absent. If both fields contain an AEP-recognized credential, the Service MUST reject the request as `not_recognized`; it MUST NOT choose one. An invalid dedicated credential fails closed without fallback to a second AEP credential in `Authorization`.
+
+`AEP-Authorization` together with `Authorization: Payment <credentials>` or `PAYMENT-SIGNATURE` is valid and non-ambiguous. After dedicated AEP authentication succeeds, the AEP layer MUST NOT consume, rewrite, log, or forward an unrelated `Authorization` credential. Payment processing occurs only after AEP authentication succeeds; the anonymous response remains the `401` AEP challenge.
+
+Field-name comparison is case-insensitive. A request MUST NOT contain multiple `AEP-Authorization` field lines or a combined value encoding more than one AEP credential. Services MUST treat such ambiguity as credential smuggling and return the non-disclosing `not_recognized` Problem Details error.
+
+Both authorization fields are sensitive. Agents, Services, intermediaries, caches, and telemetry MUST redact them and MUST NOT log raw values. Neither field participates in cache keys or idempotency fingerprints. `AEP-Authorization` MUST NOT be copied into assertion claims or signatures, Platform context, Inspect, OpenAPI, or another protocol document.
+
+A protected resource that requires authentication returns `401 Unauthorized` with an AEP challenge:
+
+~~~ http-message
+WWW-Authenticate: AEP service_did="did:web:x",inspect="https://x/a"
+~~~
+
+An Agent MAY first send the exact requested method, URL, headers, and body without AEP credentials. It begins AEP discovery only when a `401` response contains a valid `AEP` challenge with `service_did` and `inspect`. Unrelated `401` responses MUST NOT trigger AEP authentication.
+
+Before beginning discovery, approval, Grant, or authenticated retry, an Agent MUST determine whether the request body can be replayed. If it cannot reproduce the identical body, it MUST fail without starting an authentication flow. Implementations MAY apply documented cancellation, total-time, and response-size bounds and MUST fail closed rather than process partial authentication metadata.
+
+An Agent MUST NOT forward an AEP assertion or session credential across an origin change. It MAY follow a same-origin redirect with the credential only when the redirected request remains authorized by the credential and, for `aep-jwt`, uses a newly issued assertion bound to the redirect target's `resource` in the same selected AEP carrier. For a cross-origin redirect, the Agent MUST remove `Authorization`, `AEP-Authorization`, `PAYMENT-SIGNATURE`, every AEP assertion, every AEP-issued session credential, and every payment credential, then restart at the target with an anonymous request. It MUST require a new valid AEP challenge before authenticating to the new origin. Redirect handling MUST NOT copy a Service-selected API-key header to another origin.
+
+Successful authentication establishes an Agent principal and credential metadata, including the authentication method and granted scopes when applicable. It does not authorize the requested application action. The protected application separately evaluates resource policy and scopes. A valid credential with inadequate permission fails with `insufficient_scope` and `403 Forbidden`, without being treated as an authentication failure.
+
+Missing credentials use `authentication_required`. A method not listed in `authentication.methods` uses `unsupported_authentication_method`. Malformed or expired credentials, wrong operation, wrong audience, wrong resource, and replayed assertions use the non-disclosing `not_recognized` error. Protected resources MUST consume `jti` atomically before accepting an `authenticate` assertion so concurrent replays cannot both succeed.
+
 # Idempotency
 
 POST commands are state-mutating and MUST support safe retry with the `Idempotency-Key` HTTP header. This requirement applies to Enroll, Grant, and Revoke in this document.
@@ -510,22 +608,27 @@ WWW-Authenticate: AEP reason="not_recognized"
 
 The `code` field is the canonical machine-readable AEP error code. `type` identifies the AEP error class using the form `urn:aep:error:<code>`. `title` MAY be omitted from production responses.
 
+After an identity has been recognized, a `verification_pending` Problem Details response MAY include a non-empty `verification_pending` array, and a `requirements_unmet` response MAY include a non-empty `requirements_pending` array. Either response MAY include `owner_action_required` only when its value is `"true"`. These fields contain names only and MUST NOT contain claim values. They describe why the attempted operation is blocked; pending Enroll and Status state continues to use successful lifecycle responses. A `not_recognized` response MUST NOT include any of these fields.
+
 This document defines the following HTTP error codes:
 
-| AEP code                 | HTTP status | Meaning                                                                                                                                                    |
-| ------------------------ | ----------: | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `enrollment_failed`      | 400         | Generic enrollment failure where the Service suppresses precise detail.                                                                                    |
-| `invalid_request`        | 400         | The request body, parameters, or field combination is malformed or invalid.                                                                                |
-| `not_recognized`         | 401         | Umbrella anti-enumeration error for failed identity, signature, audience, operation, replay, time-window, archived-identity, or unsupported-method checks. |
-| `identity_suspended`     | 403         | The recognized identity is temporarily disabled by Service action.                                                                                         |
-| `identity_terminated`    | 403         | The recognized identity is permanently de-registered.                                                                                                      |
-| `identity_unavailable`   | 403         | The recognized identity is temporarily unavailable for Service-defined reasons.                                                                            |
-| `requirements_unmet`     | 422         | Required claims are missing or invalid.                                                                                                                    |
-| `verification_pending`   | 403         | Enrollment or required verification has not completed.                                                                                                     |
-| `verification_timeout`   | 422         | Required asynchronous verification did not complete in the Service's policy window.                                                                        |
-| `rate_limited`           | 429         | The Agent exceeded a Service rate limit.                                                                                                                   |
-| `unsupported_grant_type` | 400         | Grant or Revoke requested a `grant_type` not advertised by the Service.                                                                                    |
-| `idempotency_conflict`   | 409         | An idempotency key was reused with a different request body.                                                                                               |
+| AEP code                            | HTTP status | Meaning                                                                                                                                                    |
+| ----------------------------------- | ----------: | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `enrollment_failed`                 | 400         | Generic enrollment failure where the Service suppresses precise detail.                                                                                    |
+| `invalid_request`                   | 400         | The request body, parameters, or field combination is malformed or invalid.                                                                                |
+| `not_recognized`                    | 401         | Umbrella anti-enumeration error for failed identity, signature, audience, operation, replay, time-window, archived-identity, or unsupported-method checks. |
+| `identity_suspended`                | 403         | The recognized identity is temporarily disabled by Service action.                                                                                         |
+| `identity_terminated`               | 403         | The recognized identity is permanently de-registered.                                                                                                      |
+| `identity_unavailable`              | 403         | The recognized identity is temporarily unavailable for Service-defined reasons.                                                                            |
+| `requirements_unmet`                | 422         | Required claims are missing or invalid.                                                                                                                    |
+| `verification_pending`              | 403         | Enrollment or required verification has not completed.                                                                                                     |
+| `verification_timeout`              | 422         | Required asynchronous verification did not complete in the Service's policy window.                                                                        |
+| `rate_limited`                      | 429         | The Agent exceeded a Service rate limit.                                                                                                                   |
+| `unsupported_grant_type`            | 400         | Grant or Revoke requested a `grant_type` not advertised by the Service.                                                                                    |
+| `idempotency_conflict`              | 409         | An idempotency key was reused with a different request body.                                                                                               |
+| `authentication_required`           | 401         | The protected resource requires an advertised authentication method.                                                                                       |
+| `unsupported_authentication_method` | 401         | The presented authentication method is not accepted by the protected resource.                                                                             |
+| `insufficient_scope`                | 403         | Authentication succeeded but the principal lacks required authorization scope.                                                                             |
 
 Services MUST use `not_recognized` for bad signatures, unknown Agent identities, wrong `aud`, wrong `op`, replayed `jti`, time-window violations, archived identities, unsupported identity methods during authenticated contact, and unknown or revoked session credentials. Services MUST NOT reveal which of these checks failed.
 
@@ -592,6 +695,16 @@ IANA is requested to register the following HTTP authentication scheme in the "H
 | Reference                  | This document                                             |
 | Notes                      | Agent Enrollment Protocol client assertion authentication |
 
+## HTTP Field Name
+
+IANA is requested to register the following permanent field name in the "Hypertext Transfer Protocol (HTTP) Field Name Registry":
+
+| Field Name          | Status    | Structured Type | Reference     |
+| ------------------- | --------- | --------------- | ------------- |
+| `AEP-Authorization` | permanent | N/A             | This document |
+
+`AEP-Authorization` carries one AEP-recognized protected-resource credential while preserving its registered authentication scheme and credential syntax. It is a request field and is unsafe for logging, forwarding across disallowed redirects, or cache-key construction.
+
 ## Well-Known URI
 
 IANA is requested to register the following URI suffix in the "Well-Known URIs" registry:
@@ -648,6 +761,30 @@ Initial entries are:
 | `grant`   | Issue a session credential.                | This document |
 | `revoke`  | Revoke session credentials.                | This document |
 
+`authenticate` is not registered as a command because it does not identify a command endpoint.
+
+## AEP Operation Registry
+
+IANA is requested to create an "AEP Operations" registry. The registration policy is Specification Required. Each registration MUST define its valid target class, assertion binding, and replay behavior.
+
+| Operation      | Valid target                                | Reference     |
+| -------------- | ------------------------------------------- | ------------- |
+| `enroll`       | Enroll command endpoint                     | This document |
+| `grant`        | Grant command endpoint                      | This document |
+| `revoke`       | Revoke command endpoint                     | This document |
+| `status`       | Status command endpoint                     | This document |
+| `authenticate` | Protected Service resource, not AEP command | This document |
+
+## AEP Authentication Method Registry
+
+IANA is requested to create an "AEP Authentication Methods" registry. The registration policy is Specification Required. Each registration MUST define credential presentation, expiry and replay behavior, redirect handling, and authentication failure behavior. Registered AEP Grant Type identifiers are also valid authentication method identifiers when the corresponding grant specification defines protected-resource presentation.
+
+| Authentication Method | Description                              | Reference     |
+| --------------------- | ---------------------------------------- | ------------- |
+| `aep-jwt`             | Resource-bound AEP client assertion JWT. | This document |
+
+The initial registered Grant Type method identifiers are `oauth-bearer`, `api-key`, and `basic`, as defined by their respective documents.
+
 ## AEP Binding Identifier Registry
 
 IANA is requested to create an "AEP Binding Identifiers" registry. The registration policy is Specification Required as defined by RFC 8126. Designated experts are requested to verify that new binding registrations define transport semantics, endpoint discovery, authentication carriage, payload encoding, error mapping, and security considerations.
@@ -680,6 +817,17 @@ Each entry contains:
 
 This document creates the registry but does not register concrete extensions.
 
+## OpenAPI Specification Extension
+
+This document registers the following OpenAPI Specification Extension for Security Scheme Objects:
+
+| Field       | Value                                           |
+| ----------- | ----------------------------------------------- |
+| Name        | `x-aep-authentication-method`                   |
+| Type        | String                                          |
+| Description | Registered AEP authentication method identifier |
+| Reference   | This document                                   |
+
 ## AEP Error Code Registry
 
 IANA is requested to create an "AEP Error Codes" registry. The registration policy is Specification Required as defined by RFC 8126. Designated experts are requested to verify that new error codes are binding-independent, use `lower_snake_case`, avoid exposing identity-enumeration detail, and define default HTTP status mapping and remediation behavior.
@@ -695,20 +843,23 @@ Each entry contains:
 
 Initial entries are:
 
-| Code                     | HTTP Status | Description                                           | Reference     |
-| ------------------------ | ----------: | ----------------------------------------------------- | ------------- |
-| `enrollment_failed`      | 400         | Generic enrollment failure.                           | This document |
-| `invalid_request`        | 400         | Malformed or invalid request.                         | This document |
-| `not_recognized`         | 401         | Anti-enumeration recognition failure.                 | This document |
-| `identity_suspended`     | 403         | Recognized identity is suspended.                     | This document |
-| `identity_terminated`    | 403         | Recognized identity is terminated.                    | This document |
-| `identity_unavailable`   | 403         | Recognized identity is temporarily unavailable.       | This document |
-| `requirements_unmet`     | 422         | Required claims are missing or invalid.               | This document |
-| `verification_pending`   | 403         | Verification has not completed.                       | This document |
-| `verification_timeout`   | 422         | Verification did not complete in time.                | This document |
-| `rate_limited`           | 429         | Rate limit exceeded.                                  | This document |
-| `unsupported_grant_type` | 400         | Unsupported Grant or Revoke grant type.               | This document |
-| `idempotency_conflict`   | 409         | Idempotency key reused with a different request body. | This document |
+| Code                                | HTTP Status | Description                                           | Reference     |
+| ----------------------------------- | ----------: | ----------------------------------------------------- | ------------- |
+| `enrollment_failed`                 | 400         | Generic enrollment failure.                           | This document |
+| `invalid_request`                   | 400         | Malformed or invalid request.                         | This document |
+| `not_recognized`                    | 401         | Anti-enumeration recognition failure.                 | This document |
+| `identity_suspended`                | 403         | Recognized identity is suspended.                     | This document |
+| `identity_terminated`               | 403         | Recognized identity is terminated.                    | This document |
+| `identity_unavailable`              | 403         | Recognized identity is temporarily unavailable.       | This document |
+| `requirements_unmet`                | 422         | Required claims are missing or invalid.               | This document |
+| `verification_pending`              | 403         | Verification has not completed.                       | This document |
+| `verification_timeout`              | 422         | Verification did not complete in time.                | This document |
+| `rate_limited`                      | 429         | Rate limit exceeded.                                  | This document |
+| `unsupported_grant_type`            | 400         | Unsupported Grant or Revoke grant type.               | This document |
+| `idempotency_conflict`              | 409         | Idempotency key reused with a different request body. | This document |
+| `authentication_required`           | 401         | Protected-resource authentication is required.        | This document |
+| `unsupported_authentication_method` | 401         | Authentication method is not accepted.                | This document |
+| `insufficient_scope`                | 403         | Authenticated principal lacks sufficient scope.       | This document |
 
 ## AEP Grant Type Registry
 
@@ -742,7 +893,7 @@ This document creates the registry but does not register concrete identity metho
 
 Network use of the HTTP binding defined by this document requires TLS 1.3 or later. Plaintext HTTP is out of scope.
 
-Client assertions are replay resistant only when Services validate the full chain: `aud`, `op`, `jti`, `iat`, and `exp`. `aud` binds the assertion to the Service DID. `op` binds the assertion to a command. `jti` prevents in-window duplicate use. `iat` and `exp` bound the usable time window. Services that skip any of these checks weaken the authentication model.
+Client assertions are replay resistant only when Services validate the full chain: `aud`, `op`, `resource` when required, `jti`, `iat`, and `exp`. `aud` binds the assertion to the Service DID. `op` binds the assertion to one registered operation. `resource` binds `authenticate` to a protected request target. `jti` prevents in-window duplicate use. `iat` and `exp` bound the usable time window. Services that skip any of these checks weaken the authentication model.
 
 Services SHOULD keep assertion lifetimes short. This document sets a maximum validity interval of 300 seconds. Services MAY enforce a shorter maximum.
 

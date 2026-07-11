@@ -7,10 +7,10 @@ The initial vector set should cover:
 
 | Category                | Purpose                                                                                                                                                             | Draft Coverage                |
 | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
-| Inspect document        | Validate required fields, command advertisement, grant type advertisement, `did:web`, HTTP binding configuration, and extension discovery shape.                    | Core                          |
+| Inspect document        | Validate required fields, command advertisement, grant type advertisement, `did:web`, HTTP binding configuration, transport trust, and extension discovery shape.   | Core                          |
 | Client assertion JWT    | Validate JOSE header fields, JWT claim fields, `aud`, `op`, `iat`, `exp`, and `jti` requirements.                                                                   | Core                          |
 | Error response          | Validate AEP Problem Details shape and stable error codes.                                                                                                          | Core                          |
-| Idempotency             | Validate safe retry shape and idempotency conflict behavior.                                                                                                        | Core                          |
+| Idempotency             | Validate safe retry shape, replay retention, header placement, staged Sign keys, and conflict behavior.                                                             | Core and Platform             |
 | Enroll request/response | Validate minimal enrollment request and response shape.                                                                                                             | Core                          |
 | Status response         | Validate enrolled identity status response shape.                                                                                                                   | Core                          |
 | Grant/Revoke request    | Validate shared Grant and Revoke request fields, including revoke-all behavior.                                                                                     | Core plus credential profiles |
@@ -18,6 +18,9 @@ The initial vector set should cover:
 | API-key credential      | Validate API-key Grant response, API-key value syntax, header selection, expiry, scopes, and Revoke shape.                                                          | API-key                       |
 | Basic credential        | Validate Basic Grant response, generated username/password constraints, Basic presentation syntax, expiry, scopes, and Revoke shape.                                | Basic                         |
 | Platform specification  | Validate Platform discovery, Service-scoped Agent DID provisioning, distinct opaque DIDs per Service, delegated signing, lifecycle, and hosted verification shapes. | Platform Hosted Identity      |
+| Protected resource      | Validate explicit authentication advertisement, challenge discovery, operation/resource binding, credential presentation, failures, and redirect safety.            | Core plus credential profiles |
+| Public document caching | Validate Inspect and Platform Discovery validators, freshness, directives, and final-URL cache keys.                                                                | Core and Platform             |
+| OpenAPI discovery       | Validate URL resolution, anonymous retrieval, security inheritance, operation matching, slash modes, and contradiction fallback.                                    | Core                          |
 
 ## File Layout
 
@@ -25,18 +28,21 @@ Vectors use one directory per category:
 
 ```text
 test-vectors/
-  inspect/
+  caching/
   client-assertion/
-  errors/
-  idempotency/
-  enroll/
-  status/
-  grant-revoke/
-  platform/
   credentials/
-    oauth-bearer/
     api-key/
     basic/
+    oauth-bearer/
+  enroll/
+  errors/
+  grant-revoke/
+  idempotency/
+  inspect/
+  openapi/
+  platform/
+  protected-resource/
+  status/
 ```
 
 Each vector file is JSON. File names use lowercase hyphenated identifiers:
@@ -55,7 +61,7 @@ Each vector has this top-level shape:
   "title": "Minimal HTTP Inspect document",
   "description": "A Service advertising the baseline HTTP binding and current credential profiles.",
   "drafts": [
-    "draft-kavian-agent-enrollment-protocol-01"
+    "draft-kavian-agent-enrollment-protocol-02"
   ],
   "category": "inspect",
   "applies_to": ["agent", "service"],

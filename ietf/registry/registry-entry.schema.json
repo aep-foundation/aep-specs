@@ -19,11 +19,11 @@
   "properties": {
     "id": {
       "type": "string",
-      "pattern": "^urn:aep:(?:grant-type|ext|binding|identity-method|command|policy|proof|attestation|other):[a-z0-9][a-z0-9-]*:[a-z0-9][a-z0-9-]*(?::[a-z0-9][a-z0-9-]*)*(?:-[a-z0-9]+)*#v=[0-9]+\\.[0-9]+\\.[0-9]+$"
+      "pattern": "^urn:aep:(?:grant-type|authentication-method|http-field|ext|binding|identity-method|command|policy|proof|attestation|other):[a-z0-9][a-z0-9-]*:[a-z0-9][a-z0-9-]*(?::[a-z0-9][a-z0-9-]*)*(?:-[a-z0-9]+)*#v=[0-9]+\\.[0-9]+\\.[0-9]+$"
     },
     "kind": {
       "type": "string",
-      "enum": ["grant_type", "binding", "identity_method", "command", "policy", "proof", "attestation", "other"]
+      "enum": ["grant_type", "authentication_method", "http_field", "extension", "binding", "identity_method", "command", "policy", "proof", "attestation", "other"]
     },
     "name": {
       "type": "string",

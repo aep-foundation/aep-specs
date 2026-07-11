@@ -1,7 +1,7 @@
 ---
 title: "Basic Session Credential Grant Type for the Agent Enrollment Protocol"
 abbrev: "AEP Basic"
-docname: draft-kavian-aep-basic-session-credential-01
+docname: draft-kavian-aep-basic-session-credential-02
 category: std
 ipr: trust200902
 submissiontype: IETF
@@ -27,7 +27,7 @@ normative:
     target: https://datatracker.ietf.org/doc/draft-kavian-agent-enrollment-protocol/
     date: 2026-06-27
     seriesinfo:
-      Internet-Draft: draft-kavian-agent-enrollment-protocol-01
+      Internet-Draft: draft-kavian-agent-enrollment-protocol-02
     author:
       - ins: N. Kavian
         name: N. Kavian
@@ -144,6 +144,14 @@ On later HTTP requests, the Agent presents the credential using HTTP Basic authe
 ~~~ http-message
 Authorization: Basic YWVwX2FnZW50X2FiYzEyMzpzM2NyM3RFeGFtcGxl
 ~~~
+
+On protected resources, the Agent MAY instead use the dedicated AEP carrier while preserving the Basic field value:
+
+~~~ http-message
+AEP-Authorization: Basic YWVwX2FnZW50X2FiYzEyMzpzM2NyM3RFeGFtcGxl
+~~~
+
+Services implementing this grant type MUST accept both carriers on protected resources. Agents MUST use only one AEP carrier per request, and the ambiguity and precedence rules are defined by AEP core.
 
 The encoded value is standard base64 of `username ":" password` as defined by RFC 7617.  This encoding is not AEP's base64url binary convention.
 

@@ -1,7 +1,7 @@
 ---
 title: "API-Key Session Credential Grant Type for the Agent Enrollment Protocol"
 abbrev: "AEP API Key"
-docname: draft-kavian-aep-api-key-session-credential-01
+docname: draft-kavian-aep-api-key-session-credential-02
 category: std
 ipr: trust200902
 submissiontype: IETF
@@ -27,7 +27,7 @@ normative:
     target: https://datatracker.ietf.org/doc/draft-kavian-agent-enrollment-protocol/
     date: 2026-06-27
     seriesinfo:
-      Internet-Draft: draft-kavian-agent-enrollment-protocol-01
+      Internet-Draft: draft-kavian-agent-enrollment-protocol-02
     author:
       - ins: N. Kavian
         name: N. Kavian
@@ -84,7 +84,7 @@ A Service MAY publish configuration under `commands.grant_types_config.api-key`:
 
 `default_lifetime_seconds` is an AEP-owned numeric value and is therefore represented as a JSON string.
 
-`header_names`, when present, lists HTTP header names the Service can accept for API-key presentation.  Header names are case-insensitive on the wire, but Services SHOULD publish lowercase names.  If absent, the default header name is `x-api-key`.
+`header_names`, when present, lists HTTP header names the Service can issue for API-key presentation. Header names are case-insensitive on the wire, but Services SHOULD publish lowercase names. This field provides issuance guidance only; there is no default API-key header name. The Grant response `header` value is authoritative for each issued credential.
 
 `scopes_supported`, when present, lists Service-defined scope strings an Agent can request.
 
@@ -144,7 +144,9 @@ Services MUST issue expiring API keys.
 
 # Credential Presentation
 
-On later HTTP requests, the Agent presents the API key in the response-selected header:
+On later protected-resource requests, the Agent presents the API key in exactly the response-selected `header`. AEP does not standardize `x-api-key` or any other API-key header name. The following name is only the Service-selected value in this example:
+
+The dedicated `AEP-Authorization` carrier does not apply to this grant type because its normal presentation does not use `Authorization`. Agents MUST NOT synthesize a generic API-key scheme; they continue using the issued `header` exactly.
 
 ~~~ http-message
 x-api-key: aep_live_7Jm5Example
