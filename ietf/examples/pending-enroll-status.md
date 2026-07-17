@@ -31,7 +31,7 @@ Content-Type: application/aep+json
 
 ```json
 {
-  "owner_action_required": "false",
+  "owner_action_required": "true",
   "status": "pending",
   "verification_pending": ["contact.email"]
 }
@@ -53,7 +53,6 @@ Content-Type: application/aep+json
 
 ```json
 {
-  "owner_action_required": "false",
   "requirements_pending": ["contact.email"],
   "since": "2026-06-28T12:00:00Z",
   "status": "pending"
@@ -76,8 +75,6 @@ Content-Type: application/aep+json
 
 ```json
 {
-  "owner_action_required": "false",
-  "requirements_pending": [],
   "since": "2026-06-28T12:05:00Z",
   "status": "active"
 }

@@ -5,7 +5,10 @@ EXAMPLES := \
 	examples/pending-enroll-status.md \
 	examples/status-states.md \
 	examples/api-key-grant-revoke.md \
-	examples/basic-grant-revoke.md
+	examples/basic-grant-revoke.md \
+	examples/protected-resource-authentication.md \
+	examples/openapi-authentication.md \
+	examples/authorization-composition.md
 ARTIFACTS := ../artifacts
 EXAMPLE_ARTIFACTS := ../docs/examples
 SCHEMA_ARTIFACTS := ../docs/schemas

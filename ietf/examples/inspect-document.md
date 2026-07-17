@@ -19,6 +19,9 @@ ETag: "aep-inspect-20260627"
 ```json
 {
   "aep_version": "1.0",
+  "authentication": {
+    "methods": ["aep-jwt", "oauth-bearer", "api-key", "basic"]
+  },
   "bindings": {
     "supported": ["http"]
   },
@@ -60,7 +63,11 @@ ETag: "aep-inspect-20260627"
     "supported": []
   },
   "http": {
-    "endpoint_base": "/aep/"
+    "endpoint_base": "/aep/",
+    "openapi": {
+      "path_matching": {"trailing_slash": "strict"},
+      "url": "/openapi.json"
+    }
   },
   "identity": {
     "methods": ["did:web"]

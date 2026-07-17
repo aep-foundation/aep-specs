@@ -7,7 +7,7 @@ require "pathname"
 ROOT = Pathname.new(__dir__).join("..").expand_path
 REGISTRY_ROOT = ROOT.join("registry")
 SCHEMA_PATH = REGISTRY_ROOT.join("registry-entry.schema.json")
-ENTRY_PATHS = Dir[REGISTRY_ROOT.join("{grant-types,identity-methods}/*.json")].sort.map { |path| Pathname.new(path) }
+ENTRY_PATHS = Dir[REGISTRY_ROOT.join("{authentication-methods,extensions,grant-types,http-fields,identity-methods}/*.json")].sort.map { |path| Pathname.new(path) }
 
 def load_json(path)
   JSON.parse(path.read)

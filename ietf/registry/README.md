@@ -11,6 +11,12 @@ registries once IANA registries exist.
 ```text
 registry/
   registry-entry.schema.json
+  authentication-methods/
+    aep-jwt.json
+  extensions/
+    openapi-authentication.json
+  http-fields/
+    aep-authorization.json
   grant-types/
     oauth-bearer.json
     api-key.json

@@ -7,7 +7,6 @@ beyond the active case.
 
 ```json
 {
-  "owner_action_required": "false",
   "requirements_pending": ["contact.email"],
   "since": "2026-06-28T12:00:00Z",
   "status": "pending"
@@ -18,8 +17,6 @@ beyond the active case.
 
 ```json
 {
-  "owner_action_required": "false",
-  "requirements_pending": [],
   "since": "2026-06-28T12:10:00Z",
   "status": "unavailable"
 }
@@ -40,8 +37,6 @@ beyond the active case.
 
 ```json
 {
-  "owner_action_required": "false",
-  "requirements_pending": [],
   "since": "2026-06-28T12:20:00Z",
   "status": "terminated"
 }
@@ -51,8 +46,6 @@ beyond the active case.
 
 ```json
 {
-  "owner_action_required": "false",
-  "requirements_pending": [],
   "since": "2026-06-28T12:25:00Z",
   "status": "rejected"
 }

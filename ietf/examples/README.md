@@ -12,3 +12,6 @@ document set.
 - `api-key-grant-revoke.md`: API-key Grant, credential presentation, and
   Revoke.
 - `basic-grant-revoke.md`: Basic Grant, credential presentation, and Revoke.
+- `protected-resource-authentication.md`: protected-resource discovery, authentication methods, resource-bound JWTs, and redirect safety.
+- `openapi-authentication.md`: OpenAPI operation matching and AEP security mapping.
+- `authorization-composition.md`: standard and dedicated AEP carriers composed with payment credentials.

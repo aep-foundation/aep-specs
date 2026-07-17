@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Protected-Resource Authentication - AEP Foundation</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --border: #d7dde5;
+        --code: #f4f7fb;
+        --fg: #17202a;
+        --link: #0f5e9c;
+        --muted: #5c6b7a;
+      }
+
+      body {
+        color: var(--fg);
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        line-height: 1.55;
+        margin: 0;
+      }
+
+      main {
+        margin: 0 auto;
+        max-width: 960px;
+        padding: 40px 20px 64px;
+      }
+
+      a {
+        color: var(--link);
+      }
+
+      h1 {
+        font-size: 2rem;
+        line-height: 1.2;
+        margin: 0 0 20px;
+      }
+
+      h2 {
+        border-top: 1px solid var(--border);
+        font-size: 1.25rem;
+        margin-top: 32px;
+        padding-top: 24px;
+      }
+
+      p {
+        max-width: 760px;
+      }
+
+      pre {
+        background: var(--code);
+        border: 1px solid var(--border);
+        overflow-x: auto;
+        padding: 14px;
+      }
+
+      code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 0.92em;
+      }
+
+      .back {
+        color: var(--muted);
+        display: inline-block;
+        margin-bottom: 24px;
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <a class="back" href="../">AEP Foundation Specifications</a>
+      <h1 id="protected-resource-authentication">Protected-Resource Authentication</h1>
+
+<p>This example shows explicit authentication advertisement, challenge-driven discovery, and a resource-bound AEP assertion. <code>authenticate</code> is an assertion operation, not an AEP command endpoint.</p>
+
+<h2 id="inspect-advertisement">Inspect Advertisement</h2>
+
+<pre><code class="language-json">{
+  "aep_version": "1.0",
+  "authentication": {"methods": ["aep-jwt", "oauth-bearer", "api-key", "basic"]},
+  "bindings": {"supported": ["http"]},
+  "commands": {"grant_types": ["oauth-bearer", "api-key", "basic"], "supported": ["inspect", "enroll", "grant", "revoke", "status"]},
+  "core": {"signing_algorithms": ["EdDSA", "ES256"]},
+  "http": {"endpoint_base": "/aep/"},
+  "identity": {"methods": ["did:web"]},
+  "service": {"did": "did:web:api.example.com"}
+}
+</code></pre>
+
+<p>The method order is the Service preference. JWT-only advertisement uses <code>["aep-jwt"]</code>; credential-only advertisement omits <code>aep-jwt</code>. Omitting <code>authentication</code> advertises no protected-resource authentication method.</p>
+
+<h2 id="challenge-and-aep-jwt">Challenge and AEP JWT</h2>
+
+<pre><code class="language-http">GET /v1/orders/123 HTTP/1.1
+Host: api.example.com
+</code></pre>
+
+<pre><code class="language-http">HTTP/1.1 401 Unauthorized
+WWW-Authenticate: AEP service_did="did:web:api.example.com", inspect="https://api.example.com/.well-known/aep", reason="authentication_required"
+</code></pre>
+
+<p>The Agent obtains a fresh assertion containing:</p>
+
+<pre><code class="language-json">{
+  "aud": "did:web:api.example.com",
+  "exp": 1783958460,
+  "iat": 1783958400,
+  "iss": "did:web:agent.example.com:agents:123",
+  "jti": "01J0AEPRESOURCE000000000001",
+  "op": "authenticate",
+  "resource": "https://api.example.com/v1/orders/123",
+  "sub": "did:web:agent.example.com:agents:123"
+}
+</code></pre>
+
+<pre><code class="language-http">GET /v1/orders/123 HTTP/1.1
+Host: api.example.com
+Authorization: AEP eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9...
+</code></pre>
+
+<p>OAuth Bearer and Basic credentials use their registered <code>Authorization</code> schemes. An API key uses the exact <code>header</code> returned by Grant, for example <code>x-api-key</code>; the header name is not fixed by AEP.</p>
+
+<h2 id="redirects">Redirects</h2>
+
+<p>For a same-origin redirect to <code>/v1/orders/124</code>, the Agent obtains a new assertion whose <code>resource</code> names that target. For a redirect to another origin, it removes all AEP and AEP-issued credentials and restarts with an anonymous request. The new origin must issue its own valid AEP challenge before authentication begins.</p>
+
+    </main>
+  </body>
+</html>

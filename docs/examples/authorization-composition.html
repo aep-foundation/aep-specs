@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Protected-Resource Authorization Carriers - AEP Foundation</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --border: #d7dde5;
+        --code: #f4f7fb;
+        --fg: #17202a;
+        --link: #0f5e9c;
+        --muted: #5c6b7a;
+      }
+
+      body {
+        color: var(--fg);
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        line-height: 1.55;
+        margin: 0;
+      }
+
+      main {
+        margin: 0 auto;
+        max-width: 960px;
+        padding: 40px 20px 64px;
+      }
+
+      a {
+        color: var(--link);
+      }
+
+      h1 {
+        font-size: 2rem;
+        line-height: 1.2;
+        margin: 0 0 20px;
+      }
+
+      h2 {
+        border-top: 1px solid var(--border);
+        font-size: 1.25rem;
+        margin-top: 32px;
+        padding-top: 24px;
+      }
+
+      p {
+        max-width: 760px;
+      }
+
+      pre {
+        background: var(--code);
+        border: 1px solid var(--border);
+        overflow-x: auto;
+        padding: 14px;
+      }
+
+      code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 0.92em;
+      }
+
+      .back {
+        color: var(--muted);
+        display: inline-block;
+        margin-bottom: 24px;
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <a class="back" href="../">AEP Foundation Specifications</a>
+      <h1 id="protected-resource-authorization-carriers">Protected-Resource Authorization Carriers</h1>
+
+<p>Protected resources accept AEP JWT, OAuth Bearer, and Basic credentials through either carrier:</p>
+
+<pre><code class="language-http">Authorization: AEP eyJhbGciOiJFZERTQSJ9...
+AEP-Authorization: AEP eyJhbGciOiJFZERTQSJ9...
+Authorization: Bearer ya29.example
+AEP-Authorization: Bearer ya29.example
+Authorization: Basic YWVwX2FnZW50OnNlY3JldA==
+AEP-Authorization: Basic YWVwX2FnZW50OnNlY3JldA==
+</code></pre>
+
+<p>Each line is a separate valid request example; an Agent sends only one AEP carrier. API keys continue to use the exact header returned by Grant.</p>
+
+<h2 id="aep-then-mpp">AEP Then MPP</h2>
+
+<p>The anonymous request receives only the AEP challenge:</p>
+
+<pre><code class="language-http">HTTP/1.1 401 Unauthorized
+WWW-Authenticate: AEP service_did="did:web:x",inspect="https://x/a"
+</code></pre>
+
+<p>After AEP authentication succeeds, the application can advertise payment. A composed retry keeps payment in standard <code>Authorization</code>:</p>
+
+<pre><code class="language-http">AEP-Authorization: AEP eyJhbGciOiJFZERTQSJ9...
+Authorization: Payment mpp-credential
+</code></pre>
+
+<h2 id="aep-then-x402">AEP Then x402</h2>
+
+<p>An x402-aware retry can compose the dedicated AEP credential with its payment signature:</p>
+
+<pre><code class="language-http">AEP-Authorization: Bearer ya29.example
+PAYMENT-SIGNATURE: x402-signature
+</code></pre>
+
+<p>The AEP layer authenticates the dedicated field and leaves the unrelated payment credential untouched for the payment layer.</p>
+
+    </main>
+  </body>
+</html>

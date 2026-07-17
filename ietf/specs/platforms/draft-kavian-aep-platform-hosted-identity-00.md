@@ -26,7 +26,7 @@ normative:
     target: https://datatracker.ietf.org/doc/draft-kavian-agent-enrollment-protocol/
     date: 2026-06-27
     seriesinfo:
-      Internet-Draft: draft-kavian-agent-enrollment-protocol-01
+      Internet-Draft: draft-kavian-agent-enrollment-protocol-02
     author:
       - ins: N. Kavian
         name: N. Kavian
@@ -182,6 +182,8 @@ represented as a JSON string. The Platform MUST enforce the AEP core maximum
 assertion validity interval of 300 seconds. A Platform MAY enforce a shorter
 local maximum.
 
+Platforms SHOULD send `Cache-Control`, `ETag`, and `Last-Modified` metadata on Discovery responses. Agents MUST honor usable freshness, validators, conditional requests, and `304 Not Modified`. `no-cache` requires revalidation and `no-store` prohibits persistence or reuse beyond the current fetch. When no shorter usable freshness policy is supplied, Agents SHOULD use 300 seconds. Cache keys use the advertised Discovery URL and MUST track the final URL after an accepted safe redirect. Discovery redirects MUST remain HTTPS, MUST NOT contain user information, and MUST satisfy implementation redirect, byte, and completion-time bounds.
+
 # Provisioning
 
 Provisioning creates or retrieves a Service-scoped Agent DID for an
@@ -195,10 +197,11 @@ The request body is:
 
 ~~~ json
 {
-  "idempotency_key": "01J0AEPPLATFORM000000000001",
   "service_did": "did:web:api.service.example"
 }
 ~~~
+
+Provisioning uses `POST` and MUST carry a non-empty `Idempotency-Key` header.
 
 The Platform MUST validate that `service_did` is syntactically a DID. For
 `did:web`, the Platform MUST resolve the DID before first delegated signing
@@ -233,10 +236,8 @@ A successful response is:
 }
 ~~~
 
-The Platform MUST return the same response for a replayed provisioning request
-with the same authenticated caller, `service_did`, and `idempotency_key`. The
-Platform MUST reject an idempotency replay that changes material request
-fields.
+The Platform MUST return the same response for an exact replay as defined in
+the Platform Idempotency section.
 
 # Listing Agent Identities
 
@@ -288,6 +289,12 @@ the total number of records matching the query before `offset` and `limit` are
 applied. Both fields are AEP-owned numeric values and are therefore represented
 as JSON strings containing non-negative integers.
 
+An Agent MAY use the listing endpoint with `service_did` to recover a missing
+local reference to a Platform-hosted Agent identity. The presence of an identity
+in the Platform proves that the identity was provisioned; it does not prove that
+the Service currently recognizes the identity. The Agent uses the Service Status
+command to determine the Service enrollment lifecycle state.
+
 # DID Document Publication
 
 The Platform MUST publish a DID document for each active Service-scoped Agent
@@ -315,9 +322,18 @@ The request body is:
   "jti": "01J0AEPASSERTION0000000001",
   "lifetime_seconds": "300",
   "op": "enroll",
+  "platform_context": {"authorization_handle": "opaque-value"},
   "service_did": "did:web:api.service.example"
 }
 ~~~
+
+Delegated signing uses `POST` and MUST carry a non-empty `Idempotency-Key`
+header. `platform_context` is an optional, free-form JSON object whose members
+are defined by Platform policy or a Platform profile. It is Platform-local
+authorization or custody input. It MUST NOT be copied into client-assertion
+claims, included in assertion signature inputs, or otherwise alter the
+assertion semantics defined by AEP core. When returned, it remains opaque to
+the Agent and SHOULD be transported unchanged.
 
 The Platform MUST authenticate the caller and verify that the caller is
 authorized to sign for the requested Agent identity and `service_did`. The
@@ -329,7 +345,9 @@ and MUST NOT exceed 300 seconds. If `lifetime_seconds` is omitted, the Platform
 uses `signing.default_lifetime_seconds`. The effective lifetime MUST NOT exceed
 300 seconds. A Platform MAY reject values above a shorter local maximum.
 
-A successful response is:
+When `op` is `authenticate`, the request MUST include `resource` with the absolute HTTPS protected-resource URI and the Platform MUST include that value in the assertion. For every other operation, `resource` MUST be absent.
+
+A completed response uses `200 OK`:
 
 ~~~ json
 {
@@ -338,9 +356,27 @@ A successful response is:
   "expires_at": "2026-07-06T12:05:00Z",
   "issued_at": "2026-07-06T12:00:00Z",
   "jti": "01J0AEPASSERTION0000000001",
-  "service_did": "did:web:api.service.example"
+  "platform_context": {"authorization_handle": "opaque-value"},
+  "service_did": "did:web:api.service.example",
+  "status": "completed"
 }
 ~~~
+
+When signing has not completed, the Platform returns `202 Accepted`:
+
+~~~ json
+{
+  "platform_context": {"authorization_handle": "opaque-value"},
+  "retry_after_seconds": "5",
+  "status": "pending"
+}
+~~~
+
+`retry_after_seconds` is required on a pending response and is a decimal string
+from `"1"` through `"300"`. It controls polling cadence, not the total operation
+deadline. The Platform MUST NOT send `Retry-After` for this contract. A pending
+or completed response MAY contain `platform_context`; it SHOULD be omitted when
+there is no context to return.
 
 The JWT claims MUST satisfy AEP core client assertion requirements. The `iss`
 and `sub` claims MUST be the Service-scoped Agent DID. The `aud` claim MUST be
@@ -349,6 +385,14 @@ assertion is intended. For Platform-hosted `did:web` identities, the JOSE `kid`
 header MUST identify the Service-scoped Agent DID carried in `key_id`. Platform
 Hosted Identity does not use DID verification-method fragments such as
 `#key-1`.
+
+The Platform MUST apply an explicitly registered signing policy to every `op`.
+The operations defined by AEP core are `enroll`, `grant`, `revoke`, `status`,
+and `authenticate`; Inspect is unauthenticated and does not use delegated signing. An
+unrecognized operation, or an operation for which the Platform has no policy,
+MUST fail closed and MUST NOT produce an assertion. Extensions MAY register
+additional operation policies without redefining Inspect as permanently
+unsigned.
 
 # Lifecycle
 
@@ -424,7 +468,8 @@ condition of accepting otherwise valid AEP client assertions. Hosted
 verification is an optional convenience API for deployments that have an
 out-of-band trust relationship with the Platform.
 
-The hosted verification endpoint uses `POST`. The request body is:
+The hosted verification endpoint uses `POST` and MUST carry a non-empty
+`Idempotency-Key` header. The request body is:
 
 ~~~ json
 {
@@ -438,6 +483,8 @@ The Platform MUST verify the assertion signature, time bounds, `jti` replay
 status, `op`, `aud`, `iss`, `sub`, and the current lifecycle state of the
 managed Agent identity. The Platform MUST reject assertion replay according to
 the same replay policy it applies to local delegated-signing audit records.
+
+For `authenticate`, the hosted verification request MUST include `resource`, and the Platform MUST verify that it equals the assertion claim and intended protected-resource target. For other operations, `resource` MUST be absent.
 
 A successful response for a recognized assertion is:
 
@@ -469,6 +516,31 @@ request is authorized to learn that fact. A Platform MAY return a generic
 unrecognized response instead of identity-specific failure detail when revealing
 the distinction would create an enumeration risk.
 
+# Platform Idempotency
+
+Provisioning, delegated signing, and hosted verification MUST support safe
+retry through the `Idempotency-Key` HTTP header. Listing and lifecycle `GET`
+requests do not use this header. Lifecycle `PATCH` remains naturally idempotent
+while it only requests a target state.
+
+The Platform MUST scope idempotency lookup by a stable authenticated principal,
+including tenant scope where necessary, plus the key. It MUST retain the
+complete replayable HTTP result for at least one hour. Exact retries MUST return
+the stored result, including pending results. Durable operation invariants MUST
+continue to prevent duplicate identities or other unsafe effects after the
+retention period expires.
+
+Each record MUST bind the normalized operation and a cryptographic hash of a
+canonical representation of material path parameters and request content.
+Authentication credentials, transport-only values, the `Idempotency-Key`
+itself, and server-generated timestamps MUST be excluded. Reuse by the same
+principal for another operation or changed material input MUST return `409
+Conflict` with code `idempotency_conflict`.
+
+An initial Sign request and a later completion request have different material
+input and therefore MUST use distinct idempotency keys. Retries within either
+stage reuse that stage's key.
+
 # Error Handling
 
 Platform endpoints use `application/problem+json` for errors. Implementations
@@ -499,7 +571,7 @@ state values defined here are closed over this document.
 The Platform is a high-value key custody system. Platforms MUST
 authenticate callers, authorize every provisioning and signing operation, audit
 signing operations, rate-limit state-changing endpoints, and protect replay
-inputs such as `jti` and `idempotency_key`.
+inputs such as `jti` and `Idempotency-Key`.
 
 Platforms SHOULD use hardware-backed keys for production custody. If an
 implementation uses software-encrypted keys, it MUST separate key encryption

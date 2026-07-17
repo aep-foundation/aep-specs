@@ -1,7 +1,7 @@
 ---
 title: "OAuth Bearer Session Credential Grant Type for the Agent Enrollment Protocol"
 abbrev: "AEP OAuth"
-docname: draft-kavian-aep-oauth-session-credential-01
+docname: draft-kavian-aep-oauth-session-credential-02
 category: std
 ipr: trust200902
 submissiontype: IETF
@@ -27,7 +27,7 @@ normative:
     target: https://datatracker.ietf.org/doc/draft-kavian-agent-enrollment-protocol/
     date: 2026-06-27
     seriesinfo:
-      Internet-Draft: draft-kavian-agent-enrollment-protocol-01
+      Internet-Draft: draft-kavian-agent-enrollment-protocol-02
     author:
       - ins: N. Kavian
         name: N. Kavian
@@ -150,6 +150,14 @@ On later HTTP requests, the Agent presents the token using the Bearer authentica
 ~~~ http-message
 Authorization: Bearer ya29.example
 ~~~
+
+On protected resources, the Agent MAY instead use the dedicated AEP carrier while preserving the Bearer field value:
+
+~~~ http-message
+AEP-Authorization: Bearer ya29.example
+~~~
+
+Services implementing this grant type MUST accept both carriers on protected resources. Agents MUST use only one AEP carrier per request, and the ambiguity and precedence rules are defined by AEP core.
 
 Authenticated AEP command endpoints MUST continue to accept baseline AEP authentication.
 

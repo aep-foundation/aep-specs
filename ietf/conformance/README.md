@@ -5,12 +5,12 @@ Internet-Draft set.
 
 The current conformance scope is limited to:
 
-- `draft-kavian-aep-api-key-session-credential-01`
-- `draft-kavian-aep-basic-session-credential-01`
+- `draft-kavian-aep-api-key-session-credential-02`
+- `draft-kavian-aep-basic-session-credential-02`
 - `draft-kavian-aep-did-web-identity-method-00`
 - `draft-kavian-aep-platform-hosted-identity-00`
-- `draft-kavian-aep-oauth-session-credential-01`
-- `draft-kavian-agent-enrollment-protocol-01`
+- `draft-kavian-aep-oauth-session-credential-02`
+- `draft-kavian-agent-enrollment-protocol-02`
 
 This scope covers the HTTP binding, identity-method substrate, the initial
 `did:web` identity method feature, Inspect, Enroll, Status, Grant, Revoke,
