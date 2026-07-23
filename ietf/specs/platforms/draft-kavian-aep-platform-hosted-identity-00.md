@@ -2,6 +2,7 @@
 title: "AEP Platform Hosted Identity"
 abbrev: "AEP Platform"
 docname: draft-kavian-aep-platform-hosted-identity-00
+date: 2026-07-23
 category: std
 ipr: trust200902
 submissiontype: IETF
