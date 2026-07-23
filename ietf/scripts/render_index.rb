@@ -251,7 +251,7 @@ html = <<~HTML
       </style>
     </head>
     <body>
-      <main>
+      <main hidden>
         <header>
           <h1>AEP Foundation Specifications</h1>
           <p>
