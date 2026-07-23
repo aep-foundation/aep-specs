@@ -2,6 +2,7 @@
 title: "API-Key Session Credential Grant Type for the Agent Enrollment Protocol"
 abbrev: "AEP API Key"
 docname: draft-kavian-aep-api-key-session-credential-02
+date: 2026-07-23
 category: std
 ipr: trust200902
 submissiontype: IETF
