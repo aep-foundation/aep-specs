@@ -43,6 +43,20 @@ A grant type specification should define:
 | Security              | Storage, leakage, entropy, logging, replay, and audience-binding considerations.           |
 | Privacy               | Correlation and data-minimization considerations.                                          |
 
+## Claim Name Registration Requirements
+
+A Claim Name specification should define:
+
+| Requirement       | Description                                                        |
+| ----------------- | ------------------------------------------------------------------ |
+| Claim Name        | Stable dotted lowercase identifier.                                |
+| Value type        | JSON value type and complete shape for structured values.          |
+| Compatibility     | Unknown-name and unknown-object-member behavior.                   |
+| Validation        | Required members, syntax, and error behavior.                      |
+| Privacy           | Collection, disclosure, retention, logging, and correlation risks. |
+| Security          | Trust level, verification status, and unsafe-input handling.       |
+| Support artifacts | Schema, positive and negative vectors, and conformance checks.     |
+
 ## Compatibility Expectations
 
 Extensions are additive. They must not redefine core command semantics, core

@@ -13,6 +13,8 @@ Use the current Internet-Draft set as the protocol authority:
   registrations.
 - did:web identity method draft: `did:web` resolution and client assertion
   verification material.
+- Claims draft: interoperable person and contact Claim Names, value shapes,
+  negotiation, and forward-compatibility behavior.
 - OAuth Bearer credential draft: `oauth-bearer` Grant and Revoke behavior.
 - API-key credential draft: `api-key` Grant and Revoke behavior.
 - Basic credential draft: `basic` Grant and Revoke behavior.
@@ -42,6 +44,28 @@ A typical Agent flow is:
 A Service can implement only Inspect, Enroll, and Status when it does not issue
 session credentials. A Service that advertises Grant and Revoke needs at least
 one concrete grant type.
+
+## Claim Negotiation
+
+Claims support is optional. A Service requests Claim Names only through the
+Inspect document's `claims.required`, `claims.preferred`, and
+`claims.optional` arrays.
+
+An Agent:
+
+- must satisfy every understood required Claim Name;
+- cannot satisfy an unknown required Claim Name without local-policy or
+  extension support;
+- ignores unknown preferred and optional Claim Names; and
+- may omit preferred and optional Claim Values.
+
+A Service ignores unknown submitted Claim Names by default. It may reject
+unadvertised values when accepting them creates a privacy, security, or
+compliance risk. Consumers ignore unknown members of object-valued Claims.
+
+Use `schemas/claim-values.schema.json` for the initial person and contact
+catalog, and see `examples/claims-negotiation.md` for a complete negotiation
+example.
 
 ## Endpoint Construction
 

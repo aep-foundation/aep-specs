@@ -2,7 +2,7 @@
 
 This directory contains Internet-Draft source files for AEP.
 
-- `core/`: Standards Track drafts that define baseline interoperable protocol behavior.
+- `core/`: Standards Track drafts that define baseline interoperable protocol behavior and core vocabularies.
 - `grant-types/`: optional session-credential grant type documents for Grant and Revoke.
 - `identity-methods/`: optional identity method documents for authenticated AEP commands.
 - `platforms/`: optional Platform API documents for hosted identity, key custody, and delegated signing.

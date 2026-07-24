@@ -3,6 +3,8 @@
 
 require "json"
 require "pathname"
+require "date"
+require "ipaddr"
 require "time"
 
 ROOT = Pathname.new(__dir__).join("..").expand_path
@@ -10,14 +12,21 @@ SCHEMA_ROOT = ROOT.join("schemas")
 VECTOR_ROOT = ROOT.join("test-vectors")
 
 SCHEMA_TARGETS = [
+  ["claims/person-contact-catalog.json", "claim-values.schema.json", %w[expected]],
+  ["claims/forward-compatible-address.json", "claim-values.schema.json", %w[input claim_values]],
+  ["claims/minimal-email.json", "claim-values.schema.json", %w[input claim_values]],
+  ["claims/quoted-email.json", "claim-values.schema.json", %w[input claim_values]],
   ["client-assertion/enroll-claims.json", "client-assertion-claims.schema.json", %w[expected]],
   ["protected-resource/authenticate-assertion.json", "client-assertion-claims.schema.json", %w[expected claims]],
   ["protected-resource/authorization-carriers.json", "protected-resource-authorization.schema.json", %w[expected dedicated_jwt]],
   ["protected-resource/authorization-carriers.json", "protected-resource-authorization.schema.json", %w[expected dedicated_bearer]],
   ["protected-resource/authorization-carriers.json", "protected-resource-authorization.schema.json", %w[expected dedicated_basic]],
   ["inspect/minimal-http.json", "inspect-document.schema.json", %w[expected]],
+  ["inspect/claims-catalog-advertisement.json", "inspect-document.schema.json", %w[expected]],
   ["openapi/security-inheritance.json", "openapi-aep-security-scheme.schema.json", %w[input security_scheme]],
   ["enroll/request-minimal.json", "enroll-request.schema.json", %w[input]],
+  ["enroll/request-claims-catalog.json", "enroll-request.schema.json", %w[input]],
+  ["enroll/request-claims-catalog.json", "claim-values.schema.json", %w[input claims]],
   ["enroll/response-active.json", "enroll-response.schema.json", %w[expected body]],
   ["enroll/response-pending-verification-owner-action.json", "enroll-response.schema.json", %w[expected body]],
   ["status/response-active.json", "status-response.schema.json", %w[expected body]],
@@ -48,6 +57,18 @@ SCHEMA_TARGETS = [
   ["platform/verification-response-unrecognized.json", "platform-verification-response.schema.json", %w[expected]]
 ].freeze
 
+CLAIM_SCHEMA_CASES = %w[
+  claims/invalid-address.json
+  claims/invalid-birthdate.json
+  claims/invalid-country-shape.json
+  claims/invalid-email-domain.json
+  claims/invalid-email-dot-string.json
+  claims/invalid-email-format.json
+  claims/invalid-empty-email.json
+  claims/invalid-mobile.json
+  claims/invalid-value-type.json
+].freeze
+
 def load_json(path)
   JSON.parse(Pathname.new(path).read)
 rescue JSON::ParserError => e
@@ -75,13 +96,103 @@ def type_valid?(value, expected)
   end
 end
 
+def mailbox_parts(value)
+  return value.split("@", -1) if !value.start_with?('"') && value.count("@") == 1
+  return nil unless value.start_with?('"')
+
+  escaped = false
+  value.each_char.with_index do |character, index|
+    next if index.zero?
+
+    if escaped
+      escaped = false
+    elsif character == "\\"
+      escaped = true
+    elsif character == '"'
+      return nil unless value[index + 1] == "@"
+
+      return [value[0..index], value[(index + 2)..]]
+    end
+  end
+  nil
+end
+
+def valid_quoted_local_part?(value)
+  return false unless value.length >= 2 && value.end_with?('"')
+
+  index = 1
+  while index < value.length - 1
+    code = value.getbyte(index)
+    if code == 92
+      index += 1
+      return false if index >= value.length - 1
+
+      escaped = value.getbyte(index)
+      return false unless escaped.between?(32, 126)
+    elsif !code.between?(32, 33) && !code.between?(35, 91) && !code.between?(93, 126)
+      return false
+    end
+    index += 1
+  end
+  true
+end
+
+def valid_mailbox_domain?(value)
+  if value.start_with?("[") || value.end_with?("]")
+    return false unless value.start_with?("[") && value.end_with?("]")
+
+    literal = value[1...-1]
+    ipv6 = literal.start_with?("IPv6:")
+    address = ipv6 ? literal.delete_prefix("IPv6:") : literal
+    begin
+      return true if IPAddr.new(address).to_s
+    rescue IPAddr::InvalidAddressError
+      # Fall through to the registered general-address-literal syntax.
+    end
+    return false if ipv6
+
+    tag, content = literal.split(":", 2)
+    return false unless tag&.match?(/\A[A-Za-z0-9-]*[A-Za-z0-9]\z/) && !content.to_s.empty?
+
+    return content.bytes.all? { |byte| byte.between?(33, 90) || byte.between?(94, 126) }
+  end
+
+  value.split(".", -1).all? do |label|
+    label.bytesize <= 63 &&
+      label.match?(/\A[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\z/)
+  end
+end
+
+def valid_mailbox?(value)
+  local, domain = mailbox_parts(value)
+  return false unless local && domain && !local.empty? && !domain.empty?
+  return false if local.bytesize > 64 || domain.bytesize > 255
+
+  local_valid =
+    if local.start_with?('"')
+      valid_quoted_local_part?(local)
+    else
+      atom = /[A-Za-z0-9!#$%&'*+\-\/=?^_`{|}~]+/
+      local.match?(/\A#{atom}(?:\.#{atom})*\z/)
+    end
+  local_valid && valid_mailbox_domain?(domain)
+end
+
 def validate_format(value, format, location, errors)
-  return unless format == "date-time"
   return unless value.is_a?(String)
 
-  Time.iso8601(value)
+  case format
+  when "date"
+    parsed = Date.iso8601(value)
+    raise ArgumentError unless parsed.iso8601 == value
+  when "date-time"
+    Time.iso8601(value)
+  when "email"
+    raise ArgumentError unless valid_mailbox?(value)
+  end
 rescue ArgumentError
-  errors << "#{location}: must be RFC 3339 date-time"
+  description = format == "email" ? "RFC 5321 Mailbox" : "RFC 3339 #{format}"
+  errors << "#{location}: must be #{description}"
 end
 
 def validate_schema(schema, value, location, errors)
@@ -174,6 +285,29 @@ SCHEMA_TARGETS.each do |relative_path, schema_name, data_path|
   end
 
   validate_schema(schema, data, "#{relative_path}:#{data_path.join('.')}", errors)
+end
+
+claim_schema = load_json(SCHEMA_ROOT.join("claim-values.schema.json"))
+CLAIM_SCHEMA_CASES.each do |relative_path|
+  begin
+    vector = load_json(VECTOR_ROOT.join(relative_path))
+    values = dig_path(vector, %w[input claim_values])
+    expected_valid = dig_path(vector, %w[expected valid])
+    case_errors = []
+    validate_schema(
+      claim_schema,
+      values,
+      "#{relative_path}:input.claim_values",
+      case_errors
+    )
+    actual_valid = case_errors.empty?
+    if actual_valid != expected_valid
+      errors << "#{relative_path}: expected valid=#{expected_valid}, got " \
+                "valid=#{actual_valid} (#{case_errors.join('; ')})"
+    end
+  rescue StandardError => e
+    errors << "#{relative_path}: #{e.message}"
+  end
 end
 
 if errors.empty?

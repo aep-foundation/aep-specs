@@ -45,6 +45,7 @@ The first Internet-Draft document set is:
 
 - [`draft-kavian-aep-api-key-session-credential-02`](https://datatracker.ietf.org/doc/draft-kavian-aep-api-key-session-credential/): `ietf/specs/grant-types/draft-kavian-aep-api-key-session-credential-02.md`
 - [`draft-kavian-aep-basic-session-credential-02`](https://datatracker.ietf.org/doc/draft-kavian-aep-basic-session-credential/): `ietf/specs/grant-types/draft-kavian-aep-basic-session-credential-02.md`
+- [`draft-kavian-aep-claims-00`](https://datatracker.ietf.org/doc/draft-kavian-aep-claims/): `ietf/specs/core/draft-kavian-aep-claims-00.md`
 - [`draft-kavian-aep-did-web-identity-method-00`](https://datatracker.ietf.org/doc/draft-kavian-aep-did-web-identity-method/): `ietf/specs/identity-methods/draft-kavian-aep-did-web-identity-method-00.md`
 - [`draft-kavian-aep-oauth-session-credential-02`](https://datatracker.ietf.org/doc/draft-kavian-aep-oauth-session-credential/): `ietf/specs/grant-types/draft-kavian-aep-oauth-session-credential-02.md`
 - [`draft-kavian-aep-platform-hosted-identity-00`](https://datatracker.ietf.org/doc/draft-kavian-aep-platform-hosted-identity/): `ietf/specs/platforms/draft-kavian-aep-platform-hosted-identity-00.md`
@@ -70,6 +71,8 @@ The three session-credential documents define the initial concrete Grant/Revoke 
 The core document is independently implementable. The session-credential documents depend on the core document, but the core document does not depend on any specific session-credential document. A Service that does not issue session credentials can implement Inspect, Enroll, and Status without implementing Grant or Revoke. A Service that supports Grant and Revoke advertises one or more concrete grant types defined by companion session-credential specifications.
 
 The first Internet-Draft set includes `did:web` as the initial AEP-defined identity method feature and the hosted identity Platform specification as the initial AEP-defined Platform specification.
+The Claims document defines the initial interoperable person and contact Claim
+Names and their forward-compatible JSON value shapes.
 
 ## Governance
 
@@ -83,9 +86,9 @@ registry entries live in `registry/`.
 The `conformance/`, `test-vectors/`, and `schemas/` directories define the
 initial implementation-checking surface for the published draft set. They are
 scoped to the current core HTTP draft and the three published
-session-credential drafts, and Platform Hosted Identity. They do not
-include later lifecycle commands, additional identity methods beyond `did:web`,
-or deferred extensions.
+session-credential drafts, the Claims catalog, and Platform Hosted Identity.
+They do not include later lifecycle commands, additional identity methods
+beyond `did:web`, or deferred extensions.
 
 JSON Schemas validate stable wire objects used by the current test vectors.
 They are support artifacts derived from the Internet-Draft prose, not a

@@ -7,6 +7,7 @@ The current conformance scope is limited to:
 
 - `draft-kavian-aep-api-key-session-credential-02`
 - `draft-kavian-aep-basic-session-credential-02`
+- `draft-kavian-aep-claims-00`
 - `draft-kavian-aep-did-web-identity-method-00`
 - `draft-kavian-aep-platform-hosted-identity-00`
 - `draft-kavian-aep-oauth-session-credential-02`
@@ -16,7 +17,8 @@ This scope covers the HTTP binding, identity-method substrate, the initial
 `did:web` identity method feature, Inspect, Enroll, Status, Grant, Revoke,
 baseline `Authorization: AEP <jwt>` authentication, error handling,
 idempotency, the three initial session-credential formats, and the optional
-Platform Hosted Identity API.
+Platform Hosted Identity API. It also covers the optional Claims catalog and
+its Agent and Service negotiation behavior.
 
 ## Roles
 
@@ -33,6 +35,7 @@ The conformance model defines these implementation roles:
 | Profile                  | Requirement                                                                         |
 | ------------------------ | ----------------------------------------------------------------------------------- |
 | Core HTTP                | Implements the core AEP draft over HTTP with an enabled identity method.            |
+| Claims                   | Implements the Claims catalog and negotiation rules in addition to Core HTTP.       |
 | API-Key Credential       | Implements the API-key session-credential draft in addition to Core HTTP.           |
 | Basic Credential         | Implements the Basic session-credential draft in addition to Core HTTP.             |
 | OAuth Bearer Credential  | Implements the OAuth Bearer session-credential draft in addition to Core HTTP.      |
@@ -42,6 +45,12 @@ An implementation may claim one or more credential profiles. A Service that
 does not advertise `grant` and `revoke` does not need to claim a credential
 profile. A Platform Hosted Identity claim is independent of Agent and Service
 claims.
+
+An Agent or Service claims the Claims profile only when it implements the
+registered Claim Value shapes it uses and the Claims draft's handling of
+unknown required, preferred, optional, submitted, and object-member values.
+The profile is optional and claim-dependent: supporting one locally defined
+claim does not imply support for the AEP Claims catalog.
 
 ## Test Vector Relationship
 
@@ -61,8 +70,9 @@ endpoint construction from Inspect, media types, authentication scheme
 selection, client assertion operation binding, idempotency conflict behavior,
 credential-profile consistency, Platform discovery shape, Platform assertion
 lifetime limits, Service-scoped Agent DID uniqueness, hosted verification
-non-disclosure behavior, and the absence of Platform key-rotation endpoints. It
-does not contact a live Agent, Platform, or Service.
+non-disclosure behavior, the absence of Platform key-rotation endpoints, Claims
+catalog shapes, and Claims forward-compatibility relationships. It does not
+contact a live Agent, Platform, or Service.
 
 ## Initial Harness Boundary
 

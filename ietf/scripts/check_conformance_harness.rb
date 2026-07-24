@@ -18,6 +18,15 @@ POST_COMMANDS = %w[enroll grant revoke].freeze
 AUTHENTICATED_COMMANDS = %w[enroll grant revoke status].freeze
 AUTHENTICATED_OPERATIONS = (AUTHENTICATED_COMMANDS + ["authenticate"]).freeze
 GRANT_TYPES = %w[oauth-bearer api-key basic].freeze
+CLAIM_NAMES = %w[
+  contact.address.primary
+  contact.email
+  contact.mobile
+  person.birthdate
+  person.first_name
+  person.last_name
+  person.username
+].freeze
 CREDENTIAL_PROFILES = {
   "oauth-bearer" => {
     category: "credentials/oauth-bearer",
@@ -62,6 +71,43 @@ expect(errors, inspect.dig("authentication", "methods") == %w[aep-jwt oauth-bear
 expect(errors, !commands.fetch("supported").include?("authenticate"), "authenticate must not appear as a Service command")
 expect(errors, inspect.dig("http", "openapi", "url") == "/openapi.json", "Inspect must advertise an OpenAPI URI-reference")
 expect(errors, inspect.dig("http", "openapi", "path_matching", "trailing_slash") == "strict", "Inspect OpenAPI vector must declare strict slash matching")
+
+claims_inspect = vector("inspect/claims-catalog-advertisement.json").fetch("expected")
+advertised_claims = %w[required preferred optional].flat_map do |requirement|
+  claims_inspect.dig("claims", requirement)
+end
+expect(errors, advertised_claims.sort == CLAIM_NAMES.sort, "Claims Inspect vector must advertise the complete Claims catalog exactly once")
+
+claims_catalog = vector("claims/person-contact-catalog.json").fetch("expected")
+expect(errors, claims_catalog.keys.sort == CLAIM_NAMES.sort, "Claims catalog vector must contain every registered Claim Name")
+
+claims_enroll = vector("enroll/request-claims-catalog.json").dig("input", "claims")
+expect(errors, claims_enroll == claims_catalog, "Claims Enroll vector values must match the canonical Claims catalog vector")
+
+forward_address = vector("claims/forward-compatible-address.json")
+expect(errors, forward_address.dig("expected", "valid") == true, "Claims profile must accept additional object members")
+expect(errors, forward_address.dig("expected", "unknown_object_members") == "ignore", "Unknown Claim object members must be ignored")
+
+minimal_email = vector("claims/minimal-email.json")
+expect(errors, minimal_email.dig("input", "claim_values", "contact.email") == "a@b", "Claims profile must cover the minimum three-character email shape")
+expect(errors, minimal_email.dig("expected", "valid") == true, "The minimum email shape must be valid")
+quoted_email = vector("claims/quoted-email.json")
+expect(errors, quoted_email.dig("expected", "valid") == true, "A quoted RFC 5321 local-part must be valid")
+
+%w[invalid-address invalid-birthdate invalid-country-shape invalid-email-domain invalid-email-dot-string invalid-email-format invalid-empty-email invalid-mobile invalid-value-type].each do |name|
+  invalid = vector("claims/#{name}.json")
+  expect(errors, invalid.dig("expected", "valid") == false, "#{name} must be a negative Claim Value vector")
+end
+
+negotiation = vector("claims/negotiation-compatibility.json")
+expect(errors, negotiation.dig("expected", "enrollment_requirement_satisfied") == true, "Omitted preferred and optional Claims must not prevent enrollment")
+expect(errors, negotiation.dig("expected", "omitted_preferred_allowed") == true, "Preferred Claim Values may be omitted")
+%w[unknown_optional_action unknown_preferred_action unknown_submitted_default_action].each do |field|
+  expect(errors, negotiation.dig("expected", field) == "ignore", "#{field} must preserve Claims forward compatibility")
+end
+
+unknown_required = vector("claims/unknown-required-claim.json")
+expect(errors, unknown_required.dig("expected", "can_satisfy") == false, "An unsupported unknown required Claim cannot be satisfied")
 
 COMMAND_PATHS.each do |command, path|
   expect(errors, endpoint(endpoint_base, command) == path, "endpoint_base must construct #{path} for #{command}")
@@ -161,7 +207,7 @@ expect(errors, substitution.dig("expected", "allowed").length == AUTHENTICATED_O
 presentations = vector("protected-resource/credential-presentations.json").fetch("expected")
 expect(errors, presentations.dig("oauth-bearer", "scheme") == "Bearer", "OAuth presentation must use Bearer")
 expect(errors, presentations.dig("basic", "scheme") == "Basic", "Basic presentation must use Basic")
-expect(errors, presentations.dig("api-key", "header") != "X-API-KEY", "API-key presentation must use issued header, not a protocol default")
+expect(errors, presentations.dig("api-key", "header") == "x-api-key", "API-key presentation example must use the response-selected illustrative header")
 
 carriers = vector("protected-resource/authorization-carriers.json").fetch("expected")
 %w[jwt bearer basic].each do |method|
