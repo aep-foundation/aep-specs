@@ -22,23 +22,6 @@ Inspect ─────────▶ Enroll ───────────�
                          └──────── Grant ─▶ Session credential └──▶ Revoke
 ```
 
-## Read the Specification
-
-| Resource            | Best for                                                                                                      | Link                                                                                         |
-| ------------------- | ------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| Core Internet-Draft | Normative protocol behavior, HTTP binding, authentication, errors, security, privacy, and IANA considerations | [IETF Datatracker](https://datatracker.ietf.org/doc/draft-kavian-agent-enrollment-protocol/) |
-| Complete draft set  | Core, identity method, Platform, and session-credential documents                                             | [Published specification site](https://www.aep.foundation/)                                  |
-| Rendered artifacts  | HTML, text, XML, and PDF builds of every draft                                                                | [Latest GitHub release](https://github.com/aep-foundation/aep-specs/releases/latest)         |
-| Implementer guide   | A practical route through the drafts and support artifacts                                                    | [Implementer guide](./ietf/guides/implementer-guide.md)                                      |
-| Protocol examples   | Inspect documents and complete HTTP transcripts                                                               | [Examples](https://www.aep.foundation/examples/)                                             |
-| JSON Schemas        | Machine-readable validation of stable wire objects                                                            | [Published schemas](https://www.aep.foundation/schemas/)                                     |
-| Test vectors        | Positive and negative implementation cases                                                                    | [Test vectors](./ietf/test-vectors)                                                          |
-| Node.js SDK         | Reference TypeScript implementation and runnable applications                                                 | [`aep-node`](https://github.com/aep-foundation/aep-node)                                     |
-
-Internet-Draft prose is normative. Schemas, examples, registries, and test
-vectors are implementation support artifacts and do not replace the
-specifications.
-
 ## Protocol at a Glance
 
 | Command     | What the Agent learns or changes                                                                                                   |
@@ -54,11 +37,12 @@ Service can implement Inspect, Enroll, and Status without Grant or Revoke, or
 advertise one or more companion grant types when session credentials are
 useful.
 
-## Current Draft Set
+## Read the Specifications
 
 | Document                                                                                                    | Scope                                                                                                                                     | Source                                                                                     |
 | ----------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
 | [Agent Enrollment Protocol](https://datatracker.ietf.org/doc/draft-kavian-agent-enrollment-protocol/)       | Core commands, HTTP transport, discovery, client assertions, identity-method substrate, errors, security, privacy, and IANA registrations | [`draft-02`](./ietf/specs/core/draft-kavian-agent-enrollment-protocol-02.md)               |
+| [Claim Values](https://datatracker.ietf.org/doc/draft-kavian-aep-claims/)                                   | Interoperable claim names and forward-compatible claim value shapes                                                                       | [`draft-00`](./ietf/specs/core/draft-kavian-aep-claims-00.md)                              |
 | [`did:web` Identity Method](https://datatracker.ietf.org/doc/draft-kavian-aep-did-web-identity-method/)     | Initial AEP-defined identity method feature                                                                                               | [`draft-00`](./ietf/specs/identity-methods/draft-kavian-aep-did-web-identity-method-00.md) |
 | [Platform Hosted Identity](https://datatracker.ietf.org/doc/draft-kavian-aep-platform-hosted-identity/)     | Service-scoped Agent DID provisioning, delegated signing, verification, and lifecycle                                                     | [`draft-00`](./ietf/specs/platforms/draft-kavian-aep-platform-hosted-identity-00.md)       |
 | [OAuth Session Credential](https://datatracker.ietf.org/doc/draft-kavian-aep-oauth-session-credential/)     | OAuth Bearer credentials issued and revoked through Grant and Revoke                                                                      | [`draft-02`](./ietf/specs/grant-types/draft-kavian-aep-oauth-session-credential-02.md)     |
@@ -70,14 +54,14 @@ useful.
 The repository connects normative documents to artifacts that can be consumed
 by SDKs, servers, and conformance suites:
 
-| Area                                       | Contents                                                                                                             |
-| ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------- |
-| [`ietf/examples`](./ietf/examples)         | Complete Inspect, Enroll, Grant, Revoke, Status, protected-resource, authorization-composition, and OpenAPI examples |
-| [`ietf/schemas`](./ietf/schemas)           | JSON Schemas for stable request, response, discovery, Platform, and problem-detail objects                           |
-| [`ietf/test-vectors`](./ietf/test-vectors) | Success cases, rejection cases, redirect safety, replay/idempotency behavior, and Platform flows                     |
-| [`ietf/conformance`](./ietf/conformance)   | Conformance profiles and the artifact manifest consumed by harnesses                                                 |
-| [`ietf/registry`](./ietf/registry)         | Machine-readable authentication method, identity method, grant type, extension, and HTTP field entries               |
-| [`ietf/guides`](./ietf/guides)             | Non-normative implementation and Internet-Draft authoring guidance                                                   |
+| Area                                       | Contents                                                                                                  |
+| ------------------------------------------ | --------------------------------------------------------------------------------------------------------- |
+| [`ietf/examples`](./ietf/examples)         | Complete command, Claims negotiation, protected-resource, authorization-composition, and OpenAPI examples |
+| [`ietf/schemas`](./ietf/schemas)           | JSON Schemas for stable request, response, discovery, Claims, Platform, and problem-detail objects        |
+| [`ietf/test-vectors`](./ietf/test-vectors) | Success, rejection, Claims compatibility, redirect-safety, replay/idempotency, and Platform cases         |
+| [`ietf/conformance`](./ietf/conformance)   | Conformance profiles and the offline fixture harness                                                      |
+| [`ietf/registry`](./ietf/registry)         | Machine-readable authentication, identity, grant-type, Claim Name, extension, and HTTP-field entries      |
+| [`ietf/guides`](./ietf/guides)             | Non-normative implementation and Internet-Draft authoring guidance                                        |
 
 Start with the [implementer guide](./ietf/guides/implementer-guide.md), then use
 the [complete Enroll → Grant → Revoke transcript](./ietf/examples/enroll-grant-revoke-transcript.md)
@@ -135,6 +119,22 @@ Rendering also requires Python packages from
 described in [`ietf/README.md`](./ietf/README.md). Generated drafts are written
 to `artifacts/`; the deploy workflow publishes them on the latest GitHub
 release.
+
+## Reference Resources
+
+| Resource           | Best for                                                                  | Link                                                                                 |
+| ------------------ | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Complete draft set | Core, claims, identity method, Platform, and session-credential documents | [Published specification site](https://www.aep.foundation/)                          |
+| Rendered artifacts | HTML, text, XML, and PDF builds of every draft                            | [Latest GitHub release](https://github.com/aep-foundation/aep-specs/releases/latest) |
+| Implementer guide  | A practical route through the drafts and support artifacts                | [Implementer guide](./ietf/guides/implementer-guide.md)                              |
+| Protocol examples  | Inspect documents and complete HTTP transcripts                           | [Examples](https://www.aep.foundation/examples/)                                     |
+| JSON Schemas       | Machine-readable validation of stable wire objects                        | [Published schemas](https://www.aep.foundation/schemas/)                             |
+| Test vectors       | Positive and negative implementation cases                                | [Test vectors](./ietf/test-vectors)                                                  |
+| Node.js SDK        | Reference TypeScript implementation and runnable applications             | [`aep-node`](https://github.com/aep-foundation/aep-node)                             |
+
+Internet-Draft prose is normative. Schemas, examples, registries, and test
+vectors are implementation support artifacts and do not replace the
+specifications.
 
 ## Contributing
 

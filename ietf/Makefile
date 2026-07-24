@@ -8,6 +8,7 @@ EXAMPLES := \
 	examples/basic-grant-revoke.md \
 	examples/protected-resource-authentication.md \
 	examples/openapi-authentication.md \
+	examples/claims-negotiation.md \
 	examples/authorization-composition.md
 ARTIFACTS := ../artifacts
 EXAMPLE_ARTIFACTS := ../docs/examples

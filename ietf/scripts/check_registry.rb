@@ -7,7 +7,9 @@ require "pathname"
 ROOT = Pathname.new(__dir__).join("..").expand_path
 REGISTRY_ROOT = ROOT.join("registry")
 SCHEMA_PATH = REGISTRY_ROOT.join("registry-entry.schema.json")
-ENTRY_PATHS = Dir[REGISTRY_ROOT.join("{authentication-methods,extensions,grant-types,http-fields,identity-methods}/*.json")].sort.map { |path| Pathname.new(path) }
+CLAIM_SCHEMA_PATH = ROOT.join("schemas/claim-values.schema.json")
+CLAIMS_DRAFT_PATH = ROOT.join("specs/core/draft-kavian-aep-claims-00.md")
+ENTRY_PATHS = Dir[REGISTRY_ROOT.join("{authentication-methods,claim-names,extensions,grant-types,http-fields,identity-methods}/*.json")].sort.map { |path| Pathname.new(path) }
 
 def load_json(path)
   JSON.parse(path.read)
@@ -74,6 +76,9 @@ end
 
 seen_ids = {}
 seen_wire_identifiers = {}
+claim_entries = {}
+CLAIM_NAME_RE = /\A[a-z][a-z0-9_]*(?:\.[a-z][a-z0-9_]*)*\z/
+JSON_VALUE_TYPES = %w[array boolean integer null number object string].freeze
 
 ENTRY_PATHS.each do |path|
   entry = load_json(path)
@@ -99,6 +104,15 @@ ENTRY_PATHS.each do |path|
     errors << "#{rel}: inspect.config_key must match wire_identifier" unless entry.dig("inspect", "config_key") == wire_identifier
   end
 
+  if entry["kind"] == "claim_name"
+    errors << "#{rel}: wire_identifier must be a dotted claim name" unless wire_identifier.is_a?(String) && wire_identifier.match?(CLAIM_NAME_RE)
+    errors << "#{rel}: value_type is required for claim_name entries" unless entry.key?("value_type")
+    errors << "#{rel}: value_type must be a JSON value type" unless JSON_VALUE_TYPES.include?(entry["value_type"])
+    claim_entries[wire_identifier] = entry if wire_identifier.is_a?(String)
+  elsif entry.key?("value_type")
+    errors << "#{rel}: value_type is only valid for claim_name entries"
+  end
+
   spec_path = entry.dig("specification", "path")
   errors << "#{rel}: specification.path does not exist: #{spec_path}" if spec_path && !ROOT.parent.join(spec_path).file?
 
@@ -106,6 +120,23 @@ ENTRY_PATHS.each do |path|
     Array(paths).each do |artifact_path|
       errors << "#{rel}: #{artifact_type} path does not exist: #{artifact_path}" unless ROOT.parent.join(artifact_path).file?
     end
+  end
+end
+
+claim_schema = load_json(CLAIM_SCHEMA_PATH)
+schema_claims = claim_schema.fetch("properties", {})
+draft_claims = CLAIMS_DRAFT_PATH.read.scan(/^`([^`]+)`:\s*$/).flatten.sort
+
+errors << "claim catalog: no claim_name registry entries found" if claim_entries.empty?
+errors << "claim catalog: registry and claim-values schema Claim Names differ" unless claim_entries.keys.sort == schema_claims.keys.sort
+errors << "claim catalog: registry and Claims draft Claim Names differ" unless claim_entries.keys.sort == draft_claims
+
+claim_entries.each do |claim_name, entry|
+  schema_type = schema_claims.dig(claim_name, "type")
+  unless schema_type == entry["value_type"]
+    errors << "claim catalog: #{claim_name} registry value_type " \
+              "#{entry['value_type'].inspect} does not match schema type " \
+              "#{schema_type.inspect}"
   end
 end
 

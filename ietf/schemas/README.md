@@ -16,6 +16,7 @@ session-credential Grant responses, and the hosted identity Platform specificati
 | --------------------------------------------------- | ------------------------------------------ |
 | `api-key-grant-response.schema.json`                | API-key Grant response body                |
 | `basic-grant-response.schema.json`                  | HTTP Basic Grant response body             |
+| `claim-values.schema.json`                          | Person and contact claim-value shapes      |
 | `client-assertion-claims.schema.json`               | Client assertion JWT claim set             |
 | `enroll-request.schema.json`                        | Enroll request body                        |
 | `enroll-response.schema.json`                       | Enroll response body                       |

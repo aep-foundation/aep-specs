@@ -262,13 +262,11 @@ html = <<~HTML
 
         <h2>Current Drafts</h2>
         <p>
-          The current set contains one independently implementable core protocol
-          draft and three companion session-credential drafts. The core draft
-          defines Inspect, Enroll, Grant, Revoke, Status, HTTP discovery and
-          transport, <code>did:web</code> identity, client assertion
-          authentication, errors, security, privacy, and IANA registrations. The
-          credential drafts define concrete Grant/Revoke formats that services
-          may advertise when they issue session credentials.
+          The current set contains the independently implementable core
+          protocol and companion documents for Claims, <code>did:web</code>
+          identity, Platform Hosted Identity, and three session-credential
+          formats. The companion drafts define optional interoperable behavior
+          that Services advertise when applicable.
         </p>
         <table>
           <thead>

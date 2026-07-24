@@ -35,6 +35,15 @@ normative:
   RFC9114:
   RFC9457:
 informative:
+  AEP-CLAIMS:
+    title: "AEP Claim Values"
+    target: https://datatracker.ietf.org/doc/draft-kavian-aep-claims/
+    date: 2026-07-23
+    seriesinfo:
+      Internet-Draft: draft-kavian-aep-claims-00
+    author:
+      - ins: N. Kavian
+        name: N. Kavian
   RFC8126:
   RFC8725:
 ...
@@ -395,7 +404,7 @@ Request body:
 
 `agent_did` MUST equal the Agent DID in the client assertion `iss`, `sub`, and `kid` values, ignoring any `kid` fragment. The DID method MUST be accepted by the Service's `identity.methods` advertisement.
 
-`claims` carries claim values requested by the Service's Inspect document. This document does not define a complete claim catalog. Claim names are strings and claim values are JSON values. Services MUST ignore unknown claims unless local policy requires rejection.
+`claims` carries claim values requested by the Service's Inspect document. Claim names are strings and claim values are JSON values. Interoperable names and value shapes for common person and contact claims are defined by {{AEP-CLAIMS}}. Services MUST ignore unknown claims unless local policy requires rejection.
 
 `idempotency_key` is an opaque retry key. When both the HTTP `Idempotency-Key` header and body field are present, they MUST contain the same value.
 
@@ -647,7 +656,7 @@ This document defines the extension points needed by the core protocol:
 * `identity.methods` advertises concrete identity methods accepted for authenticated AEP commands.
 * `commands.grant_types` advertises concrete session-credential formats available through Grant and Revoke.
 * `commands.grant_types_config` MAY carry per-grant-type configuration defined by a concrete session-credential document.
-* `claims.required`, `claims.preferred`, and `claims.optional` MAY contain claim names defined by other documents.
+* `claims.required`, `claims.preferred`, and `claims.optional` MAY contain claim names from the AEP Claim Names registry or claim names defined by other documents.
 * Additional top-level Inspect fields MAY be added by future documents.
 
 Agents MUST ignore extension identifiers and additive fields they do not understand, unless local policy requires the Agent to refuse enrollment when a required capability is absent.
