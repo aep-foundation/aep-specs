@@ -1,0 +1,10 @@
+Repository tooling
+Copyright (c) 2026 AEP Foundation
+
+This notice applies to build scripts, workflow definitions, dependency
+manifests, configuration files, and other repository tooling, whether the
+recipient uses that tooling under the Apache License 2.0 or the MIT License.
+
+All other repository content is dedicated to the public domain under CC0 1.0
+Universal as described in LICENSE.md, except third-party license texts and
+material governed by IETF contribution terms.

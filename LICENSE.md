@@ -1,18 +1,32 @@
 # Licensing
 
 This repository contains specification documents, rendered specification
-artifacts, website content, and build tooling with different licensing terms.
+artifacts, JSON Schemas, examples, test vectors, conformance data, registries,
+guides, website content, and build tooling with different licensing terms.
 
 ## Specifications
 
-Specification documents and rendered specification artifacts are released into
-the public domain under **CC0 1.0 Universal**.
+Except for repository tooling defined below, third-party license texts, and
+material governed by IETF contribution terms, repository content is released
+into the public domain under **CC0 1.0 Universal**. This includes specification
+documents, rendered specification artifacts, JSON Schemas, examples, test
+vectors, conformance data, registries, guides, templates, governance material,
+and website specification content.
 
 This includes:
 
 - `docs/artifacts/`
+- `docs/examples/`
+- `docs/schemas/`
+- `ietf/conformance/`
 - `ietf/examples/`
+- `ietf/governance/`
+- `ietf/guides/`
+- `ietf/registry/`
+- `ietf/schemas/`
 - `ietf/specs/`
+- `ietf/test-vectors/`
+- Root and `ietf/` Markdown documentation that is not a third-party license.
 
 You may copy, modify, and distribute the specifications without restriction.
 
@@ -35,3 +49,6 @@ Build scripts, dependency manifests, configuration files, and other tooling are
 dual-licensed under **Apache 2.0** or **MIT**, at your option.
 
 See `LICENSE-APACHE` and `LICENSE-MIT`.
+
+The copyright notice in `COPYRIGHT` applies to repository tooling under either
+license choice.
