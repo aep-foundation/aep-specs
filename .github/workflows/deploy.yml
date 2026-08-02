@@ -64,11 +64,18 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release delete latest --yes --cleanup-tag 2>/dev/null || true
-          gh release create latest artifacts/draft-*.html artifacts/draft-*.txt artifacts/draft-*.xml artifacts/draft-*.pdf \
-            --title "Latest AEP specification artifacts" \
-            --notes "Auto-published AEP specification artifacts from commit ${{ github.sha }}." \
-            --latest
+          if gh release view latest >/dev/null 2>&1; then
+            gh release upload latest artifacts/draft-* --clobber
+            gh release edit latest \
+              --title "Latest AEP specification artifacts" \
+              --notes "Auto-published AEP specification artifacts from commit ${{ github.sha }}." \
+              --latest
+          else
+            gh release create latest artifacts/draft-* \
+              --title "Latest AEP specification artifacts" \
+              --notes "Auto-published AEP specification artifacts from commit ${{ github.sha }}." \
+              --latest
+          fi
 
       - name: Prepare GitHub Pages
         run: |
