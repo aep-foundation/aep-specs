@@ -130,7 +130,10 @@ release.
 | Protocol examples  | Inspect documents and complete HTTP transcripts                           | [Examples](https://www.aep.foundation/examples/)                                     |
 | JSON Schemas       | Machine-readable validation of stable wire objects                        | [Published schemas](https://www.aep.foundation/schemas/)                             |
 | Test vectors       | Positive and negative implementation cases                                | [Test vectors](./ietf/test-vectors)                                                  |
-| Node.js SDK        | Reference TypeScript implementation and runnable applications             | [`aep-node`](https://github.com/aep-foundation/aep-node)                             |
+| Agent SDK          | Agent-side discovery, enrollment, credentials, and lifecycle workflows    | [`@aep-foundation/agent`](https://www.npmjs.com/package/@aep-foundation/agent)       |
+| Service SDK        | Service handlers, policy hooks, persistence, and authentication           | [`@aep-foundation/service`](https://www.npmjs.com/package/@aep-foundation/service)   |
+| Platform SDK       | Hosted Agent identity provisioning, signing, and verification             | [`@aep-foundation/platform`](https://www.npmjs.com/package/@aep-foundation/platform) |
+| Complete SDK suite | Core, conformance, extension, and framework-adapter packages              | [Node.js SDK packages](https://www.npmjs.com/org/aep-foundation)                     |
 
 Internet-Draft prose is normative. Schemas, examples, registries, and test
 vectors are implementation support artifacts and do not replace the
