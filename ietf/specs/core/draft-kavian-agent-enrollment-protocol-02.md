@@ -19,6 +19,11 @@ author:
     email: nas@inflowpay.ai
 
 normative:
+  DID-WEB:
+    title: "The did:web Method Specification"
+    target: https://w3c-ccg.github.io/did-method-web/
+    author:
+      - org: W3C Credentials Community Group
   RFC3339:
   RFC5234:
   RFC6839:
@@ -213,6 +218,8 @@ The Inspect document shown here contains only the fields required for the HTTP b
 `identity.methods` lists identity method identifiers the Service accepts for authenticated AEP commands. The values are lower-case identifiers registered in the AEP Identity Methods registry. A Service that advertises Enroll, Grant, Revoke, or Status MUST advertise at least one identity method.
 
 `service.did` identifies the Service. Agents use this value as the `aud` claim in client assertion JWTs.
+
+When `service.did` uses the `did:web` method {{DID-WEB}}, the HTTPS origin encoded by the DID MUST equal the origin of the final Inspect response URL. DID path components do not alter the encoded origin. Agents MUST reject a mismatch before provisioning an Agent identity, requesting a client assertion, or transmitting credentials. Agents SHOULD expose `service_identity_mismatch` as the local failure identifier; this is not an HTTP Problem Details response from the Service. This requirement applies regardless of whether the Service appears in a directory. Other Service DID methods MUST define an equivalent origin-control binding before Agents rely on them. An Agent that does not implement that binding MUST reject the Inspect document.
 
 Services SHOULD send HTTP cache metadata, including `Cache-Control` and `ETag`, on Inspect responses. A default freshness lifetime of 300 seconds is RECOMMENDED when the Service does not need a shorter policy window.
 
@@ -908,6 +915,8 @@ Client assertions are replay resistant only when Services validate the full chai
 Services SHOULD keep assertion lifetimes short. This document sets a maximum validity interval of 300 seconds. Services MAY enforce a shorter maximum.
 
 Identity methods define how Services obtain verification material for Agent identities. Services MUST apply the resolution, trust-anchor, caching, and key-rotation requirements of each enabled identity method. A Service MUST NOT accept an Agent identity method that was not advertised in `identity.methods`.
+
+Resolving a Service DID proves that the DID document exists; it does not prove that the origin serving an Inspect document controls that DID. An attacker that publishes another Service's DID could otherwise induce an Agent to create or disclose an assertion whose audience names the victim Service. Agents MUST enforce the Service-origin binding defined for the Service DID method before provisioning identity material, requesting an assertion, or transmitting credentials. Directory membership and directory ownership metadata MUST NOT substitute for this check.
 
 The `core.signing_algorithms` advertisement is security relevant. Services MUST NOT advertise algorithms they do not intend to accept, and MUST NOT accept algorithms that were not advertised. Agents MUST NOT use `none` or symmetric JOSE algorithms for Agent identity assertions. Implementations SHOULD follow JWT best current practices {{RFC8725}}.
 
