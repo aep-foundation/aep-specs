@@ -136,7 +136,7 @@ A successful Grant response is a JSON object:
 
 `expires_at` is REQUIRED and is an RFC 3339 {{RFC3339}} timestamp for credential expiry.
 
-`scopes` is REQUIRED and contains the granted scope strings.  The Service MAY return an empty array when the token has no scope-limited authorization.
+`scopes` is OPTIONAL and contains the granted scope strings when present.  A missing or `null` value means the token has no scope-limited authorization.  The Service MAY return an empty array with the same meaning.
 
 `token_format`, when present, describes the Service-selected format.
 
