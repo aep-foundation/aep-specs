@@ -137,7 +137,7 @@ This syntax permits visible ASCII characters while excluding whitespace, control
 
 `expires_at` is REQUIRED and is an RFC 3339 {{RFC3339}} timestamp for credential expiry.
 
-`scopes` is REQUIRED and contains the granted scope strings.  The Service MAY return an empty array when the API key has no scope-limited authorization.
+`scopes` is OPTIONAL and contains the granted scope strings when present.  A missing or `null` value means the API key has no scope-limited authorization.  The Service MAY return an empty array with the same meaning.
 
 `credential_id`, when present, is a stable identifier for per-key Revoke.  If present, the Service MUST support Revoke with this value.
 

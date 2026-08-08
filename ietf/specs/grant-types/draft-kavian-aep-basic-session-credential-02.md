@@ -132,7 +132,7 @@ A successful Grant response is a JSON object:
 
 `realm`, when present, identifies the associated HTTP Basic realm.
 
-`scopes` is REQUIRED and contains the granted scope strings.  The Service MAY return an empty array when the Basic credential has no scope-limited authorization.
+`scopes` is OPTIONAL and contains the granted scope strings when present.  A missing or `null` value means the Basic credential has no scope-limited authorization.  The Service MAY return an empty array with the same meaning.
 
 `credential_id`, when present, is a stable identifier for per-credential Revoke.  If present, the Service MUST support Revoke with this value.
 
