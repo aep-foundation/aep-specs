@@ -39,6 +39,8 @@ Content-Type: application/aep+json
       "city": "San Francisco",
       "country": "US",
       "delivery_instructions": "Reception desk",
+      "first_name": "Grace",
+      "last_name": "Hopper",
       "line1": "123 Market Street"
     },
     "contact.email": "owner@example.com",
