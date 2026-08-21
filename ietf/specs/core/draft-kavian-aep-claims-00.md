@@ -143,17 +143,27 @@ This section defines Claim Names for common person and contact information.
 : An object containing a primary postal address for the Owner or Agent
   operator. The object fields defined by this document are:
 
-| Member        | Requirement | Description                                                                  |
-| ------------- | ----------- | ---------------------------------------------------------------------------- |
-| `line1`       | Required    | Non-empty first address line.                                                |
-| `line2`       | Optional    | Second address line.                                                         |
-| `city`        | Required    | Non-empty locality or city.                                                  |
-| `region`      | Optional    | State, province, region, or other subdivision.                               |
-| `postal_code` | Optional    | Postal or ZIP code.                                                          |
-| `country`     | Required    | Two uppercase ASCII letters representing an ISO 3166-1 alpha-2 country code. |
+| Member       | Requirement | Description                                                                  |
+| ------------ | ----------- | ---------------------------------------------------------------------------- |
+| `first_name` | Required    | Non-empty given name of the postal recipient.                                |
+| `last_name`  | Required    | Non-empty family name of the postal recipient.                               |
+| `line1`      | Required    | Non-empty first address line.                                                |
+| `line2`      | Optional    | Second address line.                                                         |
+| `line3`      | Optional    | Third address line.                                                          |
+| `city`       | Optional    | Non-empty locality or city when present.                                     |
+| `region`     | Optional    | State, province, region, or other subdivision.                               |
+| `postcode`   | Optional    | Postal or ZIP code.                                                          |
+| `country`    | Required    | Two uppercase ASCII letters representing an ISO 3166-1 alpha-2 country code. |
 
 Services MAY validate that `country` is an assigned ISO 3166-1 alpha-2 code
 under local policy. The wire-shape requirement is two uppercase ASCII letters.
+The legacy `postal_code` member is invalid; implementations MUST use
+`postcode`.
+
+The address `first_name` and `last_name` members identify the postal recipient
+at that address. They are independent of the `person.first_name` and
+`person.last_name` Claims. Implementations MUST NOT substitute those person
+Claims when either address member is absent.
 
 # Person Claims
 
@@ -183,8 +193,11 @@ document:
     "contact.address.primary": {
       "city": "San Francisco",
       "country": "US",
+      "first_name": "Grace",
+      "last_name": "Hopper",
       "line1": "123 Market Street",
-      "postal_code": "94105",
+      "line3": "Attention: Receiving",
+      "postcode": "94105",
       "region": "CA"
     },
     "contact.email": "owner@example.com",
