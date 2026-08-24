@@ -1,8 +1,8 @@
 ---
 title: "The Agent Enrollment Protocol"
 abbrev: "AEP"
-docname: draft-kavian-agent-enrollment-protocol-02
-date: 2026-07-23
+docname: draft-kavian-agent-enrollment-protocol-03
+date: 2026-08-24
 category: std
 ipr: trust200902
 submissiontype: IETF
@@ -43,9 +43,9 @@ informative:
   AEP-CLAIMS:
     title: "AEP Claim Values"
     target: https://datatracker.ietf.org/doc/draft-kavian-aep-claims/
-    date: 2026-07-23
+    date: 2026-08-24
     seriesinfo:
-      Internet-Draft: draft-kavian-aep-claims-00
+      Internet-Draft: draft-kavian-aep-claims-01
     author:
       - ins: N. Kavian
         name: N. Kavian
