@@ -8,7 +8,7 @@ ROOT = Pathname.new(__dir__).join("..").expand_path
 REGISTRY_ROOT = ROOT.join("registry")
 SCHEMA_PATH = REGISTRY_ROOT.join("registry-entry.schema.json")
 CLAIM_SCHEMA_PATH = ROOT.join("schemas/claim-values.schema.json")
-CLAIMS_DRAFT_PATH = ROOT.join("specs/core/draft-kavian-aep-claims-00.md")
+CLAIMS_DRAFT_PATH = ROOT.join("specs/core/draft-kavian-aep-claims-01.md")
 ENTRY_PATHS = Dir[REGISTRY_ROOT.join("{authentication-methods,claim-names,extensions,grant-types,http-fields,identity-methods}/*.json")].sort.map { |path| Pathname.new(path) }
 
 def load_json(path)

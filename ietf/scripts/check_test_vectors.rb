@@ -8,11 +8,11 @@ ROOT = Pathname.new(__dir__).join("..").expand_path
 VECTOR_ROOT = ROOT.join("test-vectors")
 
 ALLOWED_DRAFTS = %w[
-  draft-kavian-agent-enrollment-protocol-02
-  draft-kavian-aep-claims-00
-  draft-kavian-aep-oauth-session-credential-02
-  draft-kavian-aep-api-key-session-credential-02
-  draft-kavian-aep-basic-session-credential-02
+  draft-kavian-agent-enrollment-protocol-03
+  draft-kavian-aep-claims-01
+  draft-kavian-aep-oauth-session-credential-03
+  draft-kavian-aep-api-key-session-credential-03
+  draft-kavian-aep-basic-session-credential-03
   draft-kavian-aep-platform-hosted-identity-00
 ].freeze
 
@@ -73,9 +73,9 @@ Dir[VECTOR_ROOT.join("**/*.json")].sort.each do |path|
   end
 
   errors << "#{rel}: profile is not allowed" unless ALLOWED_PROFILES.include?(data["profile"])
-  if data["drafts"].include?("draft-kavian-aep-claims-00") && data["profile"] != "claims"
+  if data["drafts"].include?("draft-kavian-aep-claims-01") && data["profile"] != "claims"
     errors << "#{rel}: Claims draft vectors must use the claims profile"
-  elsif data["profile"] == "claims" && !data["drafts"].include?("draft-kavian-aep-claims-00")
+  elsif data["profile"] == "claims" && !data["drafts"].include?("draft-kavian-aep-claims-01")
     errors << "#{rel}: claims profile vectors must cover the Claims draft"
   end
   errors << "#{rel}: input must be an object" unless data["input"].is_a?(Hash)

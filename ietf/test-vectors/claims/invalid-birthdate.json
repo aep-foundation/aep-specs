@@ -3,7 +3,7 @@
   "title": "Impossible calendar birth date",
   "description": "A date-shaped string that is not an RFC 3339 full-date is rejected.",
   "drafts": [
-    "draft-kavian-aep-claims-00"
+    "draft-kavian-aep-claims-01"
   ],
   "category": "claims",
   "applies_to": ["agent", "service"],
