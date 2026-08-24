@@ -67,15 +67,21 @@ jobs:
           if gh release view latest >/dev/null 2>&1; then
             gh release upload latest artifacts/draft-* --clobber
             gh release edit latest \
+              --draft=false \
+              --target "${GITHUB_SHA}" \
               --title "Latest AEP specification artifacts" \
               --notes "Auto-published AEP specification artifacts from commit ${{ github.sha }}." \
               --latest
           else
             gh release create latest artifacts/draft-* \
+              --target "${GITHUB_SHA}" \
               --title "Latest AEP specification artifacts" \
               --notes "Auto-published AEP specification artifacts from commit ${{ github.sha }}." \
               --latest
           fi
+
+          git tag --force latest "${GITHUB_SHA}"
+          git push --force origin refs/tags/latest
 
       - name: Prepare GitHub Pages
         run: |
