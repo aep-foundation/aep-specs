@@ -1,8 +1,8 @@
 ---
 title: "The Agent Enrollment Protocol"
 abbrev: "AEP"
-docname: draft-kavian-agent-enrollment-protocol-03
-date: 2026-08-24
+docname: draft-kavian-agent-enrollment-protocol-04
+date: 2026-08-27
 category: std
 ipr: trust200902
 submissiontype: IETF
@@ -119,6 +119,14 @@ The baseline AEP flow is:
 
 Inspect is unauthenticated. Enroll, Grant, Revoke, and Status are authenticated with the baseline `Authorization: AEP <jwt>` form. Session credentials, once issued, MAY be used on commands that allow the selected credential type; Grant and Revoke themselves always use the baseline client assertion.
 
+# Versioning and Compatibility
+
+The `aep_version` member is a JSON string in `MAJOR.MINOR` form. `MAJOR` and `MINOR` are unsigned decimal integers without leading zeroes except for the value `0`. The protocol version defined by this document is `1.0`.
+
+The major version identifies the compatibility family. An implementation MUST reject an Inspect document whose major version it does not support. Minor versions within one major version are backward compatible. A same-major minor revision MAY add optional fields, optional values, optional capabilities, or clarifications that preserve existing wire behavior. It MUST NOT remove or redefine existing wire behavior or make a new capability mandatory for implementations of an earlier minor version.
+
+An implementation supporting a major version MUST process Inspect documents carrying any minor version in that major-version family according to the unknown-field and extension rules in this document. It MUST NOT infer support for an optional command, identity method, authentication method, grant type, binding, or extension from the minor version. The `aep_version` member is the sole protocol-version authority; HTTP media-type parameters do not select or modify the AEP version.
+
 # HTTP Binding
 
 This document defines an HTTP binding using HTTP semantics {{RFC9110}} over HTTP/1.1 {{RFC9112}}, HTTP/2 {{RFC9113}}, or HTTP/3 {{RFC9114}}. Network use of this binding requires TLS 1.3 or later {{RFC9846}}. Plaintext HTTP is out of scope.
@@ -209,11 +217,13 @@ The Inspect document shown here contains only the fields required for the HTTP b
 }
 ~~~
 
-`commands.supported` lists commands the Service exposes. Agents MUST NOT invoke commands absent from this list.
+`commands.supported` lists commands the Service exposes and MUST contain `inspect`. Agents MUST NOT invoke commands absent from this list. An Agent MUST ignore a syntactically valid command identifier it does not recognize.
+
+`bindings.supported` lists protocol bindings implemented by the Service and MUST contain `http` for an implementation of this document. An Agent MUST ignore a syntactically valid binding identifier it does not recognize.
 
 `commands.grant_types` lists concrete session-credential formats the Service can issue and revoke. If this array is empty or absent, the Service MUST NOT list `grant` or `revoke` in `commands.supported`.
 
-`authentication.methods` lists, in preference order, the authentication methods accepted by protected resources belonging to the Service. `aep-jwt` identifies an AEP client assertion with `op` equal to `authenticate`. Other values MUST be registered Grant Type wire identifiers and use that grant type's credential presentation rules. The field is OPTIONAL; if it is absent, the Service advertises no protected-resource authentication method. When present, it MUST be non-empty and contain no duplicates. An absent or empty `commands.grant_types` array does not imply support for `aep-jwt` or any other method. `authenticate` MUST NOT appear in `commands.supported` because it is an assertion operation, not a Service command endpoint.
+`authentication.methods` lists, in preference order, the authentication methods accepted by protected resources belonging to the Service. `aep-jwt` identifies an AEP client assertion with `op` equal to `authenticate`. Other values MUST be registered Grant Type wire identifiers and use that grant type's credential presentation rules. The field is OPTIONAL; if it is absent, the Service advertises no protected-resource authentication method. When present, it MUST contain between one and sixteen values with no duplicates. An absent or empty `commands.grant_types` array does not imply support for `aep-jwt` or any other method. `authenticate` MUST NOT appear in `commands.supported` because it is an assertion operation, not a Service command endpoint.
 
 `identity.methods` lists identity method identifiers the Service accepts for authenticated AEP commands. The values are lower-case identifiers registered in the AEP Identity Methods registry. A Service that advertises Enroll, Grant, Revoke, or Status MUST advertise at least one identity method.
 
@@ -666,7 +676,7 @@ This document defines the extension points needed by the core protocol:
 * `claims.required`, `claims.preferred`, and `claims.optional` MAY contain claim names from the AEP Claim Names registry or claim names defined by other documents.
 * Additional top-level Inspect fields MAY be added by future documents.
 
-Agents MUST ignore extension identifiers and additive fields they do not understand, unless local policy requires the Agent to refuse enrollment when a required capability is absent.
+Agents MUST ignore extension identifiers, additive fields, and syntactically valid advertised list values they do not understand, unless local policy requires the Agent to refuse enrollment when a required capability is absent. Ignoring an unknown command means that the Agent does not invoke it. Ignoring another advertised capability does not imply support for that capability.
 
 Services MUST NOT redefine the semantics of commands, fields, status values, or error codes defined by this document. Extensions are additive.
 

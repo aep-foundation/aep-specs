@@ -1,3 +1,4 @@
 source "https://rubygems.org"
 
+gem "json_schemer", "2.5.0"
 gem "kramdown-rfc2629", "1.7.39"

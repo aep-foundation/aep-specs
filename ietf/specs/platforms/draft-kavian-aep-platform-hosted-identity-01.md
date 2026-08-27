@@ -1,8 +1,8 @@
 ---
 title: "AEP Platform Hosted Identity"
 abbrev: "AEP Platform"
-docname: draft-kavian-aep-platform-hosted-identity-00
-date: 2026-07-23
+docname: draft-kavian-aep-platform-hosted-identity-01
+date: 2026-08-27
 category: std
 ipr: trust200902
 submissiontype: IETF
@@ -25,9 +25,9 @@ normative:
   AEP-CORE:
     title: "The Agent Enrollment Protocol"
     target: https://datatracker.ietf.org/doc/draft-kavian-agent-enrollment-protocol/
-    date: 2026-06-27
+    date: 2026-08-27
     seriesinfo:
-      Internet-Draft: draft-kavian-agent-enrollment-protocol-02
+      Internet-Draft: draft-kavian-agent-enrollment-protocol-04
     author:
       - ins: N. Kavian
         name: N. Kavian
@@ -138,6 +138,11 @@ A Platform that implements this specification MUST publish a discovery
 document at `/.well-known/aep-platform` on the HTTPS origin used for Platform
 APIs. The response media type is `application/aep+json`. HTTP semantics follow
 {{RFC9110}}.
+
+The `aep_version` member follows the version syntax and compatibility rules in
+the AEP core specification. A Platform client MUST reject a discovery document
+whose major version it does not support and MUST accept supported-major minor
+versions according to the core compatibility rules.
 
 The discovery document has this structure:
 

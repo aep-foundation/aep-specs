@@ -20,4 +20,4 @@ Platform artifacts.
 
 Current Platform draft sources:
 
-- `draft-kavian-aep-platform-hosted-identity-00.md`
+- `draft-kavian-aep-platform-hosted-identity-01.md`

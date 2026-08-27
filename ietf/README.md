@@ -48,8 +48,8 @@ The first Internet-Draft document set is:
 - [`draft-kavian-aep-claims-01`](https://datatracker.ietf.org/doc/draft-kavian-aep-claims/): `ietf/specs/core/draft-kavian-aep-claims-01.md`
 - [`draft-kavian-aep-did-web-identity-method-00`](https://datatracker.ietf.org/doc/draft-kavian-aep-did-web-identity-method/): `ietf/specs/identity-methods/draft-kavian-aep-did-web-identity-method-00.md`
 - [`draft-kavian-aep-oauth-session-credential-03`](https://datatracker.ietf.org/doc/draft-kavian-aep-oauth-session-credential/): `ietf/specs/grant-types/draft-kavian-aep-oauth-session-credential-03.md`
-- [`draft-kavian-aep-platform-hosted-identity-00`](https://datatracker.ietf.org/doc/draft-kavian-aep-platform-hosted-identity/): `ietf/specs/platforms/draft-kavian-aep-platform-hosted-identity-00.md`
-- [`draft-kavian-agent-enrollment-protocol-03`](https://datatracker.ietf.org/doc/draft-kavian-agent-enrollment-protocol/): `ietf/specs/core/draft-kavian-agent-enrollment-protocol-03.md`
+- [`draft-kavian-aep-platform-hosted-identity-01`](https://datatracker.ietf.org/doc/draft-kavian-aep-platform-hosted-identity/): `ietf/specs/platforms/draft-kavian-aep-platform-hosted-identity-01.md`
+- [`draft-kavian-agent-enrollment-protocol-04`](https://datatracker.ietf.org/doc/draft-kavian-agent-enrollment-protocol/): `ietf/specs/core/draft-kavian-agent-enrollment-protocol-04.md`
 
 The core document defines the baseline HTTP binding, including:
 

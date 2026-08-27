@@ -8,9 +8,9 @@ ROOT = Pathname.new(__dir__).join("..").expand_path
 PLATFORM_PATHS = [
   ROOT.join("specs/platforms"),
   ROOT.join("test-vectors/platform"),
-  ROOT.parent.join("artifacts/draft-kavian-aep-platform-hosted-identity-00.xml"),
-  ROOT.parent.join("artifacts/draft-kavian-aep-platform-hosted-identity-00.txt"),
-  ROOT.parent.join("artifacts/draft-kavian-aep-platform-hosted-identity-00.html")
+  ROOT.parent.join("artifacts/draft-kavian-aep-platform-hosted-identity-01.xml"),
+  ROOT.parent.join("artifacts/draft-kavian-aep-platform-hosted-identity-01.txt"),
+  ROOT.parent.join("artifacts/draft-kavian-aep-platform-hosted-identity-01.html")
 ].freeze
 
 errors = []
