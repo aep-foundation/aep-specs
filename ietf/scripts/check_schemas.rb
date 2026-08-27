@@ -3,9 +3,8 @@
 
 require "json"
 require "pathname"
-require "date"
 require "ipaddr"
-require "time"
+require "json_schemer"
 
 ROOT = Pathname.new(__dir__).join("..").expand_path
 SCHEMA_ROOT = ROOT.join("schemas")
@@ -22,6 +21,8 @@ SCHEMA_TARGETS = [
   ["protected-resource/authorization-carriers.json", "protected-resource-authorization.schema.json", %w[expected dedicated_bearer]],
   ["protected-resource/authorization-carriers.json", "protected-resource-authorization.schema.json", %w[expected dedicated_basic]],
   ["inspect/minimal-http.json", "inspect-document.schema.json", %w[expected]],
+  ["inspect/default-endpoint-base.json", "inspect-document.schema.json", %w[expected document]],
+  ["inspect/forward-compatible-advertisements.json", "inspect-document.schema.json", %w[input document]],
   ["inspect/claims-catalog-advertisement.json", "inspect-document.schema.json", %w[expected]],
   ["openapi/security-inheritance.json", "openapi-aep-security-scheme.schema.json", %w[input security_scheme]],
   ["enroll/request-minimal.json", "enroll-request.schema.json", %w[input]],
@@ -57,6 +58,21 @@ SCHEMA_TARGETS = [
   ["platform/verification-response-unrecognized.json", "platform-verification-response.schema.json", %w[expected]]
 ].freeze
 
+INVALID_SCHEMA_TARGETS = [
+  ["inspect/authenticated-command-without-identity-method.json", "inspect-document.schema.json", %w[input document]],
+  ["inspect/authentication-method-limit.json", "inspect-document.schema.json", %w[input document]],
+  ["inspect/command-without-inspect.json", "inspect-document.schema.json", %w[input document]],
+  ["inspect/grant-without-grant-types.json", "inspect-document.schema.json", %w[input document]],
+  ["inspect/invalid-advertisement-identifiers.json", "inspect-document.schema.json", %w[input document]],
+  ["inspect/invalid-openapi-reference.json", "inspect-document.schema.json", %w[input document]],
+  ["inspect/missing-signing-algorithm.json", "inspect-document.schema.json", %w[input document]],
+  [
+    "platform/verification-authenticate-missing-resource.json",
+    "platform-verification-request.schema.json",
+    %w[input request]
+  ]
+].freeze
+
 CLAIM_SCHEMA_CASES = %w[
   claims/invalid-address.json
   claims/invalid-birthdate.json
@@ -80,19 +96,6 @@ def dig_path(data, path)
     raise "missing path #{path.join('.')}" unless current.is_a?(Hash) && current.key?(segment)
 
     current[segment]
-  end
-end
-
-def type_valid?(value, expected)
-  case expected
-  when "object" then value.is_a?(Hash)
-  when "array" then value.is_a?(Array)
-  when "string" then value.is_a?(String)
-  when "integer" then value.is_a?(Integer)
-  when "number" then value.is_a?(Numeric)
-  when "boolean" then value == true || value == false
-  when "null" then value.nil?
-  else true
   end
 end
 
@@ -178,95 +181,22 @@ def valid_mailbox?(value)
   local_valid && valid_mailbox_domain?(domain)
 end
 
-def validate_format(value, format, location, errors)
-  return unless value.is_a?(String)
-
-  case format
-  when "date"
-    parsed = Date.iso8601(value)
-    raise ArgumentError unless parsed.iso8601 == value
-  when "date-time"
-    Time.iso8601(value)
-  when "email"
-    raise ArgumentError unless valid_mailbox?(value)
-  end
-rescue ArgumentError
-  description = format == "email" ? "RFC 5321 Mailbox" : "RFC 3339 #{format}"
-  errors << "#{location}: must be #{description}"
-end
-
-def validate_schema(schema, value, location, errors)
-  if schema.key?("oneOf")
-    matches = schema["oneOf"].count do |candidate|
-      candidate_errors = []
-      validate_schema(candidate, value, location, candidate_errors)
-      candidate_errors.empty?
-    end
-    errors << "#{location}: must match exactly one oneOf branch" unless matches == 1
-  end
-
-  if schema.key?("type")
-    types = Array(schema["type"])
-    unless types.any? { |type| type_valid?(value, type) }
-      errors << "#{location}: expected #{types.join(' or ')}"
-      return
-    end
-  end
-
-  if schema.key?("enum") && !schema["enum"].include?(value)
-    errors << "#{location}: expected one of #{schema['enum'].join(', ')}"
-  end
-
-  if schema.key?("pattern") && value.is_a?(String) && !Regexp.new(schema["pattern"]).match?(value)
-    errors << "#{location}: does not match pattern #{schema['pattern']}"
-  end
-
-  if schema.key?("minLength") && value.is_a?(String) && value.length < schema["minLength"]
-    errors << "#{location}: length must be at least #{schema['minLength']}"
-  end
-
-  if schema.key?("minItems") && value.is_a?(Array) && value.length < schema["minItems"]
-    errors << "#{location}: must contain at least #{schema['minItems']} item(s)"
-  end
-
-  if schema.key?("minimum") && value.is_a?(Numeric) && value < schema["minimum"]
-    errors << "#{location}: must be at least #{schema['minimum']}"
-  end
-
-  if schema.key?("maximum") && value.is_a?(Numeric) && value > schema["maximum"]
-    errors << "#{location}: must be at most #{schema['maximum']}"
-  end
-
-  validate_format(value, schema["format"], location, errors) if schema.key?("format")
-
-  if value.is_a?(Hash)
-    Array(schema["required"]).each do |field|
-      errors << "#{location}.#{field}: missing required field" unless value.key?(field)
-    end
-
-    if schema["additionalProperties"] == false
-      allowed = schema.fetch("properties", {}).keys
-      value.keys.each do |field|
-        errors << "#{location}.#{field}: additional property is not allowed" unless allowed.include?(field)
-      end
-    end
-
-    schema.fetch("properties", {}).each do |field, child_schema|
-      validate_schema(child_schema, value[field], "#{location}.#{field}", errors) if value.key?(field)
-    end
-  end
-
-  return unless value.is_a?(Array) && schema.key?("items")
-
-  value.each_with_index do |item, index|
-    validate_schema(schema["items"], item, "#{location}[#{index}]", errors)
-  end
+def schema_errors(schema, value)
+  JSONSchemer.schema(
+    schema,
+    formats: {
+      "email" => proc { |instance, _format| instance.is_a?(String) && valid_mailbox?(instance) }
+    }
+  ).validate(value).map { |error| error.fetch("error") }.to_a
 end
 
 errors = []
 
 Dir[SCHEMA_ROOT.join("*.schema.json")].sort.each do |path|
-  load_json(path)
+  schema = load_json(path)
+  JSONSchemer.validate_schema(schema).each do |error|
+    errors << "#{path}: #{error.fetch('error')}"
+  end
 rescue StandardError => e
   errors << e.message
 end
@@ -284,7 +214,23 @@ SCHEMA_TARGETS.each do |relative_path, schema_name, data_path|
     next
   end
 
-  validate_schema(schema, data, "#{relative_path}:#{data_path.join('.')}", errors)
+  schema_errors(schema, data).each do |error|
+    errors << "#{relative_path}:#{data_path.join('.')}: #{error}"
+  end
+end
+
+INVALID_SCHEMA_TARGETS.each do |relative_path, schema_name, data_path|
+  vector_path = VECTOR_ROOT.join(relative_path)
+  schema_path = SCHEMA_ROOT.join(schema_name)
+
+  begin
+    vector = load_json(vector_path)
+    schema = load_json(schema_path)
+    data = dig_path(vector, data_path)
+    errors << "#{relative_path}: expected schema rejection" if schema_errors(schema, data).empty?
+  rescue StandardError => e
+    errors << "#{relative_path}: #{e.message}"
+  end
 end
 
 claim_schema = load_json(SCHEMA_ROOT.join("claim-values.schema.json"))
@@ -293,13 +239,7 @@ CLAIM_SCHEMA_CASES.each do |relative_path|
     vector = load_json(VECTOR_ROOT.join(relative_path))
     values = dig_path(vector, %w[input claim_values])
     expected_valid = dig_path(vector, %w[expected valid])
-    case_errors = []
-    validate_schema(
-      claim_schema,
-      values,
-      "#{relative_path}:input.claim_values",
-      case_errors
-    )
+    case_errors = schema_errors(claim_schema, values)
     actual_valid = case_errors.empty?
     if actual_valid != expected_valid
       errors << "#{relative_path}: expected valid=#{expected_valid}, got " \
@@ -309,6 +249,31 @@ CLAIM_SCHEMA_CASES.each do |relative_path|
     errors << "#{relative_path}: #{e.message}"
   end
 end
+
+inspect_schema = load_json(SCHEMA_ROOT.join("inspect-document.schema.json"))
+minimal_inspect = load_json(VECTOR_ROOT.join("inspect/minimal-http.json")).fetch("expected")
+version_vector = load_json(VECTOR_ROOT.join("inspect/protocol-version.json"))
+version_vector.dig("expected", "cases").each do |test_case|
+  document = minimal_inspect.merge("aep_version" => test_case.fetch("received"))
+  actual_valid = schema_errors(inspect_schema, document).empty?
+  expected_valid = test_case.fetch("valid")
+  next if actual_valid == expected_valid
+
+  errors << "inspect/protocol-version.json:#{test_case.fetch('name')}: expected valid=#{expected_valid}, got valid=#{actual_valid}"
+end
+
+platform_schema = load_json(SCHEMA_ROOT.join("platform-discovery.schema.json"))
+platform_discovery = load_json(VECTOR_ROOT.join("platform/discovery.json")).fetch("expected")
+%w[1.0 1.7].each do |version|
+  errors << "platform/discovery.json: aep_version #{version} must be valid" unless schema_errors(
+    platform_schema,
+    platform_discovery.merge("aep_version" => version)
+  ).empty?
+end
+errors << "platform/discovery.json: aep_version 01.0 must be invalid" if schema_errors(
+  platform_schema,
+  platform_discovery.merge("aep_version" => "01.0")
+).empty?
 
 if errors.empty?
   puts "Schemas OK"

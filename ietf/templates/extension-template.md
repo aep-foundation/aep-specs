@@ -25,7 +25,7 @@ normative:
     target: https://datatracker.ietf.org/doc/draft-kavian-agent-enrollment-protocol/
     date: 2026-08-24
     seriesinfo:
-      Internet-Draft: draft-kavian-agent-enrollment-protocol-03
+      Internet-Draft: draft-kavian-agent-enrollment-protocol-04
     author:
       - ins: N. Kavian
         name: N. Kavian

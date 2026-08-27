@@ -8,7 +8,7 @@
   "properties": {
     "aep_version": {
       "type": "string",
-      "pattern": "^[0-9]+\\.[0-9]+$"
+      "pattern": "^(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)$"
     },
     "authentication": {
       "type": "object",
@@ -35,9 +35,12 @@
         "supported": {
           "type": "array",
           "minItems": 1,
+          "contains": {
+            "const": "http"
+          },
           "items": {
             "type": "string",
-            "enum": ["http"]
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
           }
         }
       }
@@ -49,19 +52,22 @@
         "required": {
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*(?:\\.[a-z][a-z0-9_]*)*$"
           }
         },
         "preferred": {
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*(?:\\.[a-z][a-z0-9_]*)*$"
           }
         },
         "optional": {
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*(?:\\.[a-z][a-z0-9_]*)*$"
           }
         }
       }
@@ -74,26 +80,54 @@
         "supported": {
           "type": "array",
           "minItems": 1,
+          "contains": {
+            "const": "inspect"
+          },
           "items": {
             "type": "string",
-            "enum": ["inspect", "enroll", "grant", "revoke", "status"]
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
           }
         },
         "grant_types": {
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
           }
         }
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["grant_types"],
+            "properties": {
+              "grant_types": {"minItems": 1}
+            }
+          },
+          "else": {
+            "properties": {
+              "supported": {
+                "not": {
+                  "contains": {"enum": ["grant", "revoke"]}
+                }
+              }
+            }
+          }
+        }
+      ]
     },
     "core": {
       "type": "object",
+      "required": ["signing_algorithms"],
       "additionalProperties": true,
       "properties": {
         "signing_algorithms": {
           "type": "array",
           "minItems": 1,
+          "allOf": [
+            {"contains": {"const": "EdDSA"}},
+            {"contains": {"const": "ES256"}}
+          ],
           "items": {
             "type": "string"
           }
@@ -107,14 +141,14 @@
         "supported": {
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "string",
+            "format": "uri"
           }
         }
       }
     },
     "http": {
       "type": "object",
-      "required": ["endpoint_base"],
       "additionalProperties": true,
       "properties": {
         "endpoint_base": {
@@ -128,7 +162,8 @@
           "properties": {
             "url": {
               "type": "string",
-              "minLength": 1
+              "minLength": 1,
+              "format": "uri-reference"
             },
             "path_matching": {
               "type": "object",
@@ -152,7 +187,6 @@
       "properties": {
         "methods": {
           "type": "array",
-          "minItems": 1,
           "items": {
             "type": "string",
             "pattern": "^[a-z0-9]+(?::[a-z0-9]+)*(?:-[a-z0-9]+)*$"
@@ -171,5 +205,29 @@
         }
       }
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "commands": {
+            "properties": {
+              "supported": {
+                "contains": {"enum": ["enroll", "grant", "revoke", "status"]}
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "identity": {
+            "properties": {
+              "methods": {"minItems": 1}
+            }
+          }
+        }
+      }
+    }
+  ]
 }

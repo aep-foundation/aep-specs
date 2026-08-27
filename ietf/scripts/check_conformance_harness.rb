@@ -113,6 +113,47 @@ COMMAND_PATHS.each do |command, path|
   expect(errors, endpoint(endpoint_base, command) == path, "endpoint_base must construct #{path} for #{command}")
 end
 
+default_endpoint = vector("inspect/default-endpoint-base.json")
+expect(
+  errors,
+  !default_endpoint.dig("expected", "document", "http").key?("endpoint_base"),
+  "Default endpoint-base vector must omit endpoint_base"
+)
+expect(
+  errors,
+  default_endpoint.dig("expected", "endpoint_base") == "/aep/",
+  "Omitted endpoint_base must resolve to /aep/"
+)
+
+%w[
+  authenticated-command-without-identity-method
+  authentication-method-limit
+  command-without-inspect
+  grant-without-grant-types
+  invalid-advertisement-identifiers
+  invalid-openapi-reference
+  missing-signing-algorithm
+].each do |name|
+  invalid = vector("inspect/#{name}.json")
+  expect(errors, invalid.dig("expected", "valid") == false, "#{name} must be a negative Inspect vector")
+end
+
+protocol_version = vector("inspect/protocol-version.json")
+protocol_version.dig("expected", "cases").each do |test_case|
+  received = test_case.fetch("received")
+  supported = test_case.fetch("supported", protocol_version.dig("input", "supported"))
+  syntactically_valid = received.match?(/\A(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\z/)
+  compatible = syntactically_valid && received.split(".", 2).first == supported.split(".", 2).first
+  expect(errors, syntactically_valid == test_case.fetch("valid"), "#{test_case.fetch('name')} version syntax must match its expectation")
+  expect(errors, compatible == test_case.fetch("compatible"), "#{test_case.fetch('name')} version compatibility must match its expectation")
+end
+
+forward_compatible = vector("inspect/forward-compatible-advertisements.json")
+expect(errors, forward_compatible.dig("expected", "valid") == true, "Future same-major advertisements must remain valid")
+%w[unknown_binding unknown_command unknown_field].each do |field|
+  expect(errors, forward_compatible.dig("expected", field) == "ignore", "#{field} must preserve forward compatibility")
+end
+
 client_assertion = vector("client-assertion/enroll-claims.json").fetch("expected")
 expect(errors, client_assertion.fetch("iss") == client_assertion.fetch("sub"), "Client assertion iss and sub must match")
 expect(errors, client_assertion.fetch("aud") == inspect.dig("service", "did"), "Client assertion aud must equal Inspect service.did")
