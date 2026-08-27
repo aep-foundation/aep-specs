@@ -22,7 +22,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - uses: ruby/setup-ruby@v1
         with:
@@ -30,7 +30,7 @@ jobs:
           bundler-cache: true
           working-directory: ietf
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
           cache: pip
@@ -83,15 +83,14 @@ jobs:
           git tag --force latest "${GITHUB_SHA}"
           git push --force origin refs/tags/latest
 
-      - name: Prepare GitHub Pages
-        run: |
-          mkdir -p _site
-          cp -R docs/. _site/
-          rm -rf _site/artifacts
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v6
 
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: docs
 
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
