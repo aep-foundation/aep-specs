@@ -43,6 +43,7 @@ errors = []
 Dir[VECTOR_ROOT.join("**/*.json")].sort.each do |path|
   file = Pathname.new(path)
   rel = file.relative_path_from(VECTOR_ROOT).to_s
+  next if rel == "index.json"
 
   begin
     data = JSON.parse(file.read)
