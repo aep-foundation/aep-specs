@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://www.aep.foundation/conformance/adapter-response.schema.json",
+  "title": "AEP conformance adapter response",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocol_version", "sequence", "status"],
+  "properties": {
+    "protocol_version": {
+      "const": "1"
+    },
+    "sequence": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "status": {
+      "enum": ["passed", "failed", "skipped"]
+    },
+    "message": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024
+    }
+  }
+}

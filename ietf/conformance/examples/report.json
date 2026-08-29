@@ -1,0 +1,29 @@
+{
+  "aep_version": "1.0",
+  "generated_at": "2026-08-29T20:00:00Z",
+  "implementation": {
+    "name": "example-aep-sdk",
+    "version": "1.0.0"
+  },
+  "manifest_revision": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+  "profiles": ["core-http", "claims"],
+  "report_version": "1",
+  "role": "agent",
+  "suites": [
+    {
+      "category": "claims",
+      "failed": 0,
+      "passed": 17,
+      "profile": "claims",
+      "skipped": 0
+    },
+    {
+      "category": "inspect",
+      "failed": 0,
+      "passed": 13,
+      "profile": "core-http",
+      "skipped": 0
+    }
+  ],
+  "vector_revision": "sha256:2222222222222222222222222222222222222222222222222222222222222222"
+}

@@ -175,7 +175,8 @@ if check_only
   end
 
   if errors.empty?
-    puts "Published schemas OK"
+    label = source.basename.to_s == "conformance" ? "Published conformance schemas" : "Published schemas"
+    puts "#{label} OK"
   else
     warn errors.join("\n")
     exit 1

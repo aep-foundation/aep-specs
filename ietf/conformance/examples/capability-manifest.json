@@ -1,0 +1,35 @@
+{
+  "claims": [
+    {
+      "profiles": [
+        "core-http",
+        "claims",
+        "api-key",
+        "basic",
+        "oauth-bearer",
+        "platform-hosted-identity"
+      ],
+      "role": "agent"
+    },
+    {
+      "profiles": [
+        "core-http",
+        "claims",
+        "api-key",
+        "basic",
+        "oauth-bearer",
+        "platform-hosted-identity"
+      ],
+      "role": "service"
+    },
+    {
+      "profiles": ["platform-hosted-identity"],
+      "role": "platform"
+    }
+  ],
+  "implementation": {
+    "name": "example-aep-sdk",
+    "version": "1.0.0"
+  },
+  "manifest_version": "1"
+}

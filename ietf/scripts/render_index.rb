@@ -293,7 +293,7 @@ html = <<~HTML
           <tbody>
             <tr>
               <td class="draft-id" data-label="Resource">Conformance model</td>
-              <td data-label="Description">Initial role and profile model for the published AEP draft set.</td>
+              <td data-label="Description">Role and profile model for the active AEP draft set.</td>
               <td data-label="Source">
                 <span class="links">
                   <a href="#{REPO_BASE}/blob/main/ietf/conformance/README.md">Markdown</a>
@@ -302,11 +302,21 @@ html = <<~HTML
             </tr>
             <tr>
               <td class="draft-id" data-label="Resource">Test vectors</td>
-              <td data-label="Description">Deterministic fixtures for current-v00 Agent and Service behavior.</td>
+              <td data-label="Description">Deterministic fixtures for Agent, Service, and Platform behavior.</td>
               <td data-label="Source">
                 <span class="links">
                   <a href="#{REPO_BASE}/tree/main/ietf/test-vectors">JSON</a>
                   <a href="#{REPO_BASE}/blob/main/ietf/test-vectors/README.md">Markdown</a>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td class="draft-id" data-label="Resource">Conformance contracts</td>
+              <td data-label="Description">Language-neutral capability manifest, process adapter, vector index, and report schemas.</td>
+              <td data-label="Source">
+                <span class="links">
+                  <a href="conformance/">JSON</a>
+                  <a href="#{REPO_BASE}/tree/main/ietf/conformance">Markdown</a>
                 </span>
               </td>
             </tr>

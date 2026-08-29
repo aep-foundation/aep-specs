@@ -13,6 +13,7 @@ EXAMPLES := \
 ARTIFACTS := ../artifacts
 EXAMPLE_ARTIFACTS := ../docs/examples
 SCHEMA_ARTIFACTS := ../docs/schemas
+CONFORMANCE_ARTIFACTS := ../docs/conformance
 INDEX_ARTIFACT := ../docs/index.html
 KRAMDOWN_RFC := bundle exec kramdown-rfc
 XML2RFC := .venv/bin/xml2rfc
@@ -38,9 +39,9 @@ MARKDOWN_TABLE_FILES ?= \
 	$(DRAFTS) \
 	$(EXAMPLES)
 
-.PHONY: check lint check-drafts check-external-section-refs check-vectors check-schemas check-published-schemas check-harness check-registry check-platform-guardrails format render render-drafts render-examples render-schemas render-index idnits clean
+.PHONY: check lint check-drafts check-external-section-refs check-vectors check-schemas check-conformance-contracts check-published-schemas check-published-conformance check-harness check-registry check-platform-guardrails format render render-drafts render-examples render-schemas render-conformance render-index idnits clean
 
-check: lint check-vectors check-schemas check-published-schemas check-harness check-registry check-platform-guardrails
+check: lint check-vectors check-schemas check-conformance-contracts check-published-schemas check-published-conformance check-harness check-registry check-platform-guardrails
 
 lint: check-drafts check-external-section-refs
 
@@ -56,8 +57,14 @@ check-vectors:
 check-schemas:
 	@bundle exec ruby scripts/check_schemas.rb
 
+check-conformance-contracts:
+	@bundle exec ruby scripts/check_conformance_contracts.rb
+
 check-published-schemas:
 	@bundle exec ruby scripts/publish_schemas.rb --check schemas "$(SCHEMA_ARTIFACTS)"
+
+check-published-conformance:
+	@bundle exec ruby scripts/publish_schemas.rb --check conformance "$(CONFORMANCE_ARTIFACTS)"
 
 check-harness:
 	@bundle exec ruby scripts/check_conformance_harness.rb
@@ -71,7 +78,7 @@ check-platform-guardrails:
 format:
 	@bundle exec ruby scripts/format_markdown_tables.rb $(MARKDOWN_TABLE_FILES)
 
-render: render-drafts render-examples render-schemas render-index
+render: render-drafts render-examples render-schemas render-conformance render-index
 
 render-drafts:
 	@$(KRAMDOWN_RFC) --version >/dev/null || { echo "kramdown-rfc is required for render; run bundle install"; exit 1; }
@@ -92,6 +99,9 @@ render-examples:
 
 render-schemas:
 	@bundle exec ruby scripts/publish_schemas.rb schemas "$(SCHEMA_ARTIFACTS)"
+
+render-conformance:
+	@bundle exec ruby scripts/publish_schemas.rb conformance "$(CONFORMANCE_ARTIFACTS)"
 
 render-index:
 	@bundle exec ruby scripts/render_index.rb $(DRAFTS) "$(INDEX_ARTIFACT)"

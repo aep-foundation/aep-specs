@@ -1,0 +1,9 @@
+{
+  "index_version": "1",
+  "vectors": [
+    "claims/minimal-email.json",
+    "credentials/api-key/grant-response.json",
+    "inspect/minimal-http.json",
+    "platform/discovery.json"
+  ]
+}
