@@ -39,9 +39,9 @@ MARKDOWN_TABLE_FILES ?= \
 	$(DRAFTS) \
 	$(EXAMPLES)
 
-.PHONY: check lint check-drafts check-external-section-refs check-vectors check-schemas check-conformance-contracts check-published-schemas check-published-conformance check-harness check-registry check-platform-guardrails format render render-drafts render-examples render-schemas render-conformance render-index idnits clean
+.PHONY: check lint check-drafts check-external-section-refs check-vectors check-schemas check-conformance-contracts check-conformance-runner check-published-schemas check-published-conformance check-harness check-registry check-platform-guardrails format render render-drafts render-examples render-schemas render-conformance render-index idnits clean
 
-check: lint check-vectors check-schemas check-conformance-contracts check-published-schemas check-published-conformance check-harness check-registry check-platform-guardrails
+check: lint check-vectors check-schemas check-conformance-contracts check-conformance-runner check-published-schemas check-published-conformance check-harness check-registry check-platform-guardrails
 
 lint: check-drafts check-external-section-refs
 
@@ -59,6 +59,9 @@ check-schemas:
 
 check-conformance-contracts:
 	@bundle exec ruby scripts/check_conformance_contracts.rb
+
+check-conformance-runner:
+	@bundle exec ruby scripts/check_conformance_runner.rb
 
 check-published-schemas:
 	@bundle exec ruby scripts/publish_schemas.rb --check schemas "$(SCHEMA_ARTIFACTS)"

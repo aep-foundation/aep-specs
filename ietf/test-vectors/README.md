@@ -29,6 +29,7 @@ Vectors use one directory per category:
 
 ```text
 test-vectors/
+  index.json
   caching/
   claims/
   client-assertion/
@@ -52,6 +53,9 @@ Each vector file is JSON. File names use lowercase hyphenated identifiers:
 ```text
 <category>/<vector-id>.json
 ```
+
+`index.json` is the complete, sorted input set for the black-box conformance
+runner. Static validation requires it to match every vector file recursively.
 
 ## Vector Format
 
@@ -102,8 +106,9 @@ A vector validator should check at least:
 - Claims vectors include positive and negative value-shape cases and
   negotiation compatibility cases.
 
-The validator should not require live network access. Network-dependent checks
-belong in the future conformance harness, not in static vector validation.
+The static validator does not require live network access. An implementation
+adapter owns any network or process boundary needed to exercise its public
+behavior through the black-box conformance runner.
 
 Run static vector validation with:
 

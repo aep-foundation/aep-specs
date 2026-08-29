@@ -133,6 +133,28 @@ The validated
 [`adapter-response.json`](./examples/adapter-response.json) files show one
 complete exchange.
 
+Run an implementation adapter with:
+
+```sh
+cd ietf
+bundle exec ruby scripts/run_conformance.rb \
+  --manifest path/to/capability-manifest.json \
+  --role agent \
+  --output conformance-report.json \
+  -- path/to/adapter
+```
+
+Repeat `--suite CATEGORY` to select specific vector categories. With no suite
+selection, the runner dispatches every vector applicable to the selected role
+and the profiles claimed in the manifest. The adapter command and each of its
+arguments are passed directly to the operating system without shell parsing.
+
+The runner validates the manifest, vector index, requests, responses, and final
+report. It accepts responses in any order, while rejecting missing, duplicate,
+or unexpected sequence numbers. A failed case produces a valid report and exit
+status 1. An adapter contract violation or nonzero adapter exit prevents report
+generation.
+
 ## Vector Index and Reports
 
 The sorted vector index conforms to
