@@ -13,6 +13,7 @@ ALLOWED_DRAFTS = %w[
   draft-kavian-aep-oauth-session-credential-03
   draft-kavian-aep-api-key-session-credential-03
   draft-kavian-aep-basic-session-credential-03
+  draft-kavian-aep-did-web-identity-method-00
   draft-kavian-aep-platform-hosted-identity-01
 ].freeze
 
@@ -36,6 +37,7 @@ ALLOWED_CATEGORIES = %w[
 
 ALLOWED_ROLES = %w[agent platform service].freeze
 ALLOWED_PROFILES = %w[core-http claims platform-hosted-identity oauth-bearer api-key basic].freeze
+ALLOWED_EXPECTATIONS = %w[required optional unsupported].freeze
 ID_RE = /\A[a-z0-9]+(?:-[a-z0-9]+)*\z/
 
 errors = []
@@ -52,7 +54,7 @@ Dir[VECTOR_ROOT.join("**/*.json")].sort.each do |path|
     next
   end
 
-  %w[id title description drafts category applies_to profile input expected].each do |field|
+  %w[id title description drafts category applicability input expected].each do |field|
     errors << "#{rel}: missing #{field}" unless data.key?(field)
   end
   next if errors.any? { |error| error.start_with?("#{rel}: missing") }
@@ -69,15 +71,32 @@ Dir[VECTOR_ROOT.join("**/*.json")].sort.each do |path|
     errors << "#{rel}: drafts must list published AEP draft identifiers"
   end
 
-  unless data["applies_to"].is_a?(Array) && data["applies_to"].all? { |role| ALLOWED_ROLES.include?(role) }
-    errors << "#{rel}: applies_to must contain only known roles"
+  applicability = data["applicability"]
+  unless applicability.is_a?(Hash) && applicability.keys == ALLOWED_ROLES
+    errors << "#{rel}: applicability must classify agent, platform, and service in alphabetical order"
+    next
   end
+  executable_profiles = applicability.filter_map do |role, rule|
+    unless rule.is_a?(Hash) && ALLOWED_EXPECTATIONS.include?(rule["expectation"])
+      errors << "#{rel}: #{role} applicability expectation is invalid"
+      next
+    end
+    expected_fields = rule["expectation"] == "unsupported" ? %w[expectation] : %w[expectation profile]
+    errors << "#{rel}: #{role} applicability fields are invalid" unless rule.keys.sort == expected_fields
+    if rule["expectation"] != "unsupported" && !ALLOWED_PROFILES.include?(rule["profile"])
+      errors << "#{rel}: #{role} applicability profile is invalid"
+    end
+    rule["profile"] unless rule["expectation"] == "unsupported"
+  end
+  errors << "#{rel}: at least one role must be executable" if executable_profiles.empty?
 
-  errors << "#{rel}: profile is not allowed" unless ALLOWED_PROFILES.include?(data["profile"])
-  if data["drafts"].include?("draft-kavian-aep-claims-01") && data["profile"] != "claims"
+  if data["drafts"].include?("draft-kavian-aep-claims-01") && executable_profiles.any? { |profile| profile != "claims" }
     errors << "#{rel}: Claims draft vectors must use the claims profile"
-  elsif data["profile"] == "claims" && !data["drafts"].include?("draft-kavian-aep-claims-01")
+  elsif executable_profiles.include?("claims") && !data["drafts"].include?("draft-kavian-aep-claims-01")
     errors << "#{rel}: claims profile vectors must cover the Claims draft"
+  end
+  if file.read.include?("did:web") && !data["drafts"].include?("draft-kavian-aep-did-web-identity-method-00")
+    errors << "#{rel}: did:web vectors must cover the did:web identity-method draft"
   end
   errors << "#{rel}: input must be an object" unless data["input"].is_a?(Hash)
   errors << "#{rel}: expected must be an object" unless data["expected"].is_a?(Hash)

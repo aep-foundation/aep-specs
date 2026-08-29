@@ -59,14 +59,27 @@ Tempfile.create(["aep-platform-conformance-report", ".json"]) do |output|
   end
 end
 
+Tempfile.create(["aep-optional-conformance-report", ".json"]) do |output|
+  _, stderr, status = run_harness(runner, adapter, manifest, output, "platform", "skip-optional")
+  errors << "optional skips failed: #{stderr}" unless status.success?
+  if status.success?
+    report = JSON.parse(output.read)
+    skipped = report.fetch("suites").sum { |suite| suite.fetch("skipped") }
+    errors << "optional results were not recorded as skipped" unless skipped.positive?
+  end
+end
+
 Tempfile.create(["aep-conformance-report", ".json"]) do |output|
   _, stderr, status = run_harness(runner, adapter, manifest, output, "agent", "failed", ["inspect"])
   errors << "failing adapter did not return exit status 1" unless status.exitstatus == 1
-  if status.exitstatus == 1
+  if status.exitstatus == 1 && !output.read.empty?
+    output.rewind
     report = JSON.parse(output.read)
     failed = report.fetch("suites").sum { |suite| suite.fetch("failed") }
     errors << "failed results were not recorded" unless failed.positive?
     errors << "failed vector diagnostics are missing" if stderr.empty?
+  elsif status.exitstatus == 1
+    errors << "failing adapter did not produce a report: #{stderr}"
   end
 end
 

@@ -10,11 +10,12 @@ require "time"
 module ConformanceHarness
   PROTOCOL_VERSION = "1"
   AEP_VERSION = "1.0"
-  ROLES = %w[agent service platform].freeze
+  ROLES = %w[agent platform service].freeze
   PROFILES = %w[core-http claims api-key basic oauth-bearer platform-hosted-identity].freeze
   STATUSES = %w[passed failed skipped].freeze
-  VECTOR_FIELDS = %w[id title description drafts category applies_to profile input expected].freeze
-  REQUIRED_VECTOR_FIELDS = %w[id title description drafts category applies_to profile input expected].freeze
+  EXPECTATIONS = %w[required optional unsupported].freeze
+  VECTOR_FIELDS = %w[id title description drafts category applicability input expected].freeze
+  REQUIRED_VECTOR_FIELDS = VECTOR_FIELDS
 
   module_function
 
@@ -92,15 +93,33 @@ module ConformanceHarness
   def validate_vector!(vector)
     raise "vector fields are invalid" unless vector.is_a?(Hash) && (vector.keys - VECTOR_FIELDS).empty?
     raise "vector metadata is incomplete" unless REQUIRED_VECTOR_FIELDS.all? { |field| vector.key?(field) }
-    raise "vector strings are invalid" unless %w[id title description category profile].all? do |field|
+    raise "vector strings are invalid" unless %w[id title description category].all? do |field|
       vector[field].is_a?(String) && !vector[field].empty?
     end
-    raise "vector profile is invalid" unless PROFILES.include?(vector["profile"])
     raise "vector input and expected values must be objects" unless vector["input"].is_a?(Hash) &&
       vector["expected"].is_a?(Hash)
     raise "vector drafts are invalid" unless nonempty_unique_strings?(vector["drafts"])
-    raise "vector applies_to is invalid" unless nonempty_unique_strings?(vector["applies_to"]) &&
-      (vector["applies_to"] - ROLES).empty?
+    validate_applicability!(vector["applicability"])
+  end
+
+  def validate_applicability!(applicability)
+    raise "vector applicability must classify every role" unless applicability.is_a?(Hash) &&
+      applicability.keys == ROLES
+
+    applicability.each do |role, rule|
+      raise "vector applicability for #{role} must be an object" unless rule.is_a?(Hash)
+
+      expectation = rule["expectation"]
+      raise "vector applicability expectation for #{role} is invalid" unless EXPECTATIONS.include?(expectation)
+      expected_fields = expectation == "unsupported" ? %w[expectation] : %w[expectation profile]
+      raise "vector applicability fields for #{role} are invalid" unless rule.keys.sort == expected_fields
+      next if expectation == "unsupported"
+
+      raise "vector applicability profile for #{role} is invalid" unless PROFILES.include?(rule["profile"])
+    end
+    raise "vector must be executable by at least one role" if applicability.values.all? do |rule|
+      rule.fetch("expectation") == "unsupported"
+    end
   end
 
   def nonempty_unique_strings?(values)
@@ -125,16 +144,17 @@ module ConformanceHarness
   def requests(vectors, role, profiles)
     sequence = 0
     vectors.filter_map do |_, vector|
-      next unless vector.fetch("applies_to").include?(role)
-      next unless profiles.include?(vector.fetch("profile"))
+      applicability = vector.fetch("applicability").fetch(role)
+      next if applicability.fetch("expectation") == "unsupported"
+      next unless profiles.include?(applicability.fetch("profile"))
 
       sequence += 1
       {
         "protocol_version" => PROTOCOL_VERSION,
         "sequence" => sequence,
         "role" => role,
-        "profile" => vector.fetch("profile"),
-        "expectation" => "required",
+        "profile" => applicability.fetch("profile"),
+        "expectation" => applicability.fetch("expectation"),
         "vector" => vector.slice("id", "title", "drafts", "category"),
         "case" => vector.slice("input", "expected")
       }

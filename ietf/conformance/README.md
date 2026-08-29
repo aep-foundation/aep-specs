@@ -145,9 +145,11 @@ bundle exec ruby scripts/run_conformance.rb \
 ```
 
 Repeat `--suite CATEGORY` to select specific vector categories. With no suite
-selection, the runner dispatches every vector applicable to the selected role
-and the profiles claimed in the manifest. The adapter command and each of its
-arguments are passed directly to the operating system without shell parsing.
+selection, the runner evaluates each vector's explicit classification for the
+selected role. Required and optional cases are dispatched when their profile is
+claimed in the manifest; unsupported cases are not dispatched. The adapter
+command and each of its arguments are passed directly to the operating system
+without shell parsing.
 
 The runner validates the manifest, vector index, requests, responses, and final
 report. It accepts responses in any order, while rejecting missing, duplicate,
