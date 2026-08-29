@@ -6,8 +6,19 @@
     "draft-kavian-agent-enrollment-protocol-04"
   ],
   "category": "errors",
-  "applies_to": ["agent", "service"],
-  "profile": "core-http",
+  "applicability": {
+    "agent": {
+      "expectation": "required",
+      "profile": "core-http"
+    },
+    "platform": {
+      "expectation": "unsupported"
+    },
+    "service": {
+      "expectation": "required",
+      "profile": "core-http"
+    }
+  },
   "input": {
     "failure_class": "bad_signature"
   },

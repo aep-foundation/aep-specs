@@ -17,6 +17,8 @@ responses = requests.map do |request|
            when "failed" then "failed"
            when "skipped" then "skipped"
            when "invalid" then "invalid"
+           when "skip-optional"
+             request.fetch("expectation") == "optional" ? "skipped" : "passed"
            else "passed"
            end
   {
