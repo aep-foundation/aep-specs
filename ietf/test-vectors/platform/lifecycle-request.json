@@ -1,8 +1,7 @@
 {
   "applicability": {
     "agent": {
-      "expectation": "required",
-      "profile": "platform-hosted-identity"
+      "expectation": "unsupported"
     },
     "platform": {
       "expectation": "required",
@@ -13,7 +12,7 @@
     }
   },
   "category": "platform",
-  "description": "An authenticated caller asks the Platform to update a Service-scoped Agent identity lifecycle state.",
+  "description": "A privileged Platform management caller asks the Platform to update a Service-scoped Agent identity lifecycle state.",
   "drafts": ["draft-kavian-aep-platform-hosted-identity-01"],
   "expected": {},
   "id": "lifecycle-request",

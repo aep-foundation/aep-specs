@@ -1,8 +1,7 @@
 {
   "applicability": {
     "agent": {
-      "expectation": "required",
-      "profile": "platform-hosted-identity"
+      "expectation": "unsupported"
     },
     "platform": {
       "expectation": "required",
