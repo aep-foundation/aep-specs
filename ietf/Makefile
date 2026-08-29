@@ -25,6 +25,7 @@ MARKDOWN_TABLE_FILES ?= \
 	STYLE.md \
 	specs/README.md \
 	conformance/README.md \
+	conformance/compatibility-checklist.md \
 	governance/README.md \
 	governance/extension-registration.md \
 	guides/README.md \

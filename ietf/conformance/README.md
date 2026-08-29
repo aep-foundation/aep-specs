@@ -3,6 +3,10 @@
 This directory defines the conformance model for the currently published AEP
 Internet-Draft set.
 
+The [role and profile compatibility checklist](compatibility-checklist.md)
+records the complete executable contract baseline used by language SDKs and
+conformance adapters.
+
 The current conformance scope is limited to:
 
 - `draft-kavian-aep-api-key-session-credential-03`
