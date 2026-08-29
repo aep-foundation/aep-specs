@@ -1,0 +1,41 @@
+{
+  "case": {
+    "expected": {
+      "valid": true
+    },
+    "input": {
+      "document": {
+        "aep_version": "1.0",
+        "bindings": {
+          "supported": ["http"]
+        },
+        "commands": {
+          "supported": ["enroll", "inspect", "status"]
+        },
+        "core": {
+          "signing_algorithms": ["ES256"]
+        },
+        "http": {
+          "endpoint_base": "/aep/"
+        },
+        "identity": {
+          "methods": ["did:web"]
+        },
+        "service": {
+          "did": "did:web:api.example.com"
+        }
+      }
+    }
+  },
+  "expectation": "required",
+  "profile": "core-http",
+  "protocol_version": "1",
+  "role": "agent",
+  "sequence": 1,
+  "vector": {
+    "category": "inspect",
+    "drafts": ["draft-kavian-agent-enrollment-protocol-04"],
+    "id": "inspect-minimal-http",
+    "title": "Minimal HTTP Inspect document"
+  }
+}

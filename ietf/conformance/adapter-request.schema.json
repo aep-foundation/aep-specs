@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://www.aep.foundation/conformance/adapter-request.schema.json",
+  "title": "AEP conformance adapter request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protocol_version",
+    "sequence",
+    "role",
+    "profile",
+    "expectation",
+    "vector",
+    "case"
+  ],
+  "properties": {
+    "protocol_version": {
+      "const": "1"
+    },
+    "sequence": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "role": {
+      "enum": ["agent", "service", "platform"]
+    },
+    "profile": {
+      "enum": [
+        "core-http",
+        "claims",
+        "api-key",
+        "basic",
+        "oauth-bearer",
+        "platform-hosted-identity"
+      ]
+    },
+    "expectation": {
+      "enum": ["required", "optional"]
+    },
+    "vector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "drafts", "category"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "drafts": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "category": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        }
+      }
+    },
+    "case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["input", "expected"],
+      "properties": {
+        "input": {
+          "type": "object"
+        },
+        "expected": {
+          "type": "object"
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "role": { "const": "platform" }
+        }
+      },
+      "then": {
+        "properties": {
+          "profile": { "const": "platform-hosted-identity" }
+        }
+      }
+    }
+  ]
+}
