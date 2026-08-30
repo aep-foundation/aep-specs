@@ -240,6 +240,23 @@ expect(errors, idempotency.dig("input", "first_body_hash") != idempotency.dig("i
 expect(errors, idempotency.dig("expected", "status") == 409, "Idempotency conflict must return 409")
 expect(errors, idempotency.dig("expected", "body", "code") == "idempotency_conflict", "Idempotency conflict must use idempotency_conflict code")
 
+command_header = vector("idempotency/command-header.json")
+expect(errors, command_header.dig("input", "commands") == POST_COMMANDS, "Every Core POST command must require the idempotency header")
+expect(errors, command_header.dig("expected", "header_required") == true, "Core command idempotency header must be required")
+expect(errors, command_header.dig("expected", "missing_or_empty_status") == 400, "Missing or empty Core command idempotency headers must return 400")
+expect(errors, command_header.dig("expected", "missing_or_empty_code") == "invalid_request", "Missing or empty Core command idempotency headers must use invalid_request")
+expect(errors, command_header.dig("expected", "enroll_body_key") == "optional", "The Enroll body idempotency key must remain optional")
+expect(errors, command_header.dig("expected", "mismatched_enroll_body_status") == 400, "A mismatched Enroll body idempotency key must return 400")
+
+command_replay = vector("idempotency/command-replay-conflict.json")
+expect(errors, command_replay.dig("expected", "scope") == %w[agent_did idempotency_key], "Core command idempotency must use the Agent and key scope")
+expect(errors, command_replay.dig("expected", "retention_seconds_minimum").to_i >= 3600, "Core command idempotency retention must be at least one hour")
+expect(errors, command_replay.dig("expected", "exact_retry") == "cached_or_equivalent_success", "An exact Core command retry must return a cached or equivalent success")
+%w[changed_body changed_command].each do |change|
+  expect(errors, command_replay.dig("expected", change, "status") == 409, "#{change} idempotency reuse must return 409")
+  expect(errors, command_replay.dig("expected", change, "code") == "idempotency_conflict", "#{change} idempotency reuse must use idempotency_conflict")
+end
+
 problem = vector("errors/not-recognized-problem.json").fetch("expected")
 expect(errors, problem.fetch("status") == 401, "not_recognized problem must use HTTP 401")
 expect(errors, problem.dig("body", "type") == "urn:aep:error:not_recognized", "not_recognized problem type must use AEP error URN")
