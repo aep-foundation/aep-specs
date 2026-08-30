@@ -606,11 +606,11 @@ Missing credentials use `authentication_required`. A method not listed in `authe
 
 # Idempotency
 
-POST commands are state-mutating and MUST support safe retry with the `Idempotency-Key` HTTP header. This requirement applies to Enroll, Grant, and Revoke in this document.
+POST commands are state-mutating and MUST support safe retry with a non-empty `Idempotency-Key` HTTP header. Agents MUST send this header and Services MUST reject Enroll, Grant, or Revoke requests that omit it or carry an empty value with `400 Bad Request` and `code` equal to `invalid_request`.
 
-Services MUST cache the response associated with `(agent_did, Idempotency-Key)` for at least 1 hour. If a request repeats the same key with the same authenticated Agent and the same request body, the Service MUST return the cached response or an equivalent successful response.
+Services MUST cache the response associated with `(agent_did, Idempotency-Key)` for at least 1 hour. Each record MUST bind the command and a cryptographic hash of a canonical representation of the request body. If a request repeats the same key with the same authenticated Agent, command, and request body, the Service MUST return the cached response or an equivalent successful response.
 
-If the same authenticated Agent reuses an idempotency key with a different request body, the Service MUST return `409 Conflict` with `code` equal to `idempotency_conflict`.
+If the same authenticated Agent reuses an idempotency key for a different command or request body, the Service MUST return `409 Conflict` with `code` equal to `idempotency_conflict`.
 
 The Enroll request body MAY also contain `idempotency_key` for bindings or application frameworks that persist idempotency metadata with the body. When both forms are present, they MUST match.
 
