@@ -117,7 +117,7 @@ The baseline AEP flow is:
 6. The Agent may call Grant for a supported session-credential type.
 7. The Agent may call Revoke to invalidate issued session credentials.
 
-Inspect is unauthenticated. Enroll, Grant, Revoke, and Status are authenticated with the baseline `Authorization: AEP <jwt>` form. Session credentials, once issued, MAY be used on commands that allow the selected credential type; Grant and Revoke themselves always use the baseline client assertion.
+Inspect is unauthenticated. Every Service that exposes Enroll, Grant, Revoke, or Status MUST accept the baseline `Authorization: AEP <jwt>` form on that command. Session credentials, once issued, MAY additionally be used on commands that allow the selected credential type; Grant and Revoke themselves always use the baseline client assertion. Support for the baseline client assertion on AEP command endpoints does not advertise or imply support for `aep-jwt` on protected application resources.
 
 # Versioning and Compatibility
 
@@ -223,7 +223,11 @@ The Inspect document shown here contains only the fields required for the HTTP b
 
 `commands.grant_types` lists concrete session-credential formats the Service can issue and revoke. If this array is empty or absent, the Service MUST NOT list `grant` or `revoke` in `commands.supported`.
 
+`commands.grant_types_config` contains optional configuration for advertised Grant Types. Each member name MUST also appear in `commands.grant_types`. The common `supports_per_credential_revoke` member is a string boolean. If it is absent or `"false"`, an Agent MUST use grant-type or all-grant-types Revoke. If it is `"true"`, the Service MUST accept a Revoke request containing both that `grant_type` and a `credential_id`, and an Agent MAY use that targeted form. Concrete session-credential documents MAY define additional members.
+
 `authentication.methods` lists, in preference order, the authentication methods accepted by protected resources belonging to the Service. `aep-jwt` identifies an AEP client assertion with `op` equal to `authenticate`. Other values MUST be registered Grant Type wire identifiers and use that grant type's credential presentation rules. The field is OPTIONAL; if it is absent, the Service advertises no protected-resource authentication method. When present, it MUST contain between one and sixteen values with no duplicates. An absent or empty `commands.grant_types` array does not imply support for `aep-jwt` or any other method. `authenticate` MUST NOT appear in `commands.supported` because it is an assertion operation, not a Service command endpoint.
+
+The protected-resource methods in `authentication.methods` are distinct from authentication of AEP command endpoints. Advertising or omitting `aep-jwt` in this array does not alter the requirement that every authenticated AEP command accept its operation-bound baseline client assertion.
 
 `identity.methods` lists identity method identifiers the Service accepts for authenticated AEP commands. The values are lower-case identifiers registered in the AEP Identity Methods registry. A Service that advertises Enroll, Grant, Revoke, or Status MUST advertise at least one identity method.
 
@@ -316,7 +320,7 @@ The `AEP-credentials` form is used in the `Authorization` field on command endpo
 
 # Client Assertion JWT
 
-Enroll, Grant, Revoke, Status, and protected-resource authentication use a signed client assertion JWT. Inspect is unauthenticated and does not use a client assertion.
+Enroll, Grant, Revoke, and Status use a signed client assertion JWT. Inspect is unauthenticated and does not use a client assertion. Protected resources use only the methods advertised in `authentication.methods`; `aep-jwt` selects the client assertion defined in this section with `op` equal to `authenticate`.
 
 The client assertion JWT is carried as:
 
@@ -520,7 +524,9 @@ Request body:
 
 `grant_type` MUST be one of the values advertised in `commands.grant_types`. Concrete session-credential documents MAY define additional request fields.
 
-The successful response body is defined by the concrete session-credential document. This core document requires only that the response be a JSON object and that the selected document define credential presentation, expiry semantics, and revocation behavior.
+The successful response body is defined by the concrete session-credential document. This core document requires only that the response be a JSON object and that the selected document define credential presentation, expiry semantics, and revocation behavior. A successful response MUST contain the usable credential material required by that document and a stable Service-issued `credential_id`. The identifier identifies the issued credential for management and storage; it is not credential material and is not presented to a protected resource unless the concrete document explicitly defines that behavior.
+
+A `credential_id` MUST be unique among all credentials issued by the Service, across Agents and Grant Types, and the Service MUST NOT reassign it. Its logical identity is the pair of the Service DID and `credential_id`. The identifier is opaque to Agents; this document does not require a particular identifier format.
 
 # The Revoke Command
 
@@ -544,7 +550,7 @@ Request body:
 }
 ~~~
 
-`grant_type` MUST be one of the values advertised in `commands.grant_types`. By default, Revoke targets all credentials of that grant type issued to the authenticated Agent. Concrete session-credential documents MAY define additional fields for narrower credential targeting.
+`grant_type` MUST be one of the values advertised in `commands.grant_types`. By default, Revoke targets all credentials of that grant type issued to the authenticated Agent. A request containing both `grant_type` and `credential_id` targets the single issued credential identified by `credential_id`. An Agent MUST send that form only when the Service configuration for the selected grant type advertises per-credential Revoke. A Service advertising per-credential Revoke MUST support that form. Concrete session-credential documents define any additional requirements for narrower credential targeting.
 
 To revoke all session credentials of every grant type issued to the authenticated Agent, the request body is:
 
@@ -672,7 +678,7 @@ This document defines the extension points needed by the core protocol:
 * `extensions.supported` advertises extension identifiers implemented by the Service.
 * `identity.methods` advertises concrete identity methods accepted for authenticated AEP commands.
 * `commands.grant_types` advertises concrete session-credential formats available through Grant and Revoke.
-* `commands.grant_types_config` MAY carry per-grant-type configuration defined by a concrete session-credential document.
+* `commands.grant_types_config` carries common and concrete per-grant-type configuration.
 * `claims.required`, `claims.preferred`, and `claims.optional` MAY contain claim names from the AEP Claim Names registry or claim names defined by other documents.
 * Additional top-level Inspect fields MAY be added by future documents.
 
