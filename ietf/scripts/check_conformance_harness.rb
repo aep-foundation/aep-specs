@@ -161,6 +161,39 @@ expect(errors, AUTHENTICATED_COMMANDS.include?(client_assertion.fetch("op")), "C
 expect(errors, client_assertion.fetch("exp") - client_assertion.fetch("iat") <= 300, "Client assertion lifetime must be at most 300 seconds")
 expect(errors, client_assertion.fetch("jti").is_a?(String) && !client_assertion.fetch("jti").empty?, "Client assertion jti must be non-empty")
 
+assertion_validation = vector("client-assertion/validation-requirements.json")
+assertion_header = assertion_validation.dig("expected", "header")
+assertion_claims = assertion_validation.dig("expected", "claims")
+assertion_rejections = assertion_validation.dig("expected", "reject")
+expect(errors, assertion_header == {
+  "alg" => "ES256",
+  "kid" => assertion_claims.fetch("iss"),
+  "typ" => "JWT"
+}, "Client assertion validation must require the complete identity-bound JOSE header")
+expect(errors, assertion_claims.fetch("iss") == assertion_claims.fetch("sub"), "Client assertion validation must bind iss and sub")
+assertion_lifetime = assertion_claims.fetch("exp") - assertion_claims.fetch("iat")
+expect(errors, assertion_lifetime.between?(1, 300), "Client assertion validation must bound assertion lifetime")
+%w[
+  excessive_lifetime
+  fragmented_resource
+  insecure_resource
+  mismatched_kid
+  mismatched_subject
+  missing_kid
+  missing_resource
+  nonpositive_lifetime
+  unexpected_resource
+  wrong_typ
+].each do |failure|
+  expect(errors, assertion_rejections.include?(failure), "Client assertion validation must cover #{failure}")
+end
+
+did_web_resolution = vector("client-assertion/did-web-resolution.json")
+expect(errors, did_web_resolution.dig("expected", "document_url").start_with?("https://"), "did:web resolution must use HTTPS")
+%w[missing_referenced_method plaintext_http wrong_did].each do |failure|
+  expect(errors, did_web_resolution.dig("expected", failure) == "reject", "did:web resolution must reject #{failure}")
+end
+
 {
   "enroll/request-minimal.json" => "enroll",
   "grant-revoke/grant-request-oauth-bearer.json" => "grant",
