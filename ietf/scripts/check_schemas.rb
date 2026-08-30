@@ -34,6 +34,7 @@ SCHEMA_TARGETS = [
   ["status/response-pending-requirements.json", "status-response.schema.json", %w[expected body]],
   ["grant-revoke/grant-request-oauth-bearer.json", "grant-request.schema.json", %w[expected body]],
   ["grant-revoke/revoke-request-oauth-bearer.json", "revoke-request.schema.json", %w[expected body]],
+  ["grant-revoke/revoke-request-targeted-oauth-bearer.json", "revoke-request.schema.json", %w[expected body]],
   ["grant-revoke/revoke-request-all-grant-types.json", "revoke-request.schema.json", %w[expected body]],
   ["grant-revoke/revoke-response-empty.json", "revoke-response.schema.json", %w[expected body]],
   ["errors/not-recognized-problem.json", "problem.schema.json", %w[expected body]],
@@ -59,6 +60,11 @@ SCHEMA_TARGETS = [
 ].freeze
 
 INVALID_SCHEMA_TARGETS = [
+  ["credentials/api-key/grant-response-missing-credential-id.json", "api-key-grant-response.schema.json", %w[input]],
+  ["credentials/basic/grant-response-missing-credential-id.json", "basic-grant-response.schema.json", %w[input]],
+  ["credentials/oauth-bearer/grant-response-missing-credential-id.json", "oauth-bearer-grant-response.schema.json", %w[input]],
+  ["grant-revoke/revoke-request-credential-id-without-grant-type.json", "revoke-request.schema.json", %w[input]],
+  ["grant-revoke/revoke-request-conflicting-targets.json", "revoke-request.schema.json", %w[input]],
   ["inspect/authenticated-command-without-identity-method.json", "inspect-document.schema.json", %w[input document]],
   ["inspect/authentication-method-limit.json", "inspect-document.schema.json", %w[input document]],
   ["inspect/command-without-inspect.json", "inspect-document.schema.json", %w[input document]],

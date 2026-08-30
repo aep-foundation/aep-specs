@@ -30,16 +30,16 @@ CLAIM_NAMES = %w[
 CREDENTIAL_PROFILES = {
   "oauth-bearer" => {
     category: "credentials/oauth-bearer",
-    required_fields: %w[access_token expires_at token_type],
+    required_fields: %w[access_token credential_id expires_at token_type],
     token_type: "Bearer"
   },
   "api-key" => {
     category: "credentials/api-key",
-    required_fields: %w[api_key expires_at header]
+    required_fields: %w[api_key credential_id expires_at header]
   },
   "basic" => {
     category: "credentials/basic",
-    required_fields: %w[expires_at password username]
+    required_fields: %w[credential_id expires_at password username]
   }
 }.freeze
 PLATFORM_LIFECYCLE_STATES = %w[active revoked suspended terminated].freeze
@@ -271,7 +271,7 @@ CREDENTIAL_PROFILES.each do |grant_type, config|
     expect(errors, expected.key?(field), "#{grant_type} Grant response must contain #{field}")
   end
 
-  expect(errors, expected["credential_id"].nil? || expected["credential_id"].is_a?(String), "#{grant_type} credential_id must be a string when present")
+  expect(errors, expected["credential_id"].is_a?(String), "#{grant_type} credential_id must be a string")
   expect(errors, expected["scopes"].nil? || expected["scopes"].is_a?(Array), "#{grant_type} scopes must be null or an array when present")
   expect(errors, expected["token_type"] == config[:token_type], "#{grant_type} token_type must be #{config[:token_type]}") if config[:token_type]
 end

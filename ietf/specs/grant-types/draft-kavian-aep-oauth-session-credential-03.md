@@ -95,7 +95,7 @@ A Service MAY publish configuration under `commands.grant_types_config.oauth-bea
 
 `scopes_supported`, when present, lists Service-defined scope strings an Agent can request.
 
-`supports_per_credential_revoke` is a string boolean.  If absent, the default is `"false"`.  A Service that returns `credential_id` in a Grant response MUST support Revoke with that `credential_id`.  A Service that does not support per-credential Revoke MUST omit `credential_id` from Grant responses.
+`supports_per_credential_revoke` is a string boolean.  If absent, the default is `"false"`.  Every successful Grant response includes `credential_id`.  When this value is `"true"`, the Service MUST support a Revoke request containing both `grant_type` and that `credential_id`.  When this value is `"false"` or absent, the Agent MUST use grant-type or all-grant-types Revoke instead.
 
 # Grant Request
 
@@ -140,7 +140,7 @@ A successful Grant response is a JSON object:
 
 `token_format`, when present, describes the Service-selected format.
 
-`credential_id`, when present, is a stable identifier for per-token Revoke.  If present, the Service MUST support Revoke with this value.
+`credential_id` is REQUIRED and is a stable Service-issued identifier for the issued OAuth Bearer credential. It follows the Service-wide uniqueness and non-reassignment requirements in the Core Grant command. It is not the access token and is not used for credential presentation. The Agent stores it with the credential and sends it only when targeting that credential in a Revoke request supported by the Service.
 
 This document does not define refresh tokens.  Agents renew by invoking AEP Grant again with a fresh baseline client assertion.
 
@@ -174,7 +174,7 @@ To revoke all OAuth Bearer session credentials of this type for the authenticate
 }
 ~~~
 
-To revoke one credential when the Service returned `credential_id`:
+When the Service advertises per-credential Revoke, the Agent can revoke one OAuth Bearer credential:
 
 ~~~ json
 {

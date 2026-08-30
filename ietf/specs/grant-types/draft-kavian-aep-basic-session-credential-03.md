@@ -89,7 +89,7 @@ A Service MAY publish configuration under `commands.grant_types_config.basic`:
 
 `scopes_supported`, when present, lists Service-defined scope strings an Agent can request.
 
-`supports_per_credential_revoke` is a string boolean.  If absent, the default is `"false"`.  A Service that returns `credential_id` in a Grant response MUST support Revoke with that `credential_id`.  A Service that does not support per-credential Revoke MUST omit `credential_id` from Grant responses.
+`supports_per_credential_revoke` is a string boolean.  If absent, the default is `"false"`.  Every successful Grant response includes `credential_id`.  When this value is `"true"`, the Service MUST support a Revoke request containing both `grant_type` and that `credential_id`.  When this value is `"false"` or absent, the Agent MUST use grant-type or all-grant-types Revoke instead.
 
 # Grant Request
 
@@ -134,7 +134,7 @@ A successful Grant response is a JSON object:
 
 `scopes` is OPTIONAL and contains the granted scope strings when present.  A missing or `null` value means the Basic credential has no scope-limited authorization.  The Service MAY return an empty array with the same meaning.
 
-`credential_id`, when present, is a stable identifier for per-credential Revoke.  If present, the Service MUST support Revoke with this value.
+`credential_id` is REQUIRED and is a stable Service-issued identifier for the issued Basic credential. It follows the Service-wide uniqueness and non-reassignment requirements in the Core Grant command. It is not the username or password and is not used for credential presentation. The Agent stores it with the credential and sends it only when targeting that credential in a Revoke request supported by the Service.
 
 The response does not include the base64-encoded `Authorization` value.  Agents construct that value locally from `username ":" password` according to RFC 7617.
 
@@ -170,7 +170,7 @@ To revoke all Basic credentials of this type for the authenticated Agent:
 }
 ~~~
 
-To revoke one Basic credential when the Service returned `credential_id`:
+When the Service advertises per-credential Revoke, the Agent can revoke one Basic credential:
 
 ~~~ json
 {
