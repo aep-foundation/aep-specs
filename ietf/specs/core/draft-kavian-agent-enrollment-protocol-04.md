@@ -667,7 +667,7 @@ Services MUST use `not_recognized` for bad signatures, unknown Agent identities,
 
 Services MUST use `invalid_request` for malformed JSON, missing required fields, invalid field types, unsupported field combinations, and syntactically invalid requests when returning the error would not reveal identity-recognition state.
 
-Services MUST implement constant-time-shaped response behavior for `not_recognized` paths so that observable latency does not distinguish a known Agent from an unknown Agent or a validly formatted assertion from a bad signature.
+Services SHOULD avoid readily observable timing differences among `not_recognized` paths. Implementations can perform comparable validation work or apply response-time bucketing, but this specification does not require constant-time responses or prescribe an artificial delay.
 
 When a request fails for multiple reasons, the Service MUST choose the least revealing error. For example, a request with both a bad signature and missing claims returns `not_recognized`, not `requirements_unmet`.
 
@@ -936,7 +936,7 @@ Resolving a Service DID proves that the DID document exists; it does not prove t
 
 The `core.signing_algorithms` advertisement is security relevant. Services MUST NOT advertise algorithms they do not intend to accept, and MUST NOT accept algorithms that were not advertised. Agents MUST NOT use `none` or symmetric JOSE algorithms for Agent identity assertions. Implementations SHOULD follow JWT best current practices {{RFC8725}}.
 
-Authentication failures are an enumeration risk. Services MUST collapse recognition failures to `not_recognized` and MUST shape timing so attackers cannot distinguish an unknown Agent, a bad signature, a wrong audience, a wrong operation, a replay, an expired assertion, or an archived identity.
+Authentication failures are an enumeration risk. Services MUST collapse recognition failures to `not_recognized` and SHOULD avoid readily observable timing differences among failures involving an unknown Agent, a bad signature, a wrong audience, a wrong operation, a replay, an expired assertion, or an archived identity. Implementations need not add an artificial delay when their normal verification and storage paths already have comparable observable timing.
 
 Grant issues session credentials that may be bearer credentials depending on the concrete session-credential document. Services and Agents MUST treat returned credentials as secrets. Concrete session-credential documents MUST define credential lifetime, presentation, storage guidance, and revocation semantics. Revoke MUST be available for every advertised grant type.
 
