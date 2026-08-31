@@ -38,6 +38,7 @@ SCHEMA_TARGETS = [
   ["grant-revoke/revoke-request-all-grant-types.json", "revoke-request.schema.json", %w[expected body]],
   ["grant-revoke/revoke-response-empty.json", "revoke-response.schema.json", %w[expected body]],
   ["errors/not-recognized-problem.json", "problem.schema.json", %w[expected body]],
+  ["errors/problem-details-validation.json", "problem.schema.json", %w[input cases 0 body]],
   ["errors/verification-pending-problem.json", "problem.schema.json", %w[expected body]],
   ["errors/requirements-unmet-problem.json", "problem.schema.json", %w[expected body]],
   ["idempotency/enroll-conflict.json", "idempotency-metadata.schema.json", %w[input]],
@@ -66,6 +67,7 @@ INVALID_SCHEMA_TARGETS = [
   ["grant-revoke/revoke-request-credential-id-without-grant-type.json", "revoke-request.schema.json", %w[input]],
   ["grant-revoke/revoke-request-conflicting-targets.json", "revoke-request.schema.json", %w[input]],
   ["inspect/authenticated-command-without-identity-method.json", "inspect-document.schema.json", %w[input document]],
+  ["inspect/authenticate-command-prohibited.json", "inspect-document.schema.json", %w[input document]],
   ["inspect/authentication-method-limit.json", "inspect-document.schema.json", %w[input document]],
   ["inspect/command-without-inspect.json", "inspect-document.schema.json", %w[input document]],
   ["inspect/grant-without-grant-types.json", "inspect-document.schema.json", %w[input document]],
@@ -76,7 +78,13 @@ INVALID_SCHEMA_TARGETS = [
     "platform/verification-authenticate-missing-resource.json",
     "platform-verification-request.schema.json",
     %w[input request]
-  ]
+  ],
+  ["errors/problem-details-validation.json", "problem.schema.json", %w[input cases 1 body]],
+  ["errors/problem-details-validation.json", "problem.schema.json", %w[input cases 2 body]],
+  ["errors/problem-details-validation.json", "problem.schema.json", %w[input cases 3 body]],
+  ["errors/problem-details-validation.json", "problem.schema.json", %w[input cases 5 body]],
+  ["errors/problem-details-validation.json", "problem.schema.json", %w[input cases 6 body]],
+  ["errors/problem-details-validation.json", "problem.schema.json", %w[input cases 7 body]]
 ].freeze
 
 CLAIM_SCHEMA_CASES = %w[
@@ -99,9 +107,15 @@ end
 
 def dig_path(data, path)
   path.reduce(data) do |current, segment|
-    raise "missing path #{path.join('.')}" unless current.is_a?(Hash) && current.key?(segment)
-
-    current[segment]
+    if current.is_a?(Hash) && current.key?(segment)
+      current[segment]
+    elsif current.is_a?(Array) && segment.match?(/\A(?:0|[1-9][0-9]*)\z/)
+      current.fetch(Integer(segment, 10))
+    else
+      raise "missing path #{path.join('.')}"
+    end
+  rescue IndexError
+    raise "missing path #{path.join('.')}"
   end
 end
 

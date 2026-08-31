@@ -127,6 +127,7 @@ expect(
 
 %w[
   authenticated-command-without-identity-method
+  authenticate-command-prohibited
   authentication-method-limit
   command-without-inspect
   grant-without-grant-types
@@ -264,6 +265,16 @@ expect(errors, problem.dig("body", "code") == "not_recognized", "not_recognized 
 %w[verification_pending requirements_pending owner_action_required].each do |field|
   expect(errors, !problem.fetch("body").key?(field), "not_recognized must not disclose #{field}")
 end
+
+problem_validation = vector("errors/problem-details-validation.json")
+problem_cases = problem_validation.dig("input", "cases").to_h { |test_case| [test_case.fetch("name"), test_case] }
+expect(errors, problem_cases.dig("title_omitted", "valid") == false, "Problem Details title omission must be invalid")
+expect(errors, problem_cases.dig("title_null", "valid") == false, "Problem Details title null must be invalid")
+expect(errors, problem_cases.dig("title_empty", "valid") == false, "Problem Details empty title must be invalid")
+expect(errors, problem_cases.dig("type_code_mismatch", "valid") == false, "Problem Details type must exactly match code")
+expect(errors, problem_cases.dig("not_recognized_owner_action", "valid") == false, "not_recognized must not disclose owner action")
+expect(errors, problem_cases.dig("not_recognized_requirements", "valid") == false, "not_recognized must not disclose pending requirements")
+expect(errors, problem_cases.dig("not_recognized_verification", "valid") == false, "not_recognized must not disclose pending verification")
 
 CREDENTIAL_PROFILES.each do |grant_type, config|
   expected = vector("#{config[:category]}/grant-response.json").fetch("expected")

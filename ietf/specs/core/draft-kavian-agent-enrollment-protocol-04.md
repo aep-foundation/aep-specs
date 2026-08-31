@@ -639,7 +639,7 @@ WWW-Authenticate: AEP reason="not_recognized"
 }
 ~~~
 
-The `code` field is the canonical machine-readable AEP error code. `type` identifies the AEP error class using the form `urn:aep:error:<code>`. `title` MAY be omitted from production responses.
+The `code` field is the canonical machine-readable AEP error code. `type` MUST equal `urn:aep:error:<code>`, where `<code>` is the exact value of the `code` field. `title` MUST be a non-empty string containing a short, human-readable summary of the problem type.
 
 After an identity has been recognized, a `verification_pending` Problem Details response MAY include a non-empty `verification_pending` array, and a `requirements_unmet` response MAY include a non-empty `requirements_pending` array. Either response MAY include `owner_action_required` only when its value is `"true"`. These fields contain names only and MUST NOT contain claim values. They describe why the attempted operation is blocked; pending Enroll and Status state continues to use successful lifecycle responses. A `not_recognized` response MUST NOT include any of these fields.
 
