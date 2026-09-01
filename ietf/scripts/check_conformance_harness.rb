@@ -338,6 +338,7 @@ end
 wrong_header = vector("protected-resource/api-key-wrong-header-rejected.json")
 expect(errors, wrong_header.dig("input", "issued_header").downcase != wrong_header.dig("input", "presented_header").downcase, "Wrong-header vector must use distinct header names")
 expect(errors, wrong_header.dig("expected", "accepted") == false, "API key under wrong header must be rejected")
+expect(errors, wrong_header.dig("expected", "code") == "authentication_required", "API key outside the issued header must be treated as absent")
 
 redirects = vector("protected-resource/redirect-safety.json").fetch("expected")
 expect(errors, redirects.dig("same_origin", "credential_forwarded") == false, "Same-origin changed resource must use a new assertion")

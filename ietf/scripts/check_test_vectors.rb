@@ -11,7 +11,7 @@ ALLOWED_DRAFTS = %w[
   draft-kavian-agent-enrollment-protocol-04
   draft-kavian-aep-claims-01
   draft-kavian-aep-oauth-session-credential-03
-  draft-kavian-aep-api-key-session-credential-03
+  draft-kavian-aep-api-key-session-credential-04
   draft-kavian-aep-basic-session-credential-03
   draft-kavian-aep-did-web-identity-method-00
   draft-kavian-aep-platform-hosted-identity-01

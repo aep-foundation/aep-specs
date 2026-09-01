@@ -5,7 +5,7 @@ Internet-Draft set.
 
 The current conformance scope is limited to:
 
-- `draft-kavian-aep-api-key-session-credential-03`
+- `draft-kavian-aep-api-key-session-credential-04`
 - `draft-kavian-aep-basic-session-credential-03`
 - `draft-kavian-aep-claims-01`
 - `draft-kavian-aep-did-web-identity-method-00`

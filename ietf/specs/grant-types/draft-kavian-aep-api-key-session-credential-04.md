@@ -1,8 +1,8 @@
 ---
 title: "API-Key Session Credential Grant Type for the Agent Enrollment Protocol"
 abbrev: "AEP API Key"
-docname: draft-kavian-aep-api-key-session-credential-03
-date: 2026-08-24
+docname: draft-kavian-aep-api-key-session-credential-04
+date: 2026-09-01
 category: std
 ipr: trust200902
 submissiontype: IETF
@@ -26,9 +26,9 @@ normative:
   AEP-CORE:
     title: "The Agent Enrollment Protocol"
     target: https://datatracker.ietf.org/doc/draft-kavian-agent-enrollment-protocol/
-    date: 2026-08-24
+    date: 2026-08-27
     seriesinfo:
-      Internet-Draft: draft-kavian-agent-enrollment-protocol-03
+      Internet-Draft: draft-kavian-agent-enrollment-protocol-04
     author:
       - ins: N. Kavian
         name: N. Kavian
@@ -147,6 +147,8 @@ Services MUST issue expiring API keys.
 
 On later protected-resource requests, the Agent presents the API key in exactly the response-selected `header`. AEP does not standardize `x-api-key` or any other API-key header name. The following name is only the Service-selected value in this example:
 
+A field value outside the response-selected `header` is not an API-key credential presentation, even if the value equals an issued API key. If the request contains no other AEP credential presentation, the Service returns the core `authentication_required` error. When the response-selected `header` is present but its value is malformed, expired, revoked, unknown, or bound to a different Agent, the Service returns `not_recognized`.
+
 The dedicated `AEP-Authorization` carrier does not apply to this grant type because its normal presentation does not use `Authorization`. Agents MUST NOT synthesize a generic API-key scheme; they continue using the issued `header` exactly.
 
 ~~~ http-message
@@ -182,7 +184,7 @@ To revoke all session credentials of every grant type, Agents use the core `all_
 
 # Error Handling
 
-This grant type uses the AEP error vocabulary defined by the core protocol.  An API key that is expired, malformed, revoked, unknown, or bound to a different Agent fails as `not_recognized`.
+This grant type uses the AEP error vocabulary defined by the core protocol. An API key presented in the response-selected `header` that is expired, malformed, revoked, unknown, or bound to a different Agent fails as `not_recognized`.
 
 # IANA Considerations
 
