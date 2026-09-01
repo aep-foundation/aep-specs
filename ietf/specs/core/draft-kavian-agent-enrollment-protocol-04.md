@@ -436,6 +436,14 @@ timestamps, or replace the existing record. This requirement applies when the
 request uses a new idempotency key and is distinct from replaying a request with
 the same idempotency key.
 
+The Enroll response `status` uses the complete lifecycle vocabulary defined by
+the Status command. A Service returns `active`, `pending`, or `rejected` for an
+initial enrollment decision. When returning an existing enrollment record, it
+can also return `unavailable`, `suspended`, or `terminated`. Each of these is a
+successful lifecycle representation returned with `200 OK`; an error response
+for an operation blocked by the current lifecycle state is distinct from
+reporting that state.
+
 Successful Enroll responses use `200 OK`. A synchronous enrollment returns:
 
 ~~~ json
