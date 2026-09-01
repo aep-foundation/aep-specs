@@ -43,7 +43,7 @@ for the current bounded delivery track.
 
 The first Internet-Draft document set is:
 
-- [`draft-kavian-aep-api-key-session-credential-03`](https://datatracker.ietf.org/doc/draft-kavian-aep-api-key-session-credential/): `ietf/specs/grant-types/draft-kavian-aep-api-key-session-credential-03.md`
+- [`draft-kavian-aep-api-key-session-credential-04`](https://datatracker.ietf.org/doc/draft-kavian-aep-api-key-session-credential/): `ietf/specs/grant-types/draft-kavian-aep-api-key-session-credential-04.md`
 - [`draft-kavian-aep-basic-session-credential-03`](https://datatracker.ietf.org/doc/draft-kavian-aep-basic-session-credential/): `ietf/specs/grant-types/draft-kavian-aep-basic-session-credential-03.md`
 - [`draft-kavian-aep-claims-01`](https://datatracker.ietf.org/doc/draft-kavian-aep-claims/): `ietf/specs/core/draft-kavian-aep-claims-01.md`
 - [`draft-kavian-aep-did-web-identity-method-00`](https://datatracker.ietf.org/doc/draft-kavian-aep-did-web-identity-method/): `ietf/specs/identity-methods/draft-kavian-aep-did-web-identity-method-00.md`
