@@ -60,12 +60,33 @@ jobs:
       - name: Render release artifacts
         run: make -C ietf render
 
+      - name: Prepare current release artifacts
+        run: |
+          mapfile -t drafts < <(find ietf/specs -type f -name 'draft-*.md' | sort)
+          if (( ${#drafts[@]} == 0 )); then
+            echo "Expected at least one specification draft." >&2
+            exit 1
+          fi
+
+          mkdir release-artifacts
+          for draft in "${drafts[@]}"; do
+            artifact="artifacts/$(basename "$draft" .md)"
+            for extension in html pdf txt xml; do
+              cp "${artifact}.${extension}" release-artifacts/
+            done
+          done
+
       - name: Publish latest release artifacts
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if gh release view latest >/dev/null 2>&1; then
-            gh release upload latest artifacts/draft-* --clobber
+            gh release view latest --json assets --jq '.assets[].name' |
+              while read -r asset; do
+                gh release delete-asset latest "$asset" --yes
+              done
+
+            gh release upload latest release-artifacts/*
             gh release edit latest \
               --draft=false \
               --target "${GITHUB_SHA}" \
@@ -73,7 +94,7 @@ jobs:
               --notes "Auto-published AEP specification artifacts from commit ${{ github.sha }}." \
               --latest
           else
-            gh release create latest artifacts/draft-* \
+            gh release create latest release-artifacts/* \
               --target "${GITHUB_SHA}" \
               --title "Latest AEP specification artifacts" \
               --notes "Auto-published AEP specification artifacts from commit ${{ github.sha }}." \
