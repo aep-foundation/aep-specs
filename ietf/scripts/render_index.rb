@@ -281,6 +281,50 @@ html = <<~HTML
           </tbody>
         </table>
 
+        <h2>Software Development Kits</h2>
+        <p>
+          Official SDKs provide Core protocol support and Agent, Service, and
+          Platform integrations. See the
+          <a href="#{REPO_BASE}/blob/main/SDK_SUPPORT.md">SDK support policy</a>
+          for compatibility, maintenance, release, and conformance details.
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Language</th>
+              <th>Repository</th>
+              <th>Distribution</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td data-label="Language">Node.js</td>
+              <td data-label="Repository"><a href="https://github.com/aep-foundation/aep-node">aep-node</a></td>
+              <td data-label="Distribution"><a href="https://www.npmjs.com/org/aep-foundation">npm</a></td>
+            </tr>
+            <tr>
+              <td data-label="Language">Go</td>
+              <td data-label="Repository"><a href="https://github.com/aep-foundation/aep-go">aep-go</a></td>
+              <td data-label="Distribution"><a href="https://pkg.go.dev/github.com/aep-foundation/aep-go">Go Packages</a></td>
+            </tr>
+            <tr>
+              <td data-label="Language">Java</td>
+              <td data-label="Repository"><a href="https://github.com/aep-foundation/aep-java">aep-java</a></td>
+              <td data-label="Distribution"><a href="https://central.sonatype.com/namespace/foundation.aep">Maven Central</a></td>
+            </tr>
+            <tr>
+              <td data-label="Language">Python</td>
+              <td data-label="Repository"><a href="https://github.com/aep-foundation/aep-python">aep-python</a></td>
+              <td data-label="Distribution"><a href="https://pypi.org/project/agent-enrollment-protocol/">PyPI</a></td>
+            </tr>
+            <tr>
+              <td data-label="Language">Rust</td>
+              <td data-label="Repository"><a href="https://github.com/aep-foundation/aep-rust">aep-rust</a></td>
+              <td data-label="Distribution"><a href="https://crates.io/search?q=aep-">crates.io</a></td>
+            </tr>
+          </tbody>
+        </table>
+
         <h2>Conformance</h2>
         <table>
           <thead>
