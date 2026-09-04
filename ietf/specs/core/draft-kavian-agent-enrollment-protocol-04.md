@@ -2,7 +2,7 @@
 title: "The Agent Enrollment Protocol"
 abbrev: "AEP"
 docname: draft-kavian-agent-enrollment-protocol-04
-date: 2026-08-27
+date: 2026-09-04
 category: std
 ipr: trust200902
 submissiontype: IETF
