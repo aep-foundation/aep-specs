@@ -1,8 +1,16 @@
-name: Agent-to-Service Interoperability
+name: Agent Interoperability
 
 on:
   workflow_dispatch:
     inputs:
+      counterpart:
+        description: Counterpart role to exercise
+        default: service
+        required: true
+        type: choice
+        options:
+          - service
+          - platform
       node_ref:
         description: aep-node Git reference
         default: main
@@ -119,8 +127,8 @@ jobs:
           uv sync --directory .interoperability/aep-python --all-groups --locked --python 3.14
           cargo build --manifest-path .interoperability/aep-rust/Cargo.toml --workspace --locked
 
-      - name: Run all Agent-to-Service pairs
-        run: ruby ietf/scripts/run_agent_service_interoperability_matrix.rb
+      - name: Run all Agent-to-${{ inputs.counterpart }} pairs
+        run: ruby ietf/scripts/run_agent_${{ inputs.counterpart }}_interoperability_matrix.rb
         env:
           AEP_GO_DIR: ${{ github.workspace }}/.interoperability/aep-go
           AEP_JAVA_DIR: ${{ github.workspace }}/.interoperability/aep-java
@@ -132,7 +140,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: aep-agent-service-interoperability
+          name: aep-agent-${{ inputs.counterpart }}-interoperability
           path: .interoperability/reports
           if-no-files-found: error
           retention-days: 30

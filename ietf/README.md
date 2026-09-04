@@ -133,10 +133,17 @@ Conda-managed Python.
 
 ## SDK Interoperability
 
-The manual Agent-to-Service interoperability workflow runs every official
-Agent SDK against every official Service SDK through one canonical ephemeral
-Node.js Platform. It produces JSON, Markdown, and process-log artifacts and
-does not run on pull requests or merges. With prepared SDK repositories beside
-`aep-specs`, run it locally with `make -C ietf agent-service-interoperability`.
+The manual Agent interoperability workflow runs both bounded cross-language
+matrices. Agent-to-Service uses one canonical ephemeral Node.js Platform;
+Agent-to-Platform uses one canonical Node.js Service. Each matrix produces
+JSON, Markdown, and process-log artifacts and does not run on pull requests or
+merges. With prepared SDK repositories beside `aep-specs`, run either matrix
+locally:
+
+```sh
+make -C ietf agent-service-interoperability
+make -C ietf agent-platform-interoperability
+```
+
 `AEP_NODE_DIR`, `AEP_GO_DIR`, `AEP_JAVA_DIR`, `AEP_PYTHON_DIR`, and
 `AEP_RUST_DIR` can select other checkouts.
