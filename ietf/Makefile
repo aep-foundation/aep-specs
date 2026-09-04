@@ -39,7 +39,7 @@ MARKDOWN_TABLE_FILES ?= \
 	$(DRAFTS) \
 	$(EXAMPLES)
 
-.PHONY: check lint check-drafts check-external-section-refs check-vectors check-schemas check-conformance-contracts check-conformance-runner check-published-schemas check-published-conformance check-harness check-registry check-platform-guardrails check-interoperability agent-service-interoperability format render render-drafts render-examples render-schemas render-conformance render-index idnits clean
+.PHONY: check lint check-drafts check-external-section-refs check-vectors check-schemas check-conformance-contracts check-conformance-runner check-published-schemas check-published-conformance check-harness check-registry check-platform-guardrails check-interoperability agent-service-interoperability agent-platform-interoperability format render render-drafts render-examples render-schemas render-conformance render-index idnits clean
 
 check: lint check-vectors check-schemas check-conformance-contracts check-conformance-runner check-published-schemas check-published-conformance check-harness check-registry check-platform-guardrails check-interoperability
 
@@ -79,10 +79,15 @@ check-platform-guardrails:
 	@bundle exec ruby scripts/check_platform_guardrails.rb
 
 check-interoperability:
+	@ruby -c scripts/run_agent_interoperability_matrix.rb
 	@ruby -c scripts/run_agent_service_interoperability_matrix.rb
+	@ruby -c scripts/run_agent_platform_interoperability_matrix.rb
 
 agent-service-interoperability:
 	@ruby scripts/run_agent_service_interoperability_matrix.rb
+
+agent-platform-interoperability:
+	@ruby scripts/run_agent_platform_interoperability_matrix.rb
 
 format:
 	@bundle exec ruby scripts/format_markdown_tables.rb $(MARKDOWN_TABLE_FILES)
