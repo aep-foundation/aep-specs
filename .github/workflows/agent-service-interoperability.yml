@@ -1,0 +1,138 @@
+name: Agent-to-Service Interoperability
+
+on:
+  workflow_dispatch:
+    inputs:
+      node_ref:
+        description: aep-node Git reference
+        default: main
+        required: true
+        type: string
+      go_ref:
+        description: aep-go Git reference
+        default: main
+        required: true
+        type: string
+      java_ref:
+        description: aep-java Git reference
+        default: main
+        required: true
+        type: string
+      python_ref:
+        description: aep-python Git reference
+        default: main
+        required: true
+        type: string
+      rust_ref:
+        description: aep-rust Git reference
+        default: main
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  matrix:
+    runs-on: ubuntu-latest
+    env:
+      RUSTUP_TOOLCHAIN: stable
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/checkout@v7
+        with:
+          repository: aep-foundation/aep-node
+          ref: ${{ inputs.node_ref }}
+          path: .interoperability/aep-node
+
+      - uses: actions/checkout@v7
+        with:
+          repository: aep-foundation/aep-go
+          ref: ${{ inputs.go_ref }}
+          path: .interoperability/aep-go
+
+      - uses: actions/checkout@v7
+        with:
+          repository: aep-foundation/aep-java
+          ref: ${{ inputs.java_ref }}
+          path: .interoperability/aep-java
+
+      - uses: actions/checkout@v7
+        with:
+          repository: aep-foundation/aep-python
+          ref: ${{ inputs.python_ref }}
+          path: .interoperability/aep-python
+
+      - uses: actions/checkout@v7
+        with:
+          repository: aep-foundation/aep-rust
+          ref: ${{ inputs.rust_ref }}
+          path: .interoperability/aep-rust
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 11.1.3
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: .interoperability/aep-node/pnpm-lock.yaml
+
+      - uses: actions/setup-go@v7
+        with:
+          go-version: 1.25.x
+          cache-dependency-path: .interoperability/aep-go/go.sum
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+          cache-dependency-path: .interoperability/aep-java/pom.xml
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+
+      - uses: astral-sh/setup-uv@v10.0.1
+        with:
+          version: "0.11.8"
+          enable-cache: true
+          cache-dependency-glob: .interoperability/aep-python/uv.lock
+
+      - name: Install Rust toolchain
+        run: rustup toolchain install stable --profile minimal
+
+      - name: Prepare SDKs
+        run: |
+          pnpm --dir .interoperability/aep-node install --frozen-lockfile
+          pnpm --dir .interoperability/aep-node build
+          go -C .interoperability/aep-go build ./...
+          .interoperability/aep-java/mvnw --batch-mode --no-transfer-progress \
+            -f .interoperability/aep-java/pom.xml -DskipTests install
+          uv sync --directory .interoperability/aep-python --all-groups --locked --python 3.14
+          cargo build --manifest-path .interoperability/aep-rust/Cargo.toml --workspace --locked
+
+      - name: Run all Agent-to-Service pairs
+        run: ruby ietf/scripts/run_agent_service_interoperability_matrix.rb
+        env:
+          AEP_GO_DIR: ${{ github.workspace }}/.interoperability/aep-go
+          AEP_JAVA_DIR: ${{ github.workspace }}/.interoperability/aep-java
+          AEP_NODE_DIR: ${{ github.workspace }}/.interoperability/aep-node
+          AEP_PYTHON_DIR: ${{ github.workspace }}/.interoperability/aep-python
+          AEP_RUST_DIR: ${{ github.workspace }}/.interoperability/aep-rust
+
+      - name: Upload interoperability report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: aep-agent-service-interoperability
+          path: .interoperability/reports
+          if-no-files-found: error
+          retention-days: 30

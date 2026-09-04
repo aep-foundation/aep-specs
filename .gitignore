@@ -4,3 +4,4 @@ ietf/.venv/
 ietf/.cache/
 ietf/vendor/
 artifacts/
+.interoperability/

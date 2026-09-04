@@ -130,3 +130,13 @@ Use a Python environment that can load Homebrew native libraries. If PDF
 rendering reports missing libraries such as `libgobject-2.0-0`, recreate the
 virtual environment with Homebrew Python or another system Python instead of a
 Conda-managed Python.
+
+## SDK Interoperability
+
+The manual Agent-to-Service interoperability workflow runs every official
+Agent SDK against every official Service SDK through one canonical ephemeral
+Node.js Platform. It produces JSON, Markdown, and process-log artifacts and
+does not run on pull requests or merges. With prepared SDK repositories beside
+`aep-specs`, run it locally with `make -C ietf agent-service-interoperability`.
+`AEP_NODE_DIR`, `AEP_GO_DIR`, `AEP_JAVA_DIR`, `AEP_PYTHON_DIR`, and
+`AEP_RUST_DIR` can select other checkouts.
