@@ -122,15 +122,16 @@ release.
 
 ## Reference Resources
 
-| Resource           | Best for                                                                  | Link                                                                                 |
-| ------------------ | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| Complete draft set | Core, claims, identity method, Platform, and session-credential documents | [Published specification site](https://www.aep.foundation/)                          |
-| Rendered artifacts | HTML, text, XML, and PDF builds of every draft                            | [Latest GitHub release](https://github.com/aep-foundation/aep-specs/releases/latest) |
-| Implementer guide  | A practical route through the drafts and support artifacts                | [Implementer guide](./ietf/guides/implementer-guide.md)                              |
-| Protocol examples  | Inspect documents and complete HTTP transcripts                           | [Examples](https://www.aep.foundation/examples/)                                     |
-| JSON Schemas       | Machine-readable validation of stable wire objects                        | [Published schemas](https://www.aep.foundation/schemas/)                             |
-| Test vectors       | Positive and negative implementation cases                                | [Test vectors](./ietf/test-vectors)                                                  |
-| Node.js SDK        | Reference TypeScript implementation and runnable applications             | [`aep-node`](https://github.com/aep-foundation/aep-node)                             |
+| Resource           | Best for                                                                   | Link                                                                                 |
+| ------------------ | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Complete draft set | Core, claims, identity method, Platform, and session-credential documents  | [Published specification site](https://www.aep.foundation/)                          |
+| Rendered artifacts | HTML, text, XML, and PDF builds of every draft                             | [Latest GitHub release](https://github.com/aep-foundation/aep-specs/releases/latest) |
+| Implementer guide  | A practical route through the drafts and support artifacts                 | [Implementer guide](./ietf/guides/implementer-guide.md)                              |
+| Protocol examples  | Inspect documents and complete HTTP transcripts                            | [Examples](https://www.aep.foundation/examples/)                                     |
+| JSON Schemas       | Machine-readable validation of stable wire objects                         | [Published schemas](https://www.aep.foundation/schemas/)                             |
+| Test vectors       | Positive and negative implementation cases                                 | [Test vectors](./ietf/test-vectors)                                                  |
+| SDK support        | Official languages, compatibility, releases, and interoperability evidence | [SDK support policy](./SDK_SUPPORT.md)                                               |
+| Node.js SDK        | Reference TypeScript implementation and runnable applications              | [`aep-node`](https://github.com/aep-foundation/aep-node)                             |
 
 Internet-Draft prose is normative. Schemas, examples, registries, and test
 vectors are implementation support artifacts and do not replace the

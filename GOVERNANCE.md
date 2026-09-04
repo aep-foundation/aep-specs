@@ -42,6 +42,11 @@ Protocol compatibility is evaluated from the wire behavior, not from repository
 file churn. A support artifact can change without changing the protocol version
 when it only improves validation, documentation, examples, or generated output.
 
+Official SDK package versions are independent from the protocol version and from
+one another. Matching SDK versions do not establish compatibility. The current
+language, release, maintenance, and conformance policy is documented in
+[SDK_SUPPORT.md](./SDK_SUPPORT.md).
+
 ## Artifact Compatibility
 
 | Artifact        | Compatibility rule                                                                                                                 |

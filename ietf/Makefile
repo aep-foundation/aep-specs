@@ -22,6 +22,7 @@ IDNITS := idnits
 MARKDOWN_TABLE_FILES ?= \
 	../README.md \
 	../GOVERNANCE.md \
+	../SDK_SUPPORT.md \
 	README.md \
 	STYLE.md \
 	specs/README.md \
