@@ -40,7 +40,9 @@ For each revised draft:
 
 1. Rename its Markdown file from `-NN.md` to `-(NN+1).md`.
 2. Update the frontmatter `docname` to the same full document name.
-3. Set the frontmatter `date` to the intended submission date.
+3. Set the frontmatter `date` to the intended submission date. The date for every draft being
+   submitted must be within three days of the actual Datatracker upload date. Update and render the
+   draft again if submission is delayed beyond that window.
 4. Update references to revised dependent drafts, including the reference `date` and `seriesinfo`
    revision.
 5. Re-read the complete draft and confirm the revision contains only intended current-state text.
@@ -102,9 +104,12 @@ Then:
 
 1. Repeat the repository-wide searches for the old full document name and old shortened revision.
 2. Confirm every remaining match is intentionally historical.
-3. Inspect the rendered text for the expected title, date, revision, references, and abstract.
-4. Inspect the complete Git diff, including generated files.
-5. Run `make -C ietf render` again and confirm it does not produce additional committed changes.
+3. Confirm each draft being submitted has a top-level publication date within three days of the
+   planned Datatracker upload. Do not change dates within bibliographic references unless the
+   referenced publication changed.
+4. Inspect the rendered text for the expected title, date, revision, references, and abstract.
+5. Inspect the complete Git diff, including generated files.
+6. Run `make -C ietf render` again and confirm it does not produce additional committed changes.
 
 Do not treat a successful renderer as proof that repository references, registries, vectors,
 allowlists, or InFlow-generated draft pages are current. The final searches and diff review are
@@ -130,9 +135,12 @@ exact artifacts rendered from the merged commit.
 
 Submit the rendered XML files to IETF Datatracker in dependency order. For every submission:
 
-1. Confirm Datatracker accepted the intended revision.
-2. Confirm the published title, date, abstract, and references.
-3. Record the merged repository commit that produced the artifact.
+1. Recheck that the draft's top-level date is within three days of the current date. If it is not,
+   update the source date, repeat rendering and validation, and merge the corrected source before
+   uploading it.
+2. Confirm Datatracker accepted the intended revision.
+3. Confirm the published title, date, abstract, and references.
+4. Record the merged repository commit that produced the artifact.
 
 Do not submit dependent drafts until their referenced AEP revisions are available when that ordering
 is necessary for accurate publication metadata.
