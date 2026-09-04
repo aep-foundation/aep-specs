@@ -10,3 +10,5 @@ protocol requirements.
   credential selection, and revocation strategy.
 - `internet-draft-addition-guide.md`: reusable checklist for adding or
   preparing an AEP Internet-Draft for IETF posting.
+- `internet-draft-revision-guide.md`: end-to-end process for advancing and
+  publishing revisions of existing AEP Internet-Drafts.

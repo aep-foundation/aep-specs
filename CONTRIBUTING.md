@@ -28,10 +28,11 @@ Before submitting a pull request:
 5. Confirm no internal roadmap, private partner context, or speculative launch
    language appears in public specification files.
 
-For a new Internet-Draft or a draft being prepared for IETF posting, follow
-`ietf/guides/internet-draft-addition-guide.md` before treating the work as
-publication-ready. Temporary active work may also have a root `_TASKS.md` queue
-under `ietf/`.
+For a new Internet-Draft, follow `ietf/guides/internet-draft-addition-guide.md`.
+For a new revision of a published draft, follow
+`ietf/guides/internet-draft-revision-guide.md`. Complete the applicable guide
+before treating the work as publication-ready. Temporary active work may also
+have a root `_TASKS.md` queue under `ietf/`.
 
 ## Types of Changes
 
