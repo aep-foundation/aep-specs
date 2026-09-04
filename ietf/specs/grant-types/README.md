@@ -11,5 +11,5 @@ default. A Service advertises only enabled grant types in
 Current grant type draft sources:
 
 - `draft-kavian-aep-api-key-session-credential-04.md`
-- `draft-kavian-aep-basic-session-credential-03.md`
-- `draft-kavian-aep-oauth-session-credential-03.md`
+- `draft-kavian-aep-basic-session-credential-04.md`
+- `draft-kavian-aep-oauth-session-credential-04.md`
