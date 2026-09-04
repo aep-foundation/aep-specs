@@ -29,3 +29,10 @@ review it.
 
 Security fixes may be handled through private coordination first, followed by a
 public pull request or advisory when appropriate.
+
+## Supported Versions
+
+Security fixes are applied to the current published specification revision and
+the latest stable release of each official SDK unless its release notes state
+otherwise. [SDK_SUPPORT.md](./SDK_SUPPORT.md) identifies the official SDKs and
+their maintenance policy.
