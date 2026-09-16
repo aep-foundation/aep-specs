@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AEP Specification Governance - AEP Foundation</title>
+    <style>
+      :root { color-scheme: light; --border: #d7dde5; --code: #f4f7fb; --fg: #17202a; --link: #0f5e9c; --muted: #5c6b7a; }
+      body { color: var(--fg); font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; line-height: 1.55; margin: 0; }
+      main { margin: 0 auto; max-width: 960px; padding: 40px 20px 64px; }
+      a { color: var(--link); }
+      h1 { font-size: 2rem; line-height: 1.2; margin: 0 0 12px; }
+      h2 { border-top: 1px solid var(--border); font-size: 1.25rem; margin-top: 32px; padding-top: 24px; }
+      p { max-width: 760px; }
+      table { border: 1px solid var(--border); border-collapse: collapse; margin-top: 24px; width: 100%; }
+      th, td { border-bottom: 1px solid var(--border); padding: 12px; text-align: left; vertical-align: top; }
+      tbody tr:last-child td { border-bottom: 0; }
+      th { color: var(--muted); font-size: 0.9rem; }
+      pre { background: var(--code); border: 1px solid var(--border); overflow-x: auto; padding: 14px; }
+      code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.92em; }
+      .introduction { color: var(--muted); }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>AEP Specification Governance</h1>
+      <p class="introduction">Non-normative AEP implementation guidance.</p>
+      <p>This document describes how the AEP specification set evolves in this<br />
+repository. It is project governance, not protocol text. The Internet-Draft<br />
+documents remain authoritative for protocol requirements.</p>
+
+<h2 id="scope">Scope</h2>
+
+<p>This repository maintains:</p>
+
+<ul>
+  <li>Internet-Draft sources under <code>ietf/specs/</code>.</li>
+  <li>Non-normative guides under <code>ietf/guides/</code>.</li>
+  <li>Conformance notes under <code>ietf/conformance/</code>.</li>
+  <li>Test vectors under <code>ietf/test-vectors/</code>.</li>
+  <li>JSON Schemas under <code>ietf/schemas/</code>, with public copies under<br />
+<code>docs/schemas/</code>.</li>
+  <li>Public website content under <code>docs/</code>.</li>
+</ul>
+
+<h2 id="change-classes">Change Classes</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Change class</th>
+      <th>Examples</th>
+      <th>Review expectation</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Editorial</td>
+      <td>Typos, wording cleanup, broken links, generated index refreshes</td>
+      <td>Low risk; normal review</td>
+    </tr>
+    <tr>
+      <td>Support artifact</td>
+      <td>Examples, guides, schemas, vectors, harness checks</td>
+      <td>Verify with <code>make -C ietf check</code></td>
+    </tr>
+    <tr>
+      <td>Clarification</td>
+      <td>Resolves ambiguous draft text without changing intended behavior</td>
+      <td>Check examples, schemas, and vectors for alignment</td>
+    </tr>
+    <tr>
+      <td>Protocol behavior</td>
+      <td>Adds or changes command behavior, wire fields, error handling, registries, or security requirements</td>
+      <td>Requires careful draft review and compatibility analysis</td>
+    </tr>
+    <tr>
+      <td>Feature</td>
+      <td>Adds an AEP-defined grant type, binding, identity method, or other optional capability</td>
+      <td>Requires registry review when a registry exists</td>
+    </tr>
+    <tr>
+      <td>Extension</td>
+      <td>Adds a policy model, attestation model, proof model, third-party capability, or other large module</td>
+      <td>Requires extension registration review</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="versioning-and-compatibility">Versioning And Compatibility</h2>
+
+<p>AEP uses loose protocol semver for AEP-owned protocol versions and extension<br />
+versions.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Version component</th>
+      <th>Use</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>PATCH</td>
+      <td>Editorial corrections and non-normative support fixes with no protocol behavior change.</td>
+    </tr>
+    <tr>
+      <td>MINOR</td>
+      <td>New optional fields, new optional commands, new extensions, and security- or interoperability-driven corrections that may require implementation changes.</td>
+    </tr>
+    <tr>
+      <td>MAJOR</td>
+      <td>Wire-format epochs, large architectural shifts, or removal of core protocol capabilities.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Protocol compatibility is evaluated from the wire behavior, not from repository<br />
+file churn. A support artifact can change without changing the protocol version<br />
+when it only improves validation, documentation, examples, or generated output.</p>
+
+<p>Official SDK package versions are independent from the protocol version and from<br />
+one another. Matching SDK versions do not establish compatibility. The current<br />
+language, release, maintenance, and conformance policy is documented in<br />
+<a href="./SDK_SUPPORT.md">SDK_SUPPORT.md</a>.</p>
+
+<h2 id="artifact-compatibility">Artifact Compatibility</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Artifact</th>
+      <th>Compatibility rule</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Internet-Drafts</td>
+      <td>Draft text is authoritative. Behavior-changing edits need compatibility review.</td>
+    </tr>
+    <tr>
+      <td>JSON Schemas</td>
+      <td>Schemas validate stable wire objects. Tightening schemas can affect implementers and needs review against draft prose.</td>
+    </tr>
+    <tr>
+      <td>Test vectors</td>
+      <td>Vectors encode expected behavior. Existing vector changes should be treated as compatibility-affecting unless correcting an error.</td>
+    </tr>
+    <tr>
+      <td>Examples</td>
+      <td>Examples are non-normative. They should stay aligned with drafts, schemas, and vectors.</td>
+    </tr>
+    <tr>
+      <td>Guides</td>
+      <td>Guides are non-normative. Conflicts with drafts are resolved in favor of drafts.</td>
+    </tr>
+    <tr>
+      <td>Rendered site</td>
+      <td>Generated site changes are publication artifacts and should be reproducible from source.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="publication-model">Publication Model</h2>
+
+<p>The <code>ietf/</code> directory is the source for specifications and support material.<br />
+The <code>docs/</code> directory is the GitHub Pages site.</p>
+
+<p>Rendered Internet-Draft artifacts are published as GitHub Release assets rather<br />
+than committed binaries. JSON Schemas are committed under <code>docs/schemas/</code><br />
+because their <code>$id</code> values use stable <code>https://www.aep.foundation/schemas/...</code><br />
+URLs.</p>
+
+<h2 id="required-checks">Required Checks</h2>
+
+<p>Run:</p>
+
+<pre><code class="language-sh">make -C ietf check
+</code></pre>
+
+<p>The check target validates draft structure, external section references, test<br />
+vectors, JSON Schema mappings, published schema copies, and offline conformance<br />
+fixture semantics.</p>
+
+<p>When generated website files are affected, regenerate the relevant artifact:</p>
+
+<pre><code class="language-sh">make -C ietf render-index
+make -C ietf render-examples
+make -C ietf render-schemas
+</code></pre>
+
+<h2 id="review-expectations">Review Expectations</h2>
+
+<p>Specification changes should answer:</p>
+
+<ul>
+  <li>Does the change alter wire behavior?</li>
+  <li>Does it affect Agent or Service interoperability?</li>
+  <li>Does it affect security, privacy, anti-enumeration, replay handling, or<br />
+credential leakage risk?</li>
+  <li>Do examples, schemas, vectors, and the harness still match the draft text?</li>
+  <li>Does the change require an extension registration or registry update?</li>
+</ul>
+
+<p>Behavior-changing changes should include updates to relevant support artifacts<br />
+in the same pull request when practical.</p>
+
+<h2 id="ietf-relationship">IETF Relationship</h2>
+
+<p>The repository may contain working material that supports IETF drafts, but the<br />
+IETF process controls eventual standardization. When draft text and repository<br />
+guidance disagree, draft text is corrected through normal review. When an IETF<br />
+working group or designated experts define a different registration or review<br />
+process, that process takes precedence for the affected registry or document.</p>
+    </main>
+  </body>
+</html>

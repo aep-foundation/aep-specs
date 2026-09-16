@@ -1,0 +1,36 @@
+{
+  "id": "invalid-country-shape",
+  "title": "Country code with the wrong wire shape",
+  "description": "A lowercase country code is rejected because the wire shape requires two uppercase ASCII letters.",
+  "drafts": [
+    "draft-kavian-aep-claims-01"
+  ],
+  "category": "claims",
+  "applicability": {
+    "agent": {
+      "expectation": "required",
+      "profile": "claims"
+    },
+    "platform": {
+      "expectation": "unsupported"
+    },
+    "service": {
+      "expectation": "required",
+      "profile": "claims"
+    }
+  },
+  "input": {
+    "claim_values": {
+      "contact.address.primary": {
+        "city": "San Francisco",
+        "country": "us",
+        "first_name": "Grace",
+        "last_name": "Hopper",
+        "line1": "123 Market Street"
+      }
+    }
+  },
+  "expected": {
+    "valid": false
+  }
+}

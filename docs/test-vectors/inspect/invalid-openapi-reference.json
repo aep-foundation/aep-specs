@@ -1,0 +1,40 @@
+{
+  "id": "invalid-openapi-reference",
+  "title": "Inspect document using an invalid OpenAPI reference",
+  "description": "The advertised OpenAPI URL is a valid URI-reference.",
+  "drafts": [
+    "draft-kavian-agent-enrollment-protocol-04",
+    "draft-kavian-aep-did-web-identity-method-00"
+  ],
+  "category": "inspect",
+  "applicability": {
+    "agent": {
+      "expectation": "required",
+      "profile": "core-http"
+    },
+    "platform": {
+      "expectation": "unsupported"
+    },
+    "service": {
+      "expectation": "required",
+      "profile": "core-http"
+    }
+  },
+  "input": {
+    "document": {
+      "aep_version": "1.0",
+      "bindings": {"supported": ["http"]},
+      "commands": {"supported": ["inspect"]},
+      "core": {"signing_algorithms": ["EdDSA", "ES256"]},
+      "http": {
+        "openapi": {
+          "path_matching": {"trailing_slash": "strict"},
+          "url": "not a URI"
+        }
+      },
+      "identity": {"methods": []},
+      "service": {"did": "did:web:api.example.com"}
+    }
+  },
+  "expected": {"valid": false}
+}

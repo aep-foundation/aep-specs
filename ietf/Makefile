@@ -40,9 +40,9 @@ MARKDOWN_TABLE_FILES ?= \
 	$(DRAFTS) \
 	$(EXAMPLES)
 
-.PHONY: check lint check-drafts check-external-section-refs check-vectors check-schemas check-conformance-contracts check-conformance-runner check-published-schemas check-published-conformance check-harness check-registry check-platform-guardrails check-interoperability agent-service-interoperability agent-platform-interoperability format render render-drafts render-examples render-schemas render-conformance render-index idnits clean
+.PHONY: check lint check-drafts check-external-section-refs check-vectors check-schemas check-conformance-contracts check-conformance-runner check-published-schemas check-published-conformance check-published-support check-harness check-registry check-platform-guardrails check-interoperability agent-service-interoperability agent-platform-interoperability format render render-drafts render-examples render-schemas render-conformance render-index render-support idnits clean
 
-check: lint check-vectors check-schemas check-conformance-contracts check-conformance-runner check-published-schemas check-published-conformance check-harness check-registry check-platform-guardrails check-interoperability
+check: lint check-vectors check-schemas check-conformance-contracts check-conformance-runner check-published-support check-harness check-registry check-platform-guardrails check-interoperability
 
 lint: check-drafts check-external-section-refs
 
@@ -70,6 +70,11 @@ check-published-schemas:
 check-published-conformance:
 	@bundle exec ruby scripts/publish_schemas.rb --check conformance "$(CONFORMANCE_ARTIFACTS)"
 
+check-published-support:
+	@bundle exec ruby scripts/publish_schemas.rb --check schemas "$(SCHEMA_ARTIFACTS)"
+	@bundle exec ruby scripts/publish_schemas.rb --check conformance "$(CONFORMANCE_ARTIFACTS)"
+	@bundle exec ruby scripts/publish_support_artifacts.rb --check
+
 check-harness:
 	@bundle exec ruby scripts/check_conformance_harness.rb
 
@@ -93,7 +98,7 @@ agent-platform-interoperability:
 format:
 	@bundle exec ruby scripts/format_markdown_tables.rb $(MARKDOWN_TABLE_FILES)
 
-render: render-drafts render-examples render-schemas render-conformance render-index
+render: render-drafts render-support render-index
 
 render-drafts:
 	@$(KRAMDOWN_RFC) --version >/dev/null || { echo "kramdown-rfc is required for render; run bundle install"; exit 1; }
@@ -117,6 +122,10 @@ render-schemas:
 
 render-conformance:
 	@bundle exec ruby scripts/publish_schemas.rb conformance "$(CONFORMANCE_ARTIFACTS)"
+
+render-support:
+	@$(MAKE) render-examples render-schemas render-conformance
+	@bundle exec ruby scripts/publish_support_artifacts.rb
 
 render-index:
 	@bundle exec ruby scripts/render_index.rb $(DRAFTS) "$(INDEX_ARTIFACT)"

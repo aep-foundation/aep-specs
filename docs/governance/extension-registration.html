@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AEP Extension Registration Guidance - AEP Foundation</title>
+    <style>
+      :root { color-scheme: light; --border: #d7dde5; --code: #f4f7fb; --fg: #17202a; --link: #0f5e9c; --muted: #5c6b7a; }
+      body { color: var(--fg); font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; line-height: 1.55; margin: 0; }
+      main { margin: 0 auto; max-width: 960px; padding: 40px 20px 64px; }
+      a { color: var(--link); }
+      h1 { font-size: 2rem; line-height: 1.2; margin: 0 0 12px; }
+      h2 { border-top: 1px solid var(--border); font-size: 1.25rem; margin-top: 32px; padding-top: 24px; }
+      p { max-width: 760px; }
+      table { border: 1px solid var(--border); border-collapse: collapse; margin-top: 24px; width: 100%; }
+      th, td { border-bottom: 1px solid var(--border); padding: 12px; text-align: left; vertical-align: top; }
+      tbody tr:last-child td { border-bottom: 0; }
+      th { color: var(--muted); font-size: 0.9rem; }
+      pre { background: var(--code); border: 1px solid var(--border); overflow-x: auto; padding: 14px; }
+      code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.92em; }
+      .introduction { color: var(--muted); }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>AEP Extension Registration Guidance</h1>
+      <p class="introduction">Non-normative AEP implementation guidance.</p>
+      <p>This document is non-normative governance support. The IANA Considerations<br />
+sections of published RFCs are authoritative once registries are established.</p>
+
+<h2 id="extension-identifiers">Extension Identifiers</h2>
+
+<p>AEP extension identifiers are absolute URIs. AEP-owned extension identifiers<br />
+use:</p>
+
+<pre><code class="language-text">urn:aep:ext:&lt;authority&gt;:&lt;name&gt;#v=&lt;MAJOR&gt;.&lt;MINOR&gt;.&lt;PATCH&gt;
+</code></pre>
+
+<p>The base URN identifies the extension. The <code>v</code> fragment selects the extension<br />
+version. Future fragment parameters use <code>&amp;</code> separators.</p>
+
+<h2 id="registration-classes">Registration Classes</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Registration class</th>
+      <th>Examples</th>
+      <th>Expected document</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Command extension</td>
+      <td>Lifecycle commands, audit export</td>
+      <td>Internet-Draft or equivalent stable specification</td>
+    </tr>
+    <tr>
+      <td>Grant type</td>
+      <td><code>oauth-bearer</code>, <code>api-key</code>, <code>basic</code></td>
+      <td>Grant/Revoke credential specification</td>
+    </tr>
+    <tr>
+      <td>Binding</td>
+      <td>HTTP, MCP, WebSocket, SSE</td>
+      <td>Binding specification</td>
+    </tr>
+    <tr>
+      <td>Identity method profile</td>
+      <td>DID method profiles beyond <code>did:web</code></td>
+      <td>Identity method specification</td>
+    </tr>
+    <tr>
+      <td>Policy or claim extension</td>
+      <td>Privacy preference, data residency, KYA</td>
+      <td>Extension specification</td>
+    </tr>
+    <tr>
+      <td>Proof or attestation profile</td>
+      <td>ZK proof type, runtime attestation</td>
+      <td>Profile specification</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="grant-type-registration-requirements">Grant Type Registration Requirements</h2>
+
+<p>A grant type specification should define:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Requirement</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Identifier</td>
+      <td>Lowercase hyphenated <code>grant_type</code> string.</td>
+    </tr>
+    <tr>
+      <td>Inspect advertisement</td>
+      <td>Required <code>commands.grant_types</code> value and optional <code>commands.grant_types_config</code> fields.</td>
+    </tr>
+    <tr>
+      <td>Grant request</td>
+      <td>Required and optional request fields beyond <code>grant_type</code>.</td>
+    </tr>
+    <tr>
+      <td>Grant response</td>
+      <td>Response fields, required secrets, identifiers, expiry, and scope behavior.</td>
+    </tr>
+    <tr>
+      <td>Presentation</td>
+      <td>How the credential is presented to resource endpoints.</td>
+    </tr>
+    <tr>
+      <td>Expiry</td>
+      <td>Required expiry semantics and timestamp fields.</td>
+    </tr>
+    <tr>
+      <td>Revoke</td>
+      <td>Grant-type Revoke, optional per-credential Revoke, and interaction with <code>all_grant_types</code>.</td>
+    </tr>
+    <tr>
+      <td>Errors</td>
+      <td>Any additional error behavior beyond the core error vocabulary.</td>
+    </tr>
+    <tr>
+      <td>Security</td>
+      <td>Storage, leakage, entropy, logging, replay, and audience-binding considerations.</td>
+    </tr>
+    <tr>
+      <td>Privacy</td>
+      <td>Correlation and data-minimization considerations.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="claim-name-registration-requirements">Claim Name Registration Requirements</h2>
+
+<p>A Claim Name specification should define:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Requirement</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Claim Name</td>
+      <td>Stable dotted lowercase identifier.</td>
+    </tr>
+    <tr>
+      <td>Value type</td>
+      <td>JSON value type and complete shape for structured values.</td>
+    </tr>
+    <tr>
+      <td>Compatibility</td>
+      <td>Unknown-name and unknown-object-member behavior.</td>
+    </tr>
+    <tr>
+      <td>Validation</td>
+      <td>Required members, syntax, and error behavior.</td>
+    </tr>
+    <tr>
+      <td>Privacy</td>
+      <td>Collection, disclosure, retention, logging, and correlation risks.</td>
+    </tr>
+    <tr>
+      <td>Security</td>
+      <td>Trust level, verification status, and unsafe-input handling.</td>
+    </tr>
+    <tr>
+      <td>Support artifacts</td>
+      <td>Schema, positive and negative vectors, and conformance checks.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="compatibility-expectations">Compatibility Expectations</h2>
+
+<p>Extensions are additive. They must not redefine core command semantics, core<br />
+field names, status values, error codes, authentication rules, or media types.</p>
+
+<p>An extension can add:</p>
+
+<ul>
+  <li>New Inspect fields.</li>
+  <li>New <code>commands.grant_types_config</code> fields.</li>
+  <li>New request or response fields scoped to its command or grant type.</li>
+  <li>New extension identifiers.</li>
+  <li>New test vectors, schemas, examples, and conformance harness checks.</li>
+</ul>
+
+<p>An extension should preserve forward compatibility by requiring Agents and<br />
+Services to ignore unknown additive fields unless local policy requires<br />
+rejection.</p>
+
+<h2 id="review-checklist">Review Checklist</h2>
+
+<p>Before adding an extension, verify:</p>
+
+<ul>
+  <li>The extension has a stable identifier.</li>
+  <li>The extension does not duplicate an existing extension.</li>
+  <li>Wire identifiers use lowercase hyphenated tokens.</li>
+  <li>Field names use <code>lower_snake_case</code>.</li>
+  <li>AEP-owned numeric values are JSON strings.</li>
+  <li>Timestamps use RFC 3339 strings.</li>
+  <li>Required security and privacy considerations are explicit.</li>
+  <li>Examples, schemas, vectors, and harness checks are included when the wire<br />
+behavior is stable enough to test.</li>
+</ul>
+
+<h2 id="temporary-repository-registration">Temporary Repository Registration</h2>
+
+<p>Until formal IANA registries exist, repository review should treat the published<br />
+drafts and this guidance as the temporary registration process. Once IANA<br />
+registries are created, the IANA registry contents and designated expert review<br />
+process supersede this temporary repository guidance.</p>
+
+<p>Repository-local registry entries live in <code>ietf/registry/</code>. They are validated<br />
+by:</p>
+
+<pre><code class="language-sh">make -C ietf check-registry
+</code></pre>
+    </main>
+  </body>
+</html>
