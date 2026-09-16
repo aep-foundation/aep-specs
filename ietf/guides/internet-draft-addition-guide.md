@@ -246,13 +246,14 @@ Update:
 - `ietf/schemas/README.md`
 - `ietf/test-vectors/README.md`
 - `CONTRIBUTING.md` if the workflow changes
-- generated `docs/index.html`
+- AEP website protocol and draft-page links in `inflow-server`
 - generated schema docs and copies
 
 Exit criteria:
 
 - A reader can discover the draft from the root README and IETF README.
-- Website index points to the stable, unnumbered release asset names.
+- Website protocol and draft pages point to the stable, unnumbered release
+  asset names.
 - No public documentation points to an old filename, old folder, or old draft
   classification.
 - The deployment workflow publishes both the immutable versioned artifacts and
@@ -264,7 +265,6 @@ Run:
 
 ```sh
 make -C ietf format
-make -C ietf render-index
 make -C ietf render-schemas
 make -C ietf render-drafts
 ```

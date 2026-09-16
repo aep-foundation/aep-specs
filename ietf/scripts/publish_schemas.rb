@@ -5,6 +5,7 @@ require "cgi"
 require "fileutils"
 require "json"
 require "pathname"
+require_relative "support_page"
 
 check_only = ARGV.delete("--check")
 source = Pathname.new(ARGV[0] || "")
@@ -26,7 +27,7 @@ rescue JSON::ParserError => e
   abort "#{path}: invalid JSON: #{e.message}"
 end
 
-def render_index(schema_paths)
+def render_index(schema_paths, source)
   rows = schema_paths.map do |path|
     name = path.basename.to_s
     title = schema_title(path)
@@ -39,123 +40,19 @@ def render_index(schema_paths)
     HTML
   end.join
 
-  <<~HTML
-    <!doctype html>
-    <html lang="en">
-      <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>AEP JSON Schemas</title>
-        <style>
-          :root {
-            color-scheme: light dark;
-            --bg: #f8fafc;
-            --fg: #172033;
-            --muted: #5b6475;
-            --panel: #ffffff;
-            --border: #d7dce5;
-            --link: #0b5cad;
-          }
-
-          @media (prefers-color-scheme: dark) {
-            :root {
-              --bg: #10141c;
-              --fg: #eef2f8;
-              --muted: #aeb7c8;
-              --panel: #171d28;
-              --border: #2d3545;
-              --link: #8ab8ff;
-            }
-          }
-
-          body {
-            margin: 0;
-            background: var(--bg);
-            color: var(--fg);
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            line-height: 1.5;
-          }
-
-          main {
-            width: min(920px, calc(100% - 32px));
-            margin: 0 auto;
-            padding: 48px 0;
-          }
-
-          h1 {
-            margin: 0 0 8px;
-            font-size: clamp(2rem, 6vw, 3.2rem);
-            line-height: 1.05;
-          }
-
-          p {
-            max-width: 760px;
-            color: var(--muted);
-          }
-
-          a {
-            color: var(--link);
-          }
-
-          table {
-            width: 100%;
-            border-collapse: collapse;
-            background: var(--panel);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            overflow: hidden;
-          }
-
-          th,
-          td {
-            padding: 12px;
-            border-bottom: 1px solid var(--border);
-            text-align: left;
-            vertical-align: top;
-          }
-
-          tbody tr:last-child td {
-            border-bottom: none;
-          }
-
-          th {
-            font-size: 0.9rem;
-            color: var(--muted);
-          }
-
-          code {
-            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-          }
-        </style>
-      </head>
-      <body>
-        <main>
-          <h1>AEP JSON Schemas</h1>
-          <p>
-            JSON Schemas for stable Agent Enrollment Protocol wire objects.
-            The Internet-Draft prose remains authoritative.
-          </p>
-          <table>
-            <thead>
-              <tr>
-                <th>Schema</th>
-                <th>Title</th>
-              </tr>
-            </thead>
-            <tbody>
-    #{rows}
-            </tbody>
-          </table>
-        </main>
-      </body>
-    </html>
-  HTML
+  title, introduction = if source.basename.to_s == "conformance"
+    ["AEP Conformance Schemas", "JSON Schemas for the offline AEP conformance harness. These documents are not AEP wire objects."]
+  else
+    ["AEP JSON Schemas", "JSON Schemas for stable Agent Enrollment Protocol wire objects. The Internet-Draft prose remains authoritative."]
+  end
+  table = "<table><thead><tr><th>Schema</th><th>Title</th></tr></thead><tbody>#{rows}</tbody></table>"
+  SupportPage.with_path(SupportPage.render(title, introduction, table), "/#{source.basename}/")
 end
 
 expected = schema_paths.to_h do |path|
   [path.basename.to_s, path.read]
 end
-expected["index.html"] = render_index(schema_paths)
+expected["index.html"] = render_index(schema_paths, source)
 
 if check_only
   errors = []

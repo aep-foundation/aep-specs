@@ -5,6 +5,7 @@ require "cgi"
 require "fileutils"
 require "kramdown"
 require "pathname"
+require_relative "support_page"
 
 check_only = ARGV.delete("--check")
 section = ARGV.shift || "all"
@@ -20,39 +21,16 @@ def h(value)
 end
 
 def page(title, introduction, body)
-  <<~HTML
-    <!doctype html>
-    <html lang="en">
-      <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>#{h(title)} - AEP Foundation</title>
-        <style>
-          :root { color-scheme: light; --border: #d7dde5; --code: #f4f7fb; --fg: #17202a; --link: #0f5e9c; --muted: #5c6b7a; }
-          body { color: var(--fg); font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; line-height: 1.55; margin: 0; }
-          main { margin: 0 auto; max-width: 960px; padding: 40px 20px 64px; }
-          a { color: var(--link); }
-          h1 { font-size: 2rem; line-height: 1.2; margin: 0 0 12px; }
-          h2 { border-top: 1px solid var(--border); font-size: 1.25rem; margin-top: 32px; padding-top: 24px; }
-          p { max-width: 760px; }
-          table { border: 1px solid var(--border); border-collapse: collapse; margin-top: 24px; width: 100%; }
-          th, td { border-bottom: 1px solid var(--border); padding: 12px; text-align: left; vertical-align: top; }
-          tbody tr:last-child td { border-bottom: 0; }
-          th { color: var(--muted); font-size: 0.9rem; }
-          pre { background: var(--code); border: 1px solid var(--border); overflow-x: auto; padding: 14px; }
-          code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.92em; }
-          .introduction { color: var(--muted); }
-        </style>
-      </head>
-      <body>
-        <main>
-          <h1>#{h(title)}</h1>
-          <p class="introduction">#{h(introduction)}</p>
-          #{body.strip}
-        </main>
-      </body>
-    </html>
-  HTML
+  SupportPage.render(title, introduction, body.strip)
+end
+
+def page_paths(artifacts, section)
+  artifacts.to_h do |relative, content|
+    next [relative, content] unless relative.end_with?(".html")
+
+    path = relative.end_with?("index.html") ? "/#{section}/#{relative.delete_suffix('index.html')}" : "/#{section}/#{relative}"
+    [relative, SupportPage.with_path(content, path)]
+  end
 end
 
 def table(headers, rows)
@@ -170,7 +148,7 @@ generators = {
 
 selected = section == "all" ? generators : generators.slice(section)
 errors = selected.flat_map do |name, generator|
-  synchronize(DOCS_ROOT.join(name), generator.call, check_only, preserve_unmanaged: name == "examples")
+  synchronize(DOCS_ROOT.join(name), page_paths(generator.call, name), check_only, preserve_unmanaged: name == "examples")
 end
 
 if errors.empty?

@@ -1,0 +1,24 @@
+# Agent Enrollment Protocol
+
+> AEP lets Agents enroll with Services, check enrollment status, and obtain supported session credentials.
+
+For application integration, follow the guided workflow. It first establishes
+whether the application acts as an Agent, a Service, or both, then assesses the
+repository and proposes an approved, stepwise plan.
+
+## Integration
+
+- [Guided AEP integration](https://www.aep.foundation/integration.md): Start or expand an AEP integration.
+- [Integration plan template](https://www.aep.foundation/integration-queue-template.md): Maintain AEP-INTEGRATION-PLAN.md from repository confirmation onward.
+- [Coding agents](https://www.aep.foundation/documentation/quick-start/coding-agents/): Developer instructions and a copyable prompt.
+
+## Reference
+
+- [Documentation](https://www.aep.foundation/documentation/): Concepts, role-specific guides, and SDK documentation.
+- [Specifications](https://www.aep.foundation/protocol/): Core, identity, claims, and session-credential requirements.
+- [Official SDK repositories](https://github.com/aep-foundation): Select the SDK matching the application.
+
+## Separate integrations
+
+- [ODP integration](https://www.offeringprotocol.org/integration.md): Catalog discovery.
+- [InFlow Payments integration](https://app.inflowpay.ai/integration.md): MPP and x402 payments.

@@ -9,7 +9,7 @@ output = ARGV.shift
 abort "usage: render_protocol_support_tree.rb [--check] OUTPUT" unless output && ARGV.empty?
 
 IETF_ROOT = Pathname.new(__dir__).join("..").expand_path
-ASSET_PATH = '#{onboardingPath}'
+ASSET_PATH = '#{onboardingAssetPath}'
 GITHUB_ROOT = "https://github.com/aep-foundation/aep-specs"
 LOCAL_PATH = '#{onboardingPath}'
 

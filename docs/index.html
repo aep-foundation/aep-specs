@@ -1,534 +1,170 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>AEP Foundation Specifications</title>
-    <style>
-      :root {
-        color-scheme: light dark;
-        --bg: #f8fafc;
-        --fg: #172033;
-        --muted: #5b6475;
-        --panel: #ffffff;
-        --border: #d7dce5;
-        --link: #0b5cad;
+<!DOCTYPE html><html dir='ltr' lang='en' class='h-100'><head><meta charset='utf-8'><link rel='describedby' type='text/plain' href='/llms.txt'><!-- Coding agents: follow /integration.md for the guided AEP integration workflow. --><title>AEP Foundation</title><meta property='og:type' content='website'><meta property='og:title' content='AEP Foundation'><meta property='og:image' content='https://app.inflowpay.ai/aep-foundation/img/og.jpg'><meta property='og:image:type' content='image/jpeg'><meta property='og:image:width' content='1200'><meta property='og:image:height' content='628'><meta property='og:image:alt' content='AEP — Agent Enrollment Protocol. Onboard and authenticate agents.'><meta name='twitter:card' content='summary_large_image'><meta name='twitter:image' content='https://app.inflowpay.ai/aep-foundation/img/og.jpg'><meta name='twitter:image:alt' content='AEP — Agent Enrollment Protocol. Onboard and authenticate agents.'><meta name='twitter:title' content='AEP Foundation'><meta name='description' content='A protocol to onboard and authenticate agents as net-new customers.'><meta property='og:description' content='A protocol to onboard and authenticate agents as net-new customers.'><meta name='twitter:description' content='A protocol to onboard and authenticate agents as net-new customers.'><meta name='robots' content='max-image-preview:large'><link rel='canonical' href='https://www.aep.foundation/'><meta property='og:url' content='https://www.aep.foundation/'><meta name='viewport' content='initial-scale=1.0, viewport-fit=cover, width=device-width'><link rel='icon' type='image/png' href='/favicon-96x96.png' sizes='96x96'><link rel='icon' type='image/svg+xml' href='/favicon.svg'><link rel='shortcut icon' href='/favicon.ico'><link rel='apple-touch-icon' sizes='180x180' href='/apple-touch-icon.png'><link rel='manifest' href='/site.webmanifest'><meta name='apple-mobile-web-app-title' content='AEP Foundation'><meta name='mobile-web-app-capable' content='yes'><meta name='theme-color' content='#0027a3'><script>window._inflow={contextPath:'',ga:'',version:'2.0.0'};</script><link href='https://app.inflowpay.ai/aep-foundation/css/onboarding.min.css?v=2.0.0' rel='stylesheet'><script src='https://app.inflowpay.ai/vendor/htmx/htmx.min.js?v=2.0.0'></script><script src='https://app.inflowpay.ai/vendor/jquery/jquery.min.js?v=2.0.0'></script></head><body class='d-flex flex-column min-vh-100 overflow-auto'><div class='main-content-wrapper d-flex flex-column flex-grow-1' hx-history-elt><aside id='onboarding-mobile-sidebar' class='onboarding-sidebar border-divider onboarding-sidebar-mobile'><div class='onboarding-sidebar-inner'><div class='onboarding-sidebar-top'><a class='onboarding-brand' href='/' data-shortcut='h'><img class='onboarding-brand-mark' src='https://app.inflowpay.ai/aep-foundation/img/logo.svg' alt='AEP' width='70' height='29' /></a><nav class='onboarding-nav'><a class='onboarding-nav-link' href='/documentation/' data-shortcut='d'><span class='bracket-tag mono-body-md text-uppercase'><span class='bracket-left'>[</span><span class='bracket-label'>d</span><span class='bracket-right'>]</span></span><span class='button-lg'>Docs</span></a><a class='onboarding-nav-link' href='/protocol/' data-shortcut='i'><span class='bracket-tag mono-body-md text-uppercase'><span class='bracket-left'>[</span><span class='bracket-label'>i</span><span class='bracket-right'>]</span></span><span class='button-lg'>IETF Specs</span></a><div class='nav-menu'><button type='button' class='onboarding-nav-link nav-menu-toggle' onclick='toggleOnboardingMenu(this)' aria-expanded='false' data-shortcut='g'><span class='bracket-tag mono-body-md text-uppercase'><span class='bracket-left'>[</span><span class='bracket-label'>g</span><span class='bracket-right'>]</span></span><span class='button-lg'>GitHub</span><span class='onboarding-nav-icon'><img class='nav-menu-caret' src='https://app.inflowpay.ai/aep-foundation/img/caret-right.svg' alt='' width='9' height='9' /></span></button><div class='nav-menu-panel'><a class='nav-menu-item mono-body-md' href='https://github.com/aep-foundation/aep-go/' target='_blank'><span class='nav-menu-item-name button-lg'>AEP Go</span><span class='nav-menu-item-tag mono-body-md text-uppercase'>Go</span><div class='nav-menu-item-arrow'><img src='https://app.inflowpay.ai/aep-foundation/img/right-arrow.svg' alt='' width='16' height='16' /></div></a><a class='nav-menu-item mono-body-md' href='https://github.com/aep-foundation/aep-java/' target='_blank'><span class='nav-menu-item-name button-lg'>AEP Java</span><span class='nav-menu-item-tag mono-body-md text-uppercase'>Java</span><div class='nav-menu-item-arrow'><img src='https://app.inflowpay.ai/aep-foundation/img/right-arrow.svg' alt='' width='16' height='16' /></div></a><a class='nav-menu-item mono-body-md' href='https://github.com/aep-foundation/aep-node/' target='_blank'><span class='nav-menu-item-name button-lg'>AEP Node</span><span class='nav-menu-item-tag mono-body-md text-uppercase'>TypeScript</span><div class='nav-menu-item-arrow'><img src='https://app.inflowpay.ai/aep-foundation/img/right-arrow.svg' alt='' width='16' height='16' /></div></a><a class='nav-menu-item mono-body-md' href='https://github.com/aep-foundation/aep-python/' target='_blank'><span class='nav-menu-item-name button-lg'>AEP Python</span><span class='nav-menu-item-tag mono-body-md text-uppercase'>Python</span><div class='nav-menu-item-arrow'><img src='https://app.inflowpay.ai/aep-foundation/img/right-arrow.svg' alt='' width='16' height='16' /></div></a><a class='nav-menu-item mono-body-md' href='https://github.com/aep-foundation/aep-rust/' target='_blank'><span class='nav-menu-item-name button-lg'>AEP Rust</span><span class='nav-menu-item-tag mono-body-md text-uppercase'>Rust</span><div class='nav-menu-item-arrow'><img src='https://app.inflowpay.ai/aep-foundation/img/right-arrow.svg' alt='' width='16' height='16' /></div></a></div></div><a class='onboarding-nav-link' href='https://directory.inflowpay.ai/' target='_blank' data-shortcut='s'><span class='bracket-tag mono-body-md text-uppercase'><span class='bracket-left'>[</span><span class='bracket-label'>s</span><span class='bracket-right'>]</span></span><span class='button-lg'>Services</span><span class='onboarding-nav-icon onboarding-nav-icon-circle'><img src='https://app.inflowpay.ai/aep-foundation/img/right-arrow.svg' alt='' width='16' height='16' /></span></a></nav></div><div class='onboarding-flow'><span class='onboarding-flow-title mono-body-md text-uppercase'>The Agentic Payments Flow</span><nav class='onboarding-flow-nav'><a class='onboarding-flow-link button-lg' href='https://www.offeringprotocol.org/' target='_blank'><span>Discover</span></a><a class='onboarding-flow-link button-lg is-active' href='/'><span>Onboard</span></a><a class='onboarding-flow-link button-lg' href='https://github.com/inflowpayai/' target='_blank'><span>Pay</span></a></nav></div></div></aside><div class='onboarding-mobile-menu-backdrop' onclick='closeOnboardingMobileMenu()'></div><div class='onboarding-layout'><aside id='onboarding-index-sidebar' class='onboarding-sidebar border-divider onboarding-sidebar-desktop'><div class='onboarding-sidebar-inner'><div class='onboarding-sidebar-top'><a class='onboarding-brand' href='/' data-shortcut='h'><img class='onboarding-brand-mark' src='https://app.inflowpay.ai/aep-foundation/img/logo.svg' alt='AEP' width='70' height='29' /></a><nav class='onboarding-nav'><a class='onboarding-nav-link' href='/documentation/' data-shortcut='d'><span class='bracket-tag mono-body-md text-uppercase'><span class='bracket-left'>[</span><span class='bracket-label'>d</span><span class='bracket-right'>]</span></span><span class='button-lg'>Docs</span></a><a class='onboarding-nav-link' href='/protocol/' data-shortcut='i'><span class='bracket-tag mono-body-md text-uppercase'><span class='bracket-left'>[</span><span class='bracket-label'>i</span><span class='bracket-right'>]</span></span><span class='button-lg'>IETF Specs</span></a><div class='nav-menu'><button type='button' class='onboarding-nav-link nav-menu-toggle' onclick='toggleOnboardingMenu(this)' aria-expanded='false' data-shortcut='g'><span class='bracket-tag mono-body-md text-uppercase'><span class='bracket-left'>[</span><span class='bracket-label'>g</span><span class='bracket-right'>]</span></span><span class='button-lg'>GitHub</span><span class='onboarding-nav-icon'><img class='nav-menu-caret' src='https://app.inflowpay.ai/aep-foundation/img/caret-right.svg' alt='' width='9' height='9' /></span></button><div class='nav-menu-panel'><a class='nav-menu-item mono-body-md' href='https://github.com/aep-foundation/aep-go/' target='_blank'><span class='nav-menu-item-name button-lg'>AEP Go</span><span class='nav-menu-item-tag mono-body-md text-uppercase'>Go</span><div class='nav-menu-item-arrow'><img src='https://app.inflowpay.ai/aep-foundation/img/right-arrow.svg' alt='' width='16' height='16' /></div></a><a class='nav-menu-item mono-body-md' href='https://github.com/aep-foundation/aep-java/' target='_blank'><span class='nav-menu-item-name button-lg'>AEP Java</span><span class='nav-menu-item-tag mono-body-md text-uppercase'>Java</span><div class='nav-menu-item-arrow'><img src='https://app.inflowpay.ai/aep-foundation/img/right-arrow.svg' alt='' width='16' height='16' /></div></a><a class='nav-menu-item mono-body-md' href='https://github.com/aep-foundation/aep-node/' target='_blank'><span class='nav-menu-item-name button-lg'>AEP Node</span><span class='nav-menu-item-tag mono-body-md text-uppercase'>TypeScript</span><div class='nav-menu-item-arrow'><img src='https://app.inflowpay.ai/aep-foundation/img/right-arrow.svg' alt='' width='16' height='16' /></div></a><a class='nav-menu-item mono-body-md' href='https://github.com/aep-foundation/aep-python/' target='_blank'><span class='nav-menu-item-name button-lg'>AEP Python</span><span class='nav-menu-item-tag mono-body-md text-uppercase'>Python</span><div class='nav-menu-item-arrow'><img src='https://app.inflowpay.ai/aep-foundation/img/right-arrow.svg' alt='' width='16' height='16' /></div></a><a class='nav-menu-item mono-body-md' href='https://github.com/aep-foundation/aep-rust/' target='_blank'><span class='nav-menu-item-name button-lg'>AEP Rust</span><span class='nav-menu-item-tag mono-body-md text-uppercase'>Rust</span><div class='nav-menu-item-arrow'><img src='https://app.inflowpay.ai/aep-foundation/img/right-arrow.svg' alt='' width='16' height='16' /></div></a></div></div><a class='onboarding-nav-link' href='https://directory.inflowpay.ai/' target='_blank' data-shortcut='s'><span class='bracket-tag mono-body-md text-uppercase'><span class='bracket-left'>[</span><span class='bracket-label'>s</span><span class='bracket-right'>]</span></span><span class='button-lg'>Services</span><span class='onboarding-nav-icon onboarding-nav-icon-circle'><img src='https://app.inflowpay.ai/aep-foundation/img/right-arrow.svg' alt='' width='16' height='16' /></span></a></nav></div><div class='onboarding-flow'><span class='onboarding-flow-title mono-body-md text-uppercase'>The Agentic Payments Flow</span><nav class='onboarding-flow-nav'><a class='onboarding-flow-link button-lg' href='https://www.offeringprotocol.org/' target='_blank'><span>Discover</span></a><a class='onboarding-flow-link button-lg is-active' href='/'><span>Onboard</span></a><a class='onboarding-flow-link button-lg' href='https://github.com/inflowpayai/' target='_blank'><span>Pay</span></a></nav></div></div></aside><main class='onboarding-main border-divider'><div class='onboarding-page border-divider-end'><div class='onboarding-header'><button type='button' class='onboarding-mobile-menu-toggle link-button link-btn-outline mono-body-md text-uppercase' onclick='toggleOnboardingMobileMenu(this)' aria-label='Menu' aria-expanded='false' aria-controls='onboarding-mobile-sidebar'>Menu</button><div class='onboarding-header-navigation'></div><div class='onboarding-authored'><a class='link-button link-btn-outline mono-body-md' href='https://www.inflowpay.ai/' target='_blank' data-shortcut='a'><span class='bracket-tag mono-body-md'><span class='bracket-left'>[</span><span class='bracket-label'>a</span><span class='bracket-right'>]</span></span><span>authored by</span><span class='link-button-accent'>inflow</span></a></div></div><div class='onboarding-page-body'><div class='onboarding-page-content'><div class='onboarding-index'><div class='hero-section'><div class='hero-container'><div class='hero-content'><div class='title-with-swatch heading-grey'><span class='swatch'></span><span class='mono-body-md text-uppercase'>Agent Enrollment Protocol</span></div><h1 class='hero-title'><span>A protocol to</span> <span class='heading-accent'>onboard and authenticate</span> <span>agents as net-new customers</span></h1><div class='hero-actions'><a class='onboarding-link mono-body-md onboarding-link-accent' href='https://www.inflowcli.ai/' target='_blank'>↳ use with your agent</a><a class='onboarding-link mono-body-md' href='/documentation/'>↳ add authentication to your api</a></div></div><div class='hero-banner'><a class='overlay-button mono-body-md hero-banner-action' href='/documentation/'><img class='overlay-button-icon' src='https://app.inflowpay.ai/aep-foundation/img/folder.svg' alt='' width='16' height='16' /><span class='overlay-button-title'>agent.http</span><img class='overlay-button-icon overlay-button-trailing' src='https://app.inflowpay.ai/aep-foundation/img/plus.svg' alt='' width='8' height='8' /></a><img class='hero-banner-image' src='https://app.inflowpay.ai/aep-foundation/img/banner.webp' alt='Agent Enrollment Protocol' width='860' height='480' /><img class='hero-banner-logo' src='https://app.inflowpay.ai/aep-foundation/img/banner-logo.svg' alt='AEP' width='96' height='40' /></div></div></div><div class='onboarding-intro'><h1><span class='heading-muted'>From an unauthenticated call</span> <span class='heading-strong'>to authenticated access</span></h1><p class='paragraph body-lg'>A 401 challenge points to the Inspect document. The agent uses a signed, single-use proof to authenticate directly and can request a reusable session credential when the Service offers one.</p></div><section class='step-section'><div class='step-content'><div class='step-section-title heading-grey'><div class='title-with-swatch'><span class='swatch'></span><span class='mono-body-md text-uppercase'>0--Trigger</span></div></div><h4 class='step-title'><span class='step-title-lead'>An unauthenticated call returns a 401 challenge</span><span class='step-title-body'>An agent calls a protected endpoint with no credentials. The service returns 401, and the challenge carries two fields: the Service DID and the address of its Inspect document.</span></h4></div><div class='step-media'><img class='step-image' src='https://app.inflowpay.ai/aep-foundation/img/trigger.webp' alt='' width='400' height='400' /><div class='onboarding-code-frame trigger'><div class='onboarding-code-frame-header'><div class='onboarding-code-frame-heading'><img class='onboarding-code-frame-leading' src='https://app.inflowpay.ai/aep-foundation/img/folder.svg' alt='' width='16' height='16' /><span class='onboarding-code-frame-title mono-body-md'>401-challenge.http</span></div><span class='onboarding-code-frame-collapsed-title mono-body-md'>&lt; HTTP/1.1 401 Unauthorized</span><div class='onboarding-code-frame-trailing'><button type='button' class='frame-collapse-toggle' onclick='toggleOnboardingFrame(this)' aria-label='Toggle section' aria-expanded='true'><img class='frame-collapse-icon frame-collapse-minus' src='https://app.inflowpay.ai/aep-foundation/img/minus.svg' alt='' width='9' height='9' /><img class='frame-collapse-icon frame-collapse-plus' src='https://app.inflowpay.ai/aep-foundation/img/plus.svg' alt='' width='9' height='9' /></button></div></div><div class='onboarding-code-frame-body'><pre class='onboarding-code-frame-code mono-body-md'><span class='code-prompt'>$</span> curl -v <span class='code-value'>https://api.example.com/v1/orders</span>
+
+<span class='code-meta'>&gt;</span> <span class='code-method'>GET</span> <span class='code-value'>/v1/orders</span> HTTP/1.1
+<span class='code-meta'>&gt;</span> Host: <span class='code-value'>api.example.com</span>
+
+<span class='code-highlight'>&lt; HTTP/1.1 401 Unauthorized</span>
+<span class='code-meta'>&lt;</span> WWW-Authenticate: <span class='code-method'>AEP</span> service_did=<span class='code-value'>&quot;did:web:api.example.com&quot;</span>
+<span class='code-meta'>&lt;</span>   inspect=<span class='code-value'>&quot;https://api.example.com/.well-known/aep&quot;</span></pre></div></div></div></section><section class='step-section'><div class='step-content'><div class='step-section-title heading-grey'><div class='title-with-swatch'><span class='swatch'></span><span class='mono-body-md text-uppercase'>1--</span></div><div class='step-section-title-tags'><span class='swatch-tag mono-body-md text-uppercase'>Inspect</span></div></div><h4 class='step-title'><span class='step-title-lead'>The Inspect document lists the requirements before any signature</span><span class='step-title-body'>The Agent requests the Inspect document at /.well-known/aep without credentials. It specifies the accepted signing algorithms, identity methods, session credential types, and protected-resource authentication methods. Its Service DID must match the one from the challenge.</span></h4></div><div class='step-media'><img class='step-image' src='https://app.inflowpay.ai/aep-foundation/img/inspect.webp' alt='' width='400' height='400' /><div class='onboarding-code-frame inspect'><div class='onboarding-code-frame-header'><div class='onboarding-code-frame-heading'><img class='onboarding-code-frame-leading' src='https://app.inflowpay.ai/aep-foundation/img/folder.svg' alt='' width='16' height='16' /><span class='onboarding-code-frame-title mono-body-md'>inspect.http</span></div><span class='onboarding-code-frame-collapsed-title mono-body-md'>&quot;required&quot;: [&quot;contact.email&quot;]</span><div class='onboarding-code-frame-trailing'><button type='button' class='frame-collapse-toggle' onclick='toggleOnboardingFrame(this)' aria-label='Toggle section' aria-expanded='true'><img class='frame-collapse-icon frame-collapse-minus' src='https://app.inflowpay.ai/aep-foundation/img/minus.svg' alt='' width='9' height='9' /><img class='frame-collapse-icon frame-collapse-plus' src='https://app.inflowpay.ai/aep-foundation/img/plus.svg' alt='' width='9' height='9' /></button></div></div><div class='onboarding-code-frame-body'><pre class='onboarding-code-frame-code mono-body-md'><span class='code-prompt'>$</span> curl -v <span class='code-value'>https://api.example.com/.well-known/aep</span>
+
+<span class='code-meta'>&gt;</span> <span class='code-method'>GET</span> <span class='code-value'>/.well-known/aep</span> HTTP/1.1
+<span class='code-meta'>&gt;</span> Host: <span class='code-value'>api.example.com</span>
+<span class='code-meta'>&gt;</span> Accept: <span class='code-value'>application/aep+json</span>
+
+<span class='code-meta'>&lt;</span> HTTP/1.1 200 OK
+<span class='code-meta'>&lt;</span> Content-Type: <span class='code-value'>application/aep+json</span>
+
+{
+  <span class='code-value'>&quot;aep_version&quot;</span>: <span class='code-value'>&quot;1.0&quot;</span>,
+  <span class='code-value'>&quot;authentication&quot;</span>: {
+    <span class='code-value'>&quot;methods&quot;</span>: [<span class='code-value'>&quot;aep-jwt&quot;</span>, <span class='code-value'>&quot;oauth-bearer&quot;</span>]
+  },
+  <span class='code-value'>&quot;bindings&quot;</span>: {
+    <span class='code-value'>&quot;supported&quot;</span>: [<span class='code-value'>&quot;http&quot;</span>]
+  },
+  <span class='code-value'>&quot;claims&quot;</span>: {
+<span class='code-highlight'>    &quot;required&quot;: [&quot;contact.email&quot;]</span>
+  },
+  <span class='code-value'>&quot;commands&quot;</span>: {
+    <span class='code-value'>&quot;grant_types&quot;</span>: [<span class='code-value'>&quot;oauth-bearer&quot;</span>],
+    <span class='code-value'>&quot;grant_types_config&quot;</span>: {
+      <span class='code-value'>&quot;oauth-bearer&quot;</span>: {
+        <span class='code-value'>&quot;supports_per_credential_revoke&quot;</span>: <span class='code-value'>&quot;true&quot;</span>
       }
+    },
+    <span class='code-value'>&quot;supported&quot;</span>: [<span class='code-value'>&quot;enroll&quot;</span>, <span class='code-value'>&quot;grant&quot;</span>, <span class='code-value'>&quot;inspect&quot;</span>, <span class='code-value'>&quot;revoke&quot;</span>, <span class='code-value'>&quot;status&quot;</span>]
+  },
+  <span class='code-value'>&quot;core&quot;</span>: {
+    <span class='code-value'>&quot;signing_algorithms&quot;</span>: [<span class='code-value'>&quot;EdDSA&quot;</span>, <span class='code-value'>&quot;ES256&quot;</span>]
+  },
+  <span class='code-value'>&quot;http&quot;</span>: {
+    <span class='code-value'>&quot;endpoint_base&quot;</span>: <span class='code-value'>&quot;/aep/&quot;</span>
+  },
+  <span class='code-value'>&quot;identity&quot;</span>: {
+    <span class='code-value'>&quot;methods&quot;</span>: [<span class='code-value'>&quot;did:web&quot;</span>]
+  },
+  <span class='code-value'>&quot;service&quot;</span>: {
+    <span class='code-value'>&quot;did&quot;</span>: <span class='code-value'>&quot;did:web:api.example.com&quot;</span>
+  }
+}</pre></div></div></div></section><section class='step-section'><div class='step-content'><div class='step-section-title heading-grey'><div class='title-with-swatch'><span class='swatch'></span><span class='mono-body-md text-uppercase'>2--</span></div><div class='step-section-title-tags'><span class='swatch-tag mono-body-md text-uppercase'>Enroll</span></div></div><h4 class='step-title'><span class='step-title-lead'>A signed proof establishes the Agent&#39;s identity</span><span class='step-title-body'>The Agent signs a statement with its private key. The Service verifies it against the public key at a web address the Agent controls without transmitting a shared secret. Enrollment then returns the Agent&#39;s current lifecycle status.</span></h4></div><div class='step-media'><img class='step-image' src='https://app.inflowpay.ai/aep-foundation/img/enroll.webp' alt='' width='400' height='400' /><div class='onboarding-code-frame enroll'><div class='onboarding-code-frame-header'><div class='onboarding-code-frame-heading'><img class='onboarding-code-frame-leading' src='https://app.inflowpay.ai/aep-foundation/img/folder.svg' alt='' width='16' height='16' /><span class='onboarding-code-frame-title mono-body-md'>enroll.http</span></div><span class='onboarding-code-frame-collapsed-title mono-body-md'>&quot;contact.email&quot;: &quot;ops@example.com&quot;</span><div class='onboarding-code-frame-trailing'><button type='button' class='frame-collapse-toggle' onclick='toggleOnboardingFrame(this)' aria-label='Toggle section' aria-expanded='true'><img class='frame-collapse-icon frame-collapse-minus' src='https://app.inflowpay.ai/aep-foundation/img/minus.svg' alt='' width='9' height='9' /><img class='frame-collapse-icon frame-collapse-plus' src='https://app.inflowpay.ai/aep-foundation/img/plus.svg' alt='' width='9' height='9' /></button></div></div><div class='onboarding-code-frame-body'><pre class='onboarding-code-frame-code mono-body-md'><span class='code-prompt'>$</span> curl -v -X POST <span class='code-value'>https://api.example.com/aep/enroll</span> &#92;
+  -H <span class='code-value'>'Authorization: AEP eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9...'</span> &#92;
+  -H <span class='code-value'>'Content-Type: application/aep+json'</span> &#92;
+  -H <span class='code-value'>'Idempotency-Key: 9f8a4d2e-1c3b-4f5e-8b7a-000000000000'</span> &#92;
+  -d @enroll.json
 
-      @media (prefers-color-scheme: dark) {
-        :root {
-          --bg: #10141c;
-          --fg: #eef2f8;
-          --muted: #aeb7c8;
-          --panel: #171d28;
-          --border: #2d3545;
-          --link: #8ab8ff;
-        }
-      }
+<span class='code-highlight'>&gt; POST /aep/enroll HTTP/1.1</span>
+<span class='code-meta'>&gt;</span> Host: <span class='code-value'>api.example.com</span>
+<span class='code-meta'>&gt;</span> Content-Type: <span class='code-value'>application/aep+json</span>
+<span class='code-meta'>&gt;</span> Idempotency-Key: <span class='code-value'>9f8a4d2e-1c3b-4f5e-8b7a-000000000000</span>
+<span class='code-meta'>&gt;</span> Authorization: <span class='code-method'>AEP</span> <span class='code-value'>eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9...</span>
 
-      *,
-      *::before,
-      *::after {
-        box-sizing: border-box;
-      }
+{
+  <span class='code-value'>&quot;agent_did&quot;</span>: <span class='code-value'>&quot;did:web:agent.example.com:agents:123&quot;</span>,
+  <span class='code-value'>&quot;claims&quot;</span>: {
+    <span class='code-value'>&quot;contact.email&quot;</span>: <span class='code-value'>&quot;ops@example.com&quot;</span>
+  }
+}
 
-      body {
-        margin: 0;
-        background: var(--bg);
-        color: var(--fg);
-        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        line-height: 1.5;
-      }
+<span class='code-meta'>&lt;</span> HTTP/1.1 200 OK
+<span class='code-meta'>&lt;</span> Content-Type: <span class='code-value'>application/aep+json</span>
 
-      main {
-        width: min(960px, calc(100% - 32px));
-        margin: 0 auto;
-        padding: 48px 0;
-      }
+{
+  <span class='code-value'>&quot;status&quot;</span>: <span class='code-value'>&quot;active&quot;</span>
+}</pre></div></div></div></section><section class='step-section'><div class='step-content'><div class='step-section-title heading-grey'><div class='title-with-swatch'><span class='swatch'></span><span class='mono-body-md text-uppercase'>3--</span></div><div class='step-section-title-tags'><span class='swatch-tag mono-body-md text-uppercase'>Grant</span></div></div><h4 class='step-title'><span class='step-title-lead'>Grant can issue a reusable session credential</span><span class='step-title-body'>When the Inspect document advertises Grant, the Agent can use another signed proof to request an API key, OAuth token, or HTTP Basic credential. The Agent can then use that credential on protected resources that advertise the corresponding authentication method.</span></h4></div><div class='step-media'><img class='step-image' src='https://app.inflowpay.ai/aep-foundation/img/grant.webp' alt='' width='400' height='400' /><div class='onboarding-code-frame grant'><div class='onboarding-code-frame-header'><div class='onboarding-code-frame-heading'><img class='onboarding-code-frame-leading' src='https://app.inflowpay.ai/aep-foundation/img/folder.svg' alt='' width='16' height='16' /><span class='onboarding-code-frame-title mono-body-md'>grant.http</span></div><span class='onboarding-code-frame-collapsed-title mono-body-md'>&quot;grant_type&quot;: &quot;oauth-bearer&quot;</span><div class='onboarding-code-frame-trailing'><button type='button' class='frame-collapse-toggle' onclick='toggleOnboardingFrame(this)' aria-label='Toggle section' aria-expanded='true'><img class='frame-collapse-icon frame-collapse-minus' src='https://app.inflowpay.ai/aep-foundation/img/minus.svg' alt='' width='9' height='9' /><img class='frame-collapse-icon frame-collapse-plus' src='https://app.inflowpay.ai/aep-foundation/img/plus.svg' alt='' width='9' height='9' /></button></div></div><div class='onboarding-code-frame-body'><pre class='onboarding-code-frame-code mono-body-md'><span class='code-prompt'>$</span> curl -v -X POST <span class='code-value'>https://api.example.com/aep/grant</span> &#92;
+  -H <span class='code-value'>'Authorization: AEP eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9...'</span> &#92;
+  -H <span class='code-value'>'Content-Type: application/aep+json'</span> &#92;
+  -H <span class='code-value'>'Idempotency-Key: 5cb95539-251d-46b4-9a36-8de6efd6b771'</span> &#92;
+  -d @grant.json
 
-      header {
-        margin-bottom: 32px;
-      }
+<span class='code-highlight'>&gt; POST /aep/grant HTTP/1.1</span>
+<span class='code-meta'>&gt;</span> Host: <span class='code-value'>api.example.com</span>
+<span class='code-meta'>&gt;</span> Content-Type: <span class='code-value'>application/aep+json</span>
+<span class='code-meta'>&gt;</span> Idempotency-Key: <span class='code-value'>5cb95539-251d-46b4-9a36-8de6efd6b771</span>
+<span class='code-meta'>&gt;</span> Authorization: <span class='code-method'>AEP</span> <span class='code-value'>eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9...</span>
 
-      h1 {
-        margin: 0 0 8px;
-        font-size: clamp(2rem, 6vw, 3.5rem);
-        line-height: 1.05;
-      }
+{
+  <span class='code-value'>&quot;grant_type&quot;</span>: <span class='code-value'>&quot;oauth-bearer&quot;</span>
+}
 
-      h2 {
-        margin-top: 36px;
-      }
+<span class='code-meta'>&lt;</span> HTTP/1.1 200 OK
+<span class='code-meta'>&lt;</span> Content-Type: <span class='code-value'>application/aep+json</span>
 
-      p {
-        max-width: 760px;
-        color: var(--muted);
-      }
+{
+  <span class='code-value'>&quot;access_token&quot;</span>: <span class='code-value'>&quot;ya29.example&quot;</span>,
+  <span class='code-value'>&quot;credential_id&quot;</span>: <span class='code-value'>&quot;tok_01HZY8W7Q2F8J7D3P9G9Z1N6TT&quot;</span>,
+  <span class='code-value'>&quot;expires_at&quot;</span>: <span class='code-value'>&quot;2026-09-15T22:00:00Z&quot;</span>,
+  <span class='code-value'>&quot;token_type&quot;</span>: <span class='code-value'>&quot;Bearer&quot;</span>
+}
 
-      a {
-        color: var(--link);
-      }
 
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        background: var(--panel);
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        overflow: hidden;
-      }
+<span class='code-prompt'>$</span> curl -v <span class='code-value'>https://api.example.com/v1/orders</span>
 
-      th,
-      td {
-        padding: 12px;
-        border-bottom: 1px solid var(--border);
-        text-align: left;
-        vertical-align: top;
-      }
+<span class='code-meta'>&gt;</span> <span class='code-method'>GET</span> <span class='code-value'>/v1/orders</span> HTTP/1.1
+<span class='code-meta'>&gt;</span> Host: <span class='code-value'>api.example.com</span>
+<span class='code-meta'>&gt;</span> Authorization: Bearer <span class='code-value'>ya29.example</span>
 
-      tbody tr:last-child td {
-        border-bottom: none;
-      }
+<span class='code-meta'>&lt;</span> HTTP/1.1 200 OK</pre></div></div></div></section><section class='step-section'><div class='step-content'><div class='step-section-title heading-grey is-tags-only'><div class='title-with-swatch'><span class='swatch'></span></div><div class='step-section-title-tags'><span class='swatch-tag mono-body-md text-uppercase'>Status</span><span class='step-section-title-separator mono-body-md'>+</span><span class='swatch-tag mono-body-md text-uppercase'>Revoke</span></div></div><h4 class='step-title'><span class='step-title-lead'>Enrollment stays checkable, access stays revocable</span><span class='step-title-body'>Status reads the agent&#39;s current enrollment state, active or pending, and lists any requirement still outstanding. Revoke invalidates a session credential and requires the same signed proof as Enroll and Grant, never the credential it&#39;s cutting off. The enrollment underneath stays intact.</span></h4></div><div class='step-media'><img class='step-image' src='https://app.inflowpay.ai/aep-foundation/img/status-and-revoke.webp' alt='' width='400' height='400' /><div class='step-frames'><div class='onboarding-code-frame status'><div class='onboarding-code-frame-header'><div class='onboarding-code-frame-heading'><img class='onboarding-code-frame-leading' src='https://app.inflowpay.ai/aep-foundation/img/folder.svg' alt='' width='16' height='16' /><span class='onboarding-code-frame-title mono-body-md'>status.http</span></div><span class='onboarding-code-frame-collapsed-title mono-body-md'>&gt; GET /aep/status HTTP/1.1</span><div class='onboarding-code-frame-trailing'><button type='button' class='frame-collapse-toggle' onclick='toggleOnboardingFrame(this)' aria-label='Toggle section' aria-expanded='true'><img class='frame-collapse-icon frame-collapse-minus' src='https://app.inflowpay.ai/aep-foundation/img/minus.svg' alt='' width='9' height='9' /><img class='frame-collapse-icon frame-collapse-plus' src='https://app.inflowpay.ai/aep-foundation/img/plus.svg' alt='' width='9' height='9' /></button></div></div><div class='onboarding-code-frame-body'><pre class='onboarding-code-frame-code mono-body-md'><span class='code-prompt'>$</span> curl -v <span class='code-value'>https://api.example.com/aep/status</span>
 
-      th {
-        font-size: 0.9rem;
-        color: var(--muted);
-      }
+<span class='code-highlight'>&gt; GET /aep/status HTTP/1.1</span>
+<span class='code-meta'>&gt;</span> Host: <span class='code-value'>api.example.com</span>
+<span class='code-meta'>&gt;</span> Authorization: <span class='code-method'>AEP</span> <span class='code-value'>eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9...</span>
 
-      .draft-id {
-        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-        font-size: 0.92rem;
-        white-space: nowrap;
-      }
+<span class='code-meta'>&lt;</span> HTTP/1.1 200 OK
 
-      td:last-child {
-        white-space: nowrap;
-      }
+{
+  <span class='code-value'>&quot;requirements_pending&quot;</span>: [<span class='code-value'>&quot;contact.email&quot;</span>],
+  <span class='code-value'>&quot;status&quot;</span>: <span class='code-value'>&quot;pending&quot;</span>
+}</pre></div></div><div class='onboarding-code-frame revoke'><div class='onboarding-code-frame-header'><div class='onboarding-code-frame-heading'><img class='onboarding-code-frame-leading' src='https://app.inflowpay.ai/aep-foundation/img/folder.svg' alt='' width='16' height='16' /><span class='onboarding-code-frame-title mono-body-md'>revoke.http</span></div><span class='onboarding-code-frame-collapsed-title mono-body-md'>&gt; POST /aep/revoke HTTP/1.1</span><div class='onboarding-code-frame-trailing'><button type='button' class='frame-collapse-toggle' onclick='toggleOnboardingFrame(this)' aria-label='Toggle section' aria-expanded='true'><img class='frame-collapse-icon frame-collapse-minus' src='https://app.inflowpay.ai/aep-foundation/img/minus.svg' alt='' width='9' height='9' /><img class='frame-collapse-icon frame-collapse-plus' src='https://app.inflowpay.ai/aep-foundation/img/plus.svg' alt='' width='9' height='9' /></button></div></div><div class='onboarding-code-frame-body'><pre class='onboarding-code-frame-code mono-body-md'><span class='code-prompt'>$</span> curl -v -X POST <span class='code-value'>https://api.example.com/aep/revoke</span> &#92;
+  -H <span class='code-value'>'Authorization: AEP eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9...'</span> &#92;
+  -H <span class='code-value'>'Content-Type: application/aep+json'</span> &#92;
+  -H <span class='code-value'>'Idempotency-Key: e29c88b1-8f56-421f-89b0-c2882353a36f'</span> &#92;
+  -d @revoke.json
 
-      .links {
-        display: inline-flex;
-        gap: 10px;
-        flex-wrap: nowrap;
-        white-space: nowrap;
-      }
+<span class='code-highlight'>&gt; POST /aep/revoke HTTP/1.1</span>
+<span class='code-meta'>&gt;</span> Host: <span class='code-value'>api.example.com</span>
+<span class='code-meta'>&gt;</span> Content-Type: <span class='code-value'>application/aep+json</span>
+<span class='code-meta'>&gt;</span> Idempotency-Key: <span class='code-value'>e29c88b1-8f56-421f-89b0-c2882353a36f</span>
+<span class='code-meta'>&gt;</span> Authorization: <span class='code-method'>AEP</span> <span class='code-value'>eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9...</span>
 
-      @media (max-width: 640px) {
-        main {
-          padding: 32px 0;
-        }
+{
+  <span class='code-value'>&quot;credential_id&quot;</span>: <span class='code-value'>&quot;tok_01HZY8W7Q2F8J7D3P9G9Z1N6TT&quot;</span>,
+  <span class='code-value'>&quot;grant_type&quot;</span>: <span class='code-value'>&quot;oauth-bearer&quot;</span>
+}
 
-        table,
-        tbody,
-        tr,
-        td {
-          display: block;
-          width: 100%;
-        }
+<span class='code-meta'>&lt;</span> HTTP/1.1 200 OK
+<span class='code-meta'>&lt;</span> Content-Type: <span class='code-value'>application/aep+json</span>
 
-        thead {
-          display: none;
-        }
+{}</pre></div></div></div></div></section><section class='enrollment-section'><h1 class='enrollment-heading'><span class='heading-muted'>One enrollment turns</span> <span class='heading-strong'>every visit into recognizable revenue</span></h1><div class='enrollment-grid'><div class='enrollment-item'><div class='title-with-swatch heading-grey'><span class='swatch'></span><span class='mono-body-md text-uppercase'>1</span></div><div class='enrollment-item-body'><h4 class='enrollment-item-title'>Signed identity means fewer chargebacks and disputes</h4><p class='paragraph body-lg'>Enrollment ties one identity to a private-key signature. That identity backs a chargeback dispute to avoid fraud and deter bad actors.</p></div></div><div class='enrollment-item'><div class='title-with-swatch heading-grey'><span class='swatch'></span><span class='mono-body-md text-uppercase'>2</span></div><div class='enrollment-item-body'><h4 class='enrollment-item-title'>Seller Policies use enrollment details to enforce access and transaction rules</h4><p class='paragraph body-lg'>A seller reads an agent&#39;s declared location and its enrollment status to decide: blocked outright, waits for review, or transacts without restriction.</p></div></div><div class='enrollment-item'><div class='title-with-swatch heading-grey'><span class='swatch'></span><span class='mono-body-md text-uppercase'>3</span></div><div class='enrollment-item-body'><h4 class='enrollment-item-title'>Satisfy Travel Rule&#39;s requirements and stay in compliance</h4><p class='paragraph body-lg'>Travel Rule needs a verified name, address, and date of birth before a transfer clears. AEP&#39;s claim catalog collects that exact shape at enrollment.</p></div></div><div class='enrollment-item'><div class='title-with-swatch heading-grey'><span class='swatch'></span><span class='mono-body-md text-uppercase'>4</span></div><div class='enrollment-item-body'><h4 class='enrollment-item-title'>Recognized once, remembered on every call after</h4><p class='paragraph body-lg'>Every call from a recognized agent adds to one per-agent usage record. A seller reads that record for upsell timing, term changes, or retention signals.</p></div><a class='onboarding-link mono-body-md onboarding-link-accent' href='/documentation/'>↳ view docs</a></div></div></section><section class='companion-section'><div class='companion-grid'><div class='companion-column'><div class='title-with-swatch heading-grey'><span class='swatch'></span><span class='mono-body-md text-uppercase'>Discovery [ODP]</span></div><div class='companion-media'><img class='companion-image' src='https://app.inflowpay.ai/aep-foundation/img/discovery-odp.webp' alt='' width='400' height='400' /><div class='onboarding-code-frame discover'><div class='onboarding-code-frame-header'><div class='onboarding-code-frame-heading'><img class='onboarding-code-frame-leading' src='https://app.inflowpay.ai/aep-foundation/img/folder.svg' alt='' width='16' height='16' /><span class='onboarding-code-frame-title mono-body-md'>discover.http</span></div><span class='onboarding-code-frame-collapsed-title mono-body-md'>&gt; GET /odp/offerings/</span><div class='onboarding-code-frame-trailing'><button type='button' class='frame-collapse-toggle' onclick='toggleOnboardingFrame(this)' aria-label='Toggle section' aria-expanded='true'><img class='frame-collapse-icon frame-collapse-minus' src='https://app.inflowpay.ai/aep-foundation/img/minus.svg' alt='' width='9' height='9' /><img class='frame-collapse-icon frame-collapse-plus' src='https://app.inflowpay.ai/aep-foundation/img/plus.svg' alt='' width='9' height='9' /></button></div></div><div class='onboarding-code-frame-body'><pre class='onboarding-code-frame-code mono-body-md'><span class='code-prompt'>$</span> curl -v <span class='code-value'>https://api.example.com/odp/offerings/neural-search-api</span>
 
-        table {
-          background: transparent;
-          border: none;
-          border-radius: 0;
-        }
+<span class='code-highlight'>&gt; GET /odp/offerings/neural-search-api HTTP/1.1</span>
+<span class='code-meta'>&gt;</span> Host: <span class='code-value'>api.example.com</span>
 
-        tbody tr {
-          background: var(--panel);
-          border: 1px solid var(--border);
-          border-radius: 8px;
-          margin-bottom: 14px;
-          padding: 4px 0;
-        }
+<span class='code-meta'>&lt;</span> HTTP/1.1 200 OK
+<span class='code-meta'>&lt;</span> Content-Type: <span class='code-value'>application/odp+json</span>
 
-        td {
-          border-bottom: 1px solid var(--border);
-          padding: 10px 14px;
-          white-space: normal;
-        }
+{
+  <span class='code-value'>&quot;odp_version&quot;</span>: <span class='code-value'>&quot;1.0&quot;</span>,
+  <span class='code-value'>&quot;id&quot;</span>: <span class='code-value'>&quot;neural-search-api&quot;</span>,
+  <span class='code-value'>&quot;name&quot;</span>: <span class='code-value'>&quot;Neural Search API&quot;</span>,
+  <span class='code-value'>&quot;price&quot;</span>: {
+    <span class='code-value'>&quot;amount&quot;</span>: <span class='code-value'>&quot;0.003&quot;</span>,
+    <span class='code-value'>&quot;currency&quot;</span>: <span class='code-value'>&quot;USDC&quot;</span>,
+    <span class='code-value'>&quot;type&quot;</span>: <span class='code-value'>&quot;fixed&quot;</span>
+  }
+}</pre></div></div></div><div class='companion-copy'><h4 class='companion-title'><span class='companion-title-lead'>Find what a Service sells, before AEP runs</span><span class='companion-title-body'>ODP is the most agent-compatible, deterministic way for agents to find services. A protected service is routed to AEP for enrollment.</span></h4></div><a class='onboarding-link mono-body-md onboarding-link-accent' href='https://www.offeringprotocol.org/' target='_blank'>↳ learn more</a></div><div class='companion-column'><div class='title-with-swatch heading-grey'><span class='swatch'></span><span class='mono-body-md text-uppercase'>Pay [InFlow CLI]</span></div><div class='companion-media'><img class='companion-image' src='https://app.inflowpay.ai/aep-foundation/img/pay-inflow-cli.webp' alt='' width='400' height='400' /><div class='onboarding-code-frame settle'><div class='onboarding-code-frame-header'><div class='onboarding-code-frame-heading'><img class='onboarding-code-frame-leading' src='https://app.inflowpay.ai/aep-foundation/img/folder.svg' alt='' width='16' height='16' /><span class='onboarding-code-frame-title mono-body-md'>settle.http</span></div><span class='onboarding-code-frame-collapsed-title mono-body-md'>$ inflow mpp pay</span><div class='onboarding-code-frame-trailing'><button type='button' class='frame-collapse-toggle' onclick='toggleOnboardingFrame(this)' aria-label='Toggle section' aria-expanded='true'><img class='frame-collapse-icon frame-collapse-minus' src='https://app.inflowpay.ai/aep-foundation/img/minus.svg' alt='' width='9' height='9' /><img class='frame-collapse-icon frame-collapse-plus' src='https://app.inflowpay.ai/aep-foundation/img/plus.svg' alt='' width='9' height='9' /></button></div></div><div class='onboarding-code-frame-body'><pre class='onboarding-code-frame-code mono-body-md'><span class='code-meta'>&gt;</span> <span class='code-method'>GET</span> <span class='code-value'>/v1/orders</span> HTTP/1.1
+<span class='code-meta'>&gt;</span> Host: <span class='code-value'>api.example.com</span>
+<span class='code-meta'>&gt;</span> AEP-Authorization: <span class='code-method'>AEP</span> <span class='code-value'>eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9...</span>
 
-        tbody tr td:last-child {
-          border-bottom: none;
-        }
+<span class='code-meta'>&lt;</span> HTTP/1.1 402 Payment Required
+<span class='code-meta'>&lt;</span> WWW-Authenticate: Payment id=<span class='code-value'>&quot;challenge-1&quot;</span>, realm=<span class='code-value'>&quot;api.example.com&quot;</span>,
+<span class='code-meta'>&lt;</span>   method=<span class='code-value'>&quot;inflow&quot;</span>
 
-        td::before {
-          content: attr(data-label);
-          display: block;
-          font-size: 0.75rem;
-          text-transform: uppercase;
-          letter-spacing: 0.04em;
-          color: var(--muted);
-          margin-bottom: 4px;
-        }
+<span class='code-highlight'>$ inflow mpp pay https://api.example.com/v1/orders</span>
 
-        .draft-id {
-          white-space: normal;
-          word-break: break-word;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <main>
-      <header>
-        <h1>AEP Foundation Specifications</h1>
-        <p>
-          Internet-Draft sources and rendered specifications for the Agent
-          Enrollment Protocol.
-        </p>
-      </header>
+<span class='code-meta'>&gt;</span> <span class='code-method'>GET</span> <span class='code-value'>/v1/orders</span> HTTP/1.1
+<span class='code-meta'>&gt;</span> Host: <span class='code-value'>api.example.com</span>
+<span class='code-meta'>&gt;</span> AEP-Authorization: <span class='code-method'>AEP</span> <span class='code-value'>eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9...</span>
+<span class='code-meta'>&gt;</span> Authorization: Payment <span class='code-value'>eyJhbW91bnQiOiIwLjAwMyJ9...</span>
 
-      <h2>Current Drafts</h2>
-      <p>
-        The current set contains the independently implementable core
-        protocol and companion documents for Claims, <code>did:web</code>
-        identity, Platform Hosted Identity, and three session-credential
-        formats. The companion drafts define optional interoperable behavior
-        that Services advertise when applicable.
-      </p>
-      <table>
-        <thead>
-          <tr>
-            <th>Draft</th>
-            <th>Description</th>
-            <th>Formats</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="draft-id" data-label="Draft">draft-kavian-aep-claims-01</td>
-            <td data-label="Description">This document defines a claim-value catalog for the Agent Enrollment Protocol (AEP).</td>
-            <td data-label="Formats">
-              <span class="links">
-                <a href="https://datatracker.ietf.org/doc/draft-kavian-aep-claims/">IETF</a>
-                <a href="https://github.com/aep-foundation/aep-specs/releases/latest/download/draft-kavian-aep-claims.html">HTML</a>
-                <a href="https://github.com/aep-foundation/aep-specs/releases/latest/download/draft-kavian-aep-claims.txt">TXT</a>
-                <a href="https://github.com/aep-foundation/aep-specs/releases/latest/download/draft-kavian-aep-claims.xml">XML</a>
-                <a href="https://github.com/aep-foundation/aep-specs/releases/latest/download/draft-kavian-aep-claims.pdf">PDF</a>
-              </span>
-            </td>
-          </tr>
-          <tr>
-            <td class="draft-id" data-label="Draft">draft-kavian-agent-enrollment-protocol-04</td>
-            <td data-label="Description">The Agent Enrollment Protocol (AEP) defines an HTTP-based mechanism for autonomous agents to discover service enrollment requirements, enroll an agent identity, obtain optional session credentials, revoke those credentials, and query enrollment status.</td>
-            <td data-label="Formats">
-              <span class="links">
-                <a href="https://datatracker.ietf.org/doc/draft-kavian-agent-enrollment-protocol/">IETF</a>
-                <a href="https://github.com/aep-foundation/aep-specs/releases/latest/download/draft-kavian-agent-enrollment-protocol.html">HTML</a>
-                <a href="https://github.com/aep-foundation/aep-specs/releases/latest/download/draft-kavian-agent-enrollment-protocol.txt">TXT</a>
-                <a href="https://github.com/aep-foundation/aep-specs/releases/latest/download/draft-kavian-agent-enrollment-protocol.xml">XML</a>
-                <a href="https://github.com/aep-foundation/aep-specs/releases/latest/download/draft-kavian-agent-enrollment-protocol.pdf">PDF</a>
-              </span>
-            </td>
-          </tr>
-          <tr>
-            <td class="draft-id" data-label="Draft">draft-kavian-aep-api-key-session-credential-04</td>
-            <td data-label="Description">This document defines the API-key session-credential grant type for the Agent Enrollment Protocol (AEP).</td>
-            <td data-label="Formats">
-              <span class="links">
-                <a href="https://datatracker.ietf.org/doc/draft-kavian-aep-api-key-session-credential/">IETF</a>
-                <a href="https://github.com/aep-foundation/aep-specs/releases/latest/download/draft-kavian-aep-api-key-session-credential.html">HTML</a>
-                <a href="https://github.com/aep-foundation/aep-specs/releases/latest/download/draft-kavian-aep-api-key-session-credential.txt">TXT</a>
-                <a href="https://github.com/aep-foundation/aep-specs/releases/latest/download/draft-kavian-aep-api-key-session-credential.xml">XML</a>
-                <a href="https://github.com/aep-foundation/aep-specs/releases/latest/download/draft-kavian-aep-api-key-session-credential.pdf">PDF</a>
-              </span>
-            </td>
-          </tr>
-          <tr>
-            <td class="draft-id" data-label="Draft">draft-kavian-aep-basic-session-credential-04</td>
-            <td data-label="Description">This document defines the Basic session-credential grant type for the Agent Enrollment Protocol (AEP).</td>
-            <td data-label="Formats">
-              <span class="links">
-                <a href="https://datatracker.ietf.org/doc/draft-kavian-aep-basic-session-credential/">IETF</a>
-                <a href="https://github.com/aep-foundation/aep-specs/releases/latest/download/draft-kavian-aep-basic-session-credential.html">HTML</a>
-                <a href="https://github.com/aep-foundation/aep-specs/releases/latest/download/draft-kavian-aep-basic-session-credential.txt">TXT</a>
-                <a href="https://github.com/aep-foundation/aep-specs/releases/latest/download/draft-kavian-aep-basic-session-credential.xml">XML</a>
-                <a href="https://github.com/aep-foundation/aep-specs/releases/latest/download/draft-kavian-aep-basic-session-credential.pdf">PDF</a>
-              </span>
-            </td>
-          </tr>
-          <tr>
-            <td class="draft-id" data-label="Draft">draft-kavian-aep-oauth-session-credential-04</td>
-            <td data-label="Description">This document defines the OAuth Bearer session-credential grant type for the Agent Enrollment Protocol (AEP).</td>
-            <td data-label="Formats">
-              <span class="links">
-                <a href="https://datatracker.ietf.org/doc/draft-kavian-aep-oauth-session-credential/">IETF</a>
-                <a href="https://github.com/aep-foundation/aep-specs/releases/latest/download/draft-kavian-aep-oauth-session-credential.html">HTML</a>
-                <a href="https://github.com/aep-foundation/aep-specs/releases/latest/download/draft-kavian-aep-oauth-session-credential.txt">TXT</a>
-                <a href="https://github.com/aep-foundation/aep-specs/releases/latest/download/draft-kavian-aep-oauth-session-credential.xml">XML</a>
-                <a href="https://github.com/aep-foundation/aep-specs/releases/latest/download/draft-kavian-aep-oauth-session-credential.pdf">PDF</a>
-              </span>
-            </td>
-          </tr>
-          <tr>
-            <td class="draft-id" data-label="Draft">draft-kavian-aep-did-web-identity-method-00</td>
-            <td data-label="Description">This document defines the `did:web` identity method for the Agent Enrollment Protocol (AEP).</td>
-            <td data-label="Formats">
-              <span class="links">
-                <a href="https://datatracker.ietf.org/doc/draft-kavian-aep-did-web-identity-method/">IETF</a>
-                <a href="https://github.com/aep-foundation/aep-specs/releases/latest/download/draft-kavian-aep-did-web-identity-method.html">HTML</a>
-                <a href="https://github.com/aep-foundation/aep-specs/releases/latest/download/draft-kavian-aep-did-web-identity-method.txt">TXT</a>
-                <a href="https://github.com/aep-foundation/aep-specs/releases/latest/download/draft-kavian-aep-did-web-identity-method.xml">XML</a>
-                <a href="https://github.com/aep-foundation/aep-specs/releases/latest/download/draft-kavian-aep-did-web-identity-method.pdf">PDF</a>
-              </span>
-            </td>
-          </tr>
-          <tr>
-            <td class="draft-id" data-label="Draft">draft-kavian-aep-platform-hosted-identity-01</td>
-            <td data-label="Description">This document defines interoperable hosted identity behavior for Agent Enrollment Protocol (AEP) Platforms.</td>
-            <td data-label="Formats">
-              <span class="links">
-                <a href="https://datatracker.ietf.org/doc/draft-kavian-aep-platform-hosted-identity/">IETF</a>
-                <a href="https://github.com/aep-foundation/aep-specs/releases/latest/download/draft-kavian-aep-platform-hosted-identity.html">HTML</a>
-                <a href="https://github.com/aep-foundation/aep-specs/releases/latest/download/draft-kavian-aep-platform-hosted-identity.txt">TXT</a>
-                <a href="https://github.com/aep-foundation/aep-specs/releases/latest/download/draft-kavian-aep-platform-hosted-identity.xml">XML</a>
-                <a href="https://github.com/aep-foundation/aep-specs/releases/latest/download/draft-kavian-aep-platform-hosted-identity.pdf">PDF</a>
-              </span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-      <h2>Software Development Kits</h2>
-      <p>
-        Official SDKs provide Core protocol support and Agent, Service, and
-        Platform integrations. See the
-        <a href="https://github.com/aep-foundation/aep-specs/blob/main/SDK_SUPPORT.md">SDK support policy</a>
-        for compatibility, maintenance, release, and conformance details.
-      </p>
-      <table>
-        <thead>
-          <tr>
-            <th>Language</th>
-            <th>Repository</th>
-            <th>Distribution</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td data-label="Language">Node.js</td>
-            <td data-label="Repository"><a href="https://github.com/aep-foundation/aep-node">aep-node</a></td>
-            <td data-label="Distribution"><a href="https://www.npmjs.com/org/aep-foundation">npm</a></td>
-          </tr>
-          <tr>
-            <td data-label="Language">Go</td>
-            <td data-label="Repository"><a href="https://github.com/aep-foundation/aep-go">aep-go</a></td>
-            <td data-label="Distribution"><a href="https://pkg.go.dev/github.com/aep-foundation/aep-go">Go Packages</a></td>
-          </tr>
-          <tr>
-            <td data-label="Language">Java</td>
-            <td data-label="Repository"><a href="https://github.com/aep-foundation/aep-java">aep-java</a></td>
-            <td data-label="Distribution"><a href="https://central.sonatype.com/namespace/foundation.aep">Maven Central</a></td>
-          </tr>
-          <tr>
-            <td data-label="Language">Python</td>
-            <td data-label="Repository"><a href="https://github.com/aep-foundation/aep-python">aep-python</a></td>
-            <td data-label="Distribution"><a href="https://pypi.org/project/agent-enrollment-protocol/">PyPI</a></td>
-          </tr>
-          <tr>
-            <td data-label="Language">Rust</td>
-            <td data-label="Repository"><a href="https://github.com/aep-foundation/aep-rust">aep-rust</a></td>
-            <td data-label="Distribution"><a href="https://crates.io/search?q=aep-">crates.io</a></td>
-          </tr>
-        </tbody>
-      </table>
-
-      <h2>Conformance</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Resource</th>
-            <th>Description</th>
-            <th>Source</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="draft-id" data-label="Resource">Conformance model</td>
-            <td data-label="Description">Role and profile model for the active AEP draft set.</td>
-            <td data-label="Source">
-              <span class="links">
-                <a href="https://github.com/aep-foundation/aep-specs/blob/main/ietf/conformance/README.md">Markdown</a>
-              </span>
-            </td>
-          </tr>
-          <tr>
-            <td class="draft-id" data-label="Resource">Test vectors</td>
-            <td data-label="Description">Deterministic fixtures for Agent, Service, and Platform behavior.</td>
-            <td data-label="Source">
-              <span class="links">
-                <a href="https://github.com/aep-foundation/aep-specs/tree/main/ietf/test-vectors">JSON</a>
-                <a href="https://github.com/aep-foundation/aep-specs/blob/main/ietf/test-vectors/README.md">Markdown</a>
-              </span>
-            </td>
-          </tr>
-          <tr>
-            <td class="draft-id" data-label="Resource">Conformance contracts</td>
-            <td data-label="Description">Language-neutral capability manifest, process adapter, vector index, and report schemas.</td>
-            <td data-label="Source">
-              <span class="links">
-                <a href="conformance/">JSON</a>
-                <a href="https://github.com/aep-foundation/aep-specs/tree/main/ietf/conformance">Markdown</a>
-              </span>
-            </td>
-          </tr>
-          <tr>
-            <td class="draft-id" data-label="Resource">JSON Schemas</td>
-            <td data-label="Description">Validation schemas for stable wire objects used by the current test vectors.</td>
-            <td data-label="Source">
-              <span class="links">
-                <a href="schemas/">JSON</a>
-                <a href="https://github.com/aep-foundation/aep-specs/blob/main/ietf/schemas/README.md">Markdown</a>
-              </span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-      <h2>Guides</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Guide</th>
-            <th>Description</th>
-            <th>Source</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="draft-id" data-label="Guide">Implementer guide</td>
-            <td data-label="Description">Non-normative guidance for command sequencing, idempotency, client assertions, credential choice, and revocation strategy.</td>
-            <td data-label="Source">
-              <span class="links">
-                <a href="https://github.com/aep-foundation/aep-specs/blob/main/ietf/guides/implementer-guide.md">Markdown</a>
-              </span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-      <h2>Governance</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Resource</th>
-            <th>Description</th>
-            <th>Source</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="draft-id" data-label="Resource">Project governance</td>
-            <td data-label="Description">Versioning, compatibility, artifact publication, review, and change management guidance.</td>
-            <td data-label="Source">
-              <span class="links">
-                <a href="https://github.com/aep-foundation/aep-specs/blob/main/GOVERNANCE.md">Markdown</a>
-              </span>
-            </td>
-          </tr>
-          <tr>
-            <td class="draft-id" data-label="Resource">Extension registration</td>
-            <td data-label="Description">Non-normative guidance for extension identifiers, grant types, and support artifacts before formal IANA registries exist.</td>
-            <td data-label="Source">
-              <span class="links">
-                <a href="https://github.com/aep-foundation/aep-specs/blob/main/ietf/governance/extension-registration.md">Markdown</a>
-              </span>
-            </td>
-          </tr>
-          <tr>
-            <td class="draft-id" data-label="Resource">Extension registry</td>
-            <td data-label="Description">Repository-local machine-readable registry entries for current AEP grant-type extensions.</td>
-            <td data-label="Source">
-              <span class="links">
-                <a href="https://github.com/aep-foundation/aep-specs/tree/main/ietf/registry">JSON</a>
-                <a href="https://github.com/aep-foundation/aep-specs/blob/main/ietf/registry/README.md">Markdown</a>
-              </span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-      <h2>Examples</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Example</th>
-            <th>Description</th>
-            <th>Source</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="draft-id" data-label="Example">Complete Inspect document</td>
-            <td data-label="Description">A Service advertising the baseline HTTP binding, did:web, and the initial Grant credential types.</td>
-            <td data-label="Source">
-              <span class="links">
-                <a href="examples/inspect-document.html">HTML</a>
-                <a href="https://github.com/aep-foundation/aep-specs/blob/main/ietf/examples/inspect-document.md">Markdown</a>
-              </span>
-            </td>
-          </tr>
-          <tr>
-            <td class="draft-id" data-label="Example">Enroll, Grant, and Revoke transcript</td>
-            <td data-label="Description">A minimal successful flow from enrollment through session credential issuance and revocation.</td>
-            <td data-label="Source">
-              <span class="links">
-                <a href="examples/enroll-grant-revoke-transcript.html">HTML</a>
-                <a href="https://github.com/aep-foundation/aep-specs/blob/main/ietf/examples/enroll-grant-revoke-transcript.md">Markdown</a>
-              </span>
-            </td>
-          </tr>
-          <tr>
-            <td class="draft-id" data-label="Example">Pending Enroll and Status polling</td>
-            <td data-label="Description">A pending enrollment flow followed by Status polling until the identity becomes active.</td>
-            <td data-label="Source">
-              <span class="links">
-                <a href="examples/pending-enroll-status.html">HTML</a>
-                <a href="https://github.com/aep-foundation/aep-specs/blob/main/ietf/examples/pending-enroll-status.md">Markdown</a>
-              </span>
-            </td>
-          </tr>
-          <tr>
-            <td class="draft-id" data-label="Example">Status states</td>
-            <td data-label="Description">Representative Status responses for pending, unavailable, suspended, terminated, and rejected identities.</td>
-            <td data-label="Source">
-              <span class="links">
-                <a href="examples/status-states.html">HTML</a>
-                <a href="https://github.com/aep-foundation/aep-specs/blob/main/ietf/examples/status-states.md">Markdown</a>
-              </span>
-            </td>
-          </tr>
-          <tr>
-            <td class="draft-id" data-label="Example">API-key Grant and Revoke</td>
-            <td data-label="Description">API-key session credential issuance, presentation, per-credential Revoke, and grant-type Revoke.</td>
-            <td data-label="Source">
-              <span class="links">
-                <a href="examples/api-key-grant-revoke.html">HTML</a>
-                <a href="https://github.com/aep-foundation/aep-specs/blob/main/ietf/examples/api-key-grant-revoke.md">Markdown</a>
-              </span>
-            </td>
-          </tr>
-          <tr>
-            <td class="draft-id" data-label="Example">Basic Grant and Revoke</td>
-            <td data-label="Description">Basic session credential issuance, presentation, per-credential Revoke, and grant-type Revoke.</td>
-            <td data-label="Source">
-              <span class="links">
-                <a href="examples/basic-grant-revoke.html">HTML</a>
-                <a href="https://github.com/aep-foundation/aep-specs/blob/main/ietf/examples/basic-grant-revoke.md">Markdown</a>
-              </span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-      <h2>Source</h2>
-      <p>
-        Draft sources and contribution guidelines are maintained in the
-        <a href="https://github.com/aep-foundation/aep-specs">aep-foundation/aep-specs</a>
-        repository.
-      </p>
-    </main>
-  </body>
-</html>
+<span class='code-meta'>&lt;</span> HTTP/1.1 200 OK
+<span class='code-meta'>&lt;</span> Payment-Receipt: <span class='code-value'>eyJzZXR0bGVkIjp0cnVlfQ...</span></pre></div></div></div><div class='companion-copy'><h4 class='companion-title'><span class='companion-title-lead'>Settle a charge once identity is resolved</span><span class='companion-title-body'>x402 or MPP turns a 402 response into a completed payment. InFlow CLI is the wallet that moves the funds, for an agent AEP has already confirmed.</span></h4></div><a class='onboarding-link mono-body-md onboarding-link-accent' href='https://github.com/inflowpayai/' target='_blank'>↳ learn more</a></div></div></section><section class='cta-section'><h1 class='cta-heading'><span class='heading-muted'>Convert guest checkouts</span> <span class='heading-strong'>into registered agent customers</span></h1><div class='cta-actions'><a class='onboarding-link mono-body-md onboarding-link-accent' href='https://www.inflowcli.ai/' target='_blank'>↳ use with your agent</a><a class='onboarding-link mono-body-md' href='/documentation/'>↳ add authentication to your api</a></div></section></div></div></div><footer class='onboarding-footer'><div class='onboarding-footer-column'><div class='title-with-swatch heading-grey'><span class='swatch'></span><span class='mono-body-md text-uppercase'>Agent Enrollment Protocol</span></div><div class='onboarding-footer-body'><a class='onboarding-footer-label mono-body-md text-uppercase' href='https://github.com/aep-foundation/' target='_blank'>Github</a><div class='onboarding-footer-tagline mono-body-md text-uppercase'><a class='link-underline-dotted' href='https://www.offeringprotocol.org/' target='_blank'>Discover</a><span>, </span><a class='link-underline-dotted muted' href='/'>Onboard</a><span>, and </span><a class='link-underline-dotted' href='https://github.com/inflowpayai/' target='_blank'>Pay</a></div></div></div><div class='onboarding-footer-column'><div class='title-with-swatch heading-grey'><span class='swatch'></span><span class='mono-body-md text-uppercase'>Disclaimer</span></div><div class='onboarding-footer-body'><span class='onboarding-footer-note mono-body-md text-uppercase'>© 2026 All rights reserved, AEP.</span><div class='onboarding-footer-authored mono-body-md text-uppercase'><span>Authored by </span><a class='link-underline-dotted' href='https://www.inflowpay.ai/' target='_blank' data-shortcut='a'>InFlow</a></div></div><a href='/'><img class='onboarding-footer-mark' src='https://app.inflowpay.ai/aep-foundation/img/logo.svg' alt='AEP' width='74' height='40' /></a></div></footer></div></main></div></div><script src='https://app.inflowpay.ai/vendor/bootstrap/bootstrap.bundle.min.js?v=2.0.0'></script><script src='https://app.inflowpay.ai/aep-foundation/js/onboarding.min.js?v=2.0.0'></script></body></html>
