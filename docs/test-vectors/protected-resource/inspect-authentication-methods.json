@@ -1,0 +1,22 @@
+{
+  "id": "inspect-authentication-methods",
+  "title": "Inspect protected-resource authentication methods",
+  "description": "Inspect explicitly distinguishes JWT-only, credential-only, and ordered mixed authentication advertisement.",
+  "drafts": ["draft-kavian-agent-enrollment-protocol-04"],
+  "category": "protected-resource",
+  "applicability": {
+    "agent": {
+      "expectation": "required",
+      "profile": "core-http"
+    },
+    "platform": {
+      "expectation": "unsupported"
+    },
+    "service": {
+      "expectation": "required",
+      "profile": "core-http"
+    }
+  },
+  "input": {},
+  "expected": {"jwt_only": {"authentication": {"methods": ["aep-jwt"]}}, "credentials_only": {"authentication": {"methods": ["oauth-bearer", "api-key", "basic"]}}, "ordered_mixed": {"authentication": {"methods": ["aep-jwt", "oauth-bearer", "api-key", "basic"]}}, "omitted_means": "no-advertised-method"}
+}

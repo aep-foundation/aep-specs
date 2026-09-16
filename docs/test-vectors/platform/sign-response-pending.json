@@ -1,0 +1,26 @@
+{
+  "id": "sign-response-pending",
+  "title": "Platform delegated signing pending response",
+  "description": "A Platform returns an opaque continuation context and bounded retry cadence.",
+  "drafts": ["draft-kavian-aep-platform-hosted-identity-01"],
+  "category": "platform",
+  "applicability": {
+    "agent": {
+      "expectation": "required",
+      "profile": "platform-hosted-identity"
+    },
+    "platform": {
+      "expectation": "required",
+      "profile": "platform-hosted-identity"
+    },
+    "service": {
+      "expectation": "unsupported"
+    }
+  },
+  "input": {"idempotency_key_header": "01J0AEPSIGNINITIAL0000000001"},
+  "expected": {
+    "status": "pending",
+    "platform_context": {"authorization_handle": "opaque-value"},
+    "retry_after_seconds": "5"
+  }
+}

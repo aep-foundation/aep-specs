@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Internet-Draft Addition Guide - AEP Foundation</title>
+    <style>
+      :root { color-scheme: light; --border: #d7dde5; --code: #f4f7fb; --fg: #17202a; --link: #0f5e9c; --muted: #5c6b7a; }
+      body { color: var(--fg); font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; line-height: 1.55; margin: 0; }
+      main { margin: 0 auto; max-width: 960px; padding: 40px 20px 64px; }
+      a { color: var(--link); }
+      h1 { font-size: 2rem; line-height: 1.2; margin: 0 0 12px; }
+      h2 { border-top: 1px solid var(--border); font-size: 1.25rem; margin-top: 32px; padding-top: 24px; }
+      p { max-width: 760px; }
+      table { border: 1px solid var(--border); border-collapse: collapse; margin-top: 24px; width: 100%; }
+      th, td { border-bottom: 1px solid var(--border); padding: 12px; text-align: left; vertical-align: top; }
+      tbody tr:last-child td { border-bottom: 0; }
+      th { color: var(--muted); font-size: 0.9rem; }
+      pre { background: var(--code); border: 1px solid var(--border); overflow-x: auto; padding: 14px; }
+      code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.92em; }
+      .introduction { color: var(--muted); }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Internet-Draft Addition Guide</h1>
+      <p class="introduction">Non-normative AEP implementation guidance.</p>
+      <p>Use this guide for every new AEP Internet-Draft, including extension, grant<br />
+type, identity method, Platform, transport, policy, attestation, and other<br />
+future specification documents.</p>
+
+<p>The goal is stronger than making CI pass. A draft that completes this guide<br />
+should be ready for public IETF posting: the source is in the right place, the<br />
+document is internally coherent, support artifacts match the prose, generated<br />
+outputs are current, and the posting package is ready.</p>
+
+<h2 id="1-classify-the-draft">1. Classify The Draft</h2>
+
+<p>Decide the correct <code>ietf/specs/</code> subdirectory before editing content.</p>
+
+<ul>
+  <li><code>core/</code>: baseline interoperable protocol behavior.</li>
+  <li><code>grant-types/</code>: concrete Grant and Revoke session credential formats.</li>
+  <li><code>identity-methods/</code>: concrete Agent identity methods.</li>
+  <li><code>platforms/</code>: Platform-operated APIs outside the Service-facing AEP command<br />
+surface.</li>
+  <li><code>transports/</code>: non-baseline transport bindings.</li>
+  <li><code>extensions/</code>: optional protocol capabilities that build on core and are not<br />
+better described by a more specific spec class.</li>
+</ul>
+
+<p>Update <code>ietf/specs/README.md</code> and the target subdirectory <code>README.md</code>.</p>
+
+<p>Exit criteria:</p>
+
+<ul>
+  <li>The draft path matches the protocol layer it defines.</li>
+  <li>Repo navigation explains the new spec class or existing class clearly.</li>
+  <li>No README implies the draft belongs to a different class.</li>
+</ul>
+
+<h2 id="2-set-the-draft-name-and-metadata">2. Set The Draft Name And Metadata</h2>
+
+<p>Choose an author-style Internet-Draft name, usually<br />
+<code>draft-kavian-aep-&lt;topic&gt;-00.md</code>. Avoid terms such as <code>profile</code> unless the<br />
+draft is truly a constrained profile of another mechanism.</p>
+
+<p>Check:</p>
+
+<ul>
+  <li>YAML <code>docname</code> exactly matches the filename without <code>.md</code>.</li>
+  <li><code>title</code>, <code>abbrev</code>, <code>category</code>, <code>ipr</code>, <code>submissiontype</code>, <code>stand_alone</code>, and<br />
+author metadata match existing drafts.</li>
+  <li>Normative references are required to implement the wire behavior.</li>
+  <li>Informative references are short and directly relevant.</li>
+</ul>
+
+<p>Exit criteria:</p>
+
+<ul>
+  <li>Draft lint passes.</li>
+  <li>Datatracker links derived from the docname are correct.</li>
+  <li>Filename, <code>docname</code>, README links, vectors, and generated index all use the<br />
+same identifier.</li>
+</ul>
+
+<h2 id="3-read-the-required-context">3. Read The Required Context</h2>
+
+<p>Read before editing:</p>
+
+<ul>
+  <li><code>ietf/STYLE.md</code></li>
+  <li><code>ietf/specs/README.md</code></li>
+  <li>the target subdirectory <code>README.md</code></li>
+  <li>the closest existing draft in the same class</li>
+  <li>any draft referenced normatively by the new draft</li>
+  <li>source design material that motivated the draft</li>
+</ul>
+
+<p>Extract requirements into a temporary gap list and mark each gap as: fix in<br />
+draft, fix in schemas, fix in vectors, fix in conformance, intentionally out of<br />
+scope, or defer with rationale.</p>
+
+<p>Exit criteria:</p>
+
+<ul>
+  <li>The draft does not rely on summary memory.</li>
+  <li>Source requirements are implemented or explicitly scoped out.</li>
+  <li>No private strategy, partner assumptions, or internal roadmap text leaks into<br />
+public draft files.</li>
+</ul>
+
+<h2 id="4-write-the-draft-to-ietf-quality">4. Write The Draft To IETF Quality</h2>
+
+<p>The draft needs:</p>
+
+<ul>
+  <li>abstract stating what the document defines without marketing language</li>
+  <li>introduction stating scope, non-goals, and relationship to AEP core</li>
+  <li>BCP 14 Requirements Language</li>
+  <li>terminology that reuses AEP core terms and defines only new terms</li>
+  <li>complete wire-visible behavior</li>
+  <li>request, response, validation, and error behavior for every new endpoint,<br />
+command, object, or registry value</li>
+  <li>testable normative statements</li>
+  <li>examples that are fake, realistic, and schema-valid</li>
+  <li><code>lower_snake_case</code> JSON fields</li>
+  <li>string-encoded AEP-owned numeric protocol values</li>
+  <li>RFC 3339 timestamps</li>
+  <li>JWT NumericDate JSON numbers where governed by JWT specs</li>
+  <li>no hand-written <code># References</code> section</li>
+</ul>
+
+<p>Exit criteria:</p>
+
+<ul>
+  <li>The draft reads like the existing AEP Internet-Drafts.</li>
+  <li>A new implementer can build the behavior from the draft alone.</li>
+  <li>Examples and normative prose do not contradict each other.</li>
+</ul>
+
+<h2 id="5-preserve-aep-architecture">5. Preserve AEP Architecture</h2>
+
+<p>The draft must state how it relates to AEP core and must not redefine core<br />
+claims, commands, errors, lifecycle states, roles, or fields.</p>
+
+<p>Preserve:</p>
+
+<ul>
+  <li>explicit discovery</li>
+  <li>fail-closed authentication and replay behavior</li>
+  <li>the <code>not_recognized</code> anti-enumeration surface where applicable</li>
+  <li>separation between Service-facing AEP commands and Platform-operated APIs</li>
+  <li>optional behavior staying out of core unless required for minimum<br />
+interoperability</li>
+</ul>
+
+<p>Exit criteria:</p>
+
+<ul>
+  <li>The draft composes with AEP core without changing core semantics.</li>
+  <li>Cross-layer references flow from the new draft to core, not from core to the<br />
+optional draft unless deliberately updating core.</li>
+  <li>Unsupported implementations can safely ignore optional behavior.</li>
+</ul>
+
+<h2 id="6-review-security-and-privacy">6. Review Security And Privacy</h2>
+
+<p>Security and Privacy Considerations must be specific to the draft.</p>
+
+<p>Cover:</p>
+
+<ul>
+  <li>authentication boundaries</li>
+  <li>authorization boundaries</li>
+  <li>replay protection</li>
+  <li>idempotency for mutating operations</li>
+  <li>credential, token, key, or secret disclosure</li>
+  <li>information disclosure and enumeration risk</li>
+  <li>denial-of-service and rate limiting</li>
+  <li>audit requirements</li>
+  <li>log and telemetry minimization</li>
+  <li>correlation risk and pairwise identifiers where relevant</li>
+  <li>recovery, rotation, suspension, revocation, or termination where relevant</li>
+</ul>
+
+<p>Exit criteria:</p>
+
+<ul>
+  <li>Security and privacy sections cover every new trust boundary.</li>
+  <li>No endpoint exposes private signing material, raw credentials, or unnecessary<br />
+PII.</li>
+  <li>Failure behavior does not create probing-friendly distinctions.</li>
+</ul>
+
+<h2 id="7-align-json-schemas">7. Align JSON Schemas</h2>
+
+<p>Add schemas for stable wire objects introduced by the draft.</p>
+
+<p>Check:</p>
+
+<ul>
+  <li>schema names are consistent</li>
+  <li><code>$id</code> values use <code>https://www.aep.foundation/schemas/</code></li>
+  <li>required fields match normative prose</li>
+  <li>optional fields are optional in prose</li>
+  <li>enum values match normative prose exactly</li>
+  <li>DID fields use appropriate patterns</li>
+  <li>date-time fields use <code>format: date-time</code></li>
+  <li>numeric-string fields are strings, not JSON numbers</li>
+  <li><code>additionalProperties</code> is intentional</li>
+</ul>
+
+<p>Update <code>ietf/schemas/README.md</code>, <code>ietf/scripts/check_schemas.rb</code>, and<br />
+published copies under <code>docs/schemas/</code>.</p>
+
+<p>Exit criteria:</p>
+
+<ul>
+  <li>Every stable wire object has a schema or a documented reason it does not.</li>
+  <li>Every schema has at least one validating test vector when practical.</li>
+  <li>Schema and published-schema checks pass.</li>
+</ul>
+
+<h2 id="8-build-meaningful-test-vectors">8. Build Meaningful Test Vectors</h2>
+
+<p>Vectors should cover interoperability behavior, not only object syntax.</p>
+
+<p>Add vectors for:</p>
+
+<ul>
+  <li>stable request objects</li>
+  <li>stable success response objects</li>
+  <li>important error or non-disclosure behavior</li>
+  <li>idempotency behavior for mutating operations</li>
+  <li>discovery or advertisement behavior</li>
+  <li>lifecycle or state transitions when defined</li>
+</ul>
+
+<p>Update <code>ietf/scripts/check_test_vectors.rb</code> and <code>ietf/test-vectors/README.md</code><br />
+for new categories, roles, or profiles.</p>
+
+<p>Exit criteria:</p>
+
+<ul>
+  <li>Vectors exercise the draft’s interoperability surface.</li>
+  <li>Vector checks pass.</li>
+  <li>Schema-targeted vectors validate.</li>
+</ul>
+
+<h2 id="9-define-conformance-impact">9. Define Conformance Impact</h2>
+
+<p>Decide whether the draft adds Agent, Service, Platform, binding, extension, or<br />
+other role requirements.</p>
+
+<p>Define:</p>
+
+<ul>
+  <li>support claim requirements</li>
+  <li>Core, Standard, Extended, or claim-dependent status</li>
+  <li>static-vector coverage</li>
+  <li>live-harness coverage</li>
+  <li>declaration-only requirements</li>
+</ul>
+
+<p>Update <code>ietf/conformance/README.md</code> and<br />
+<code>ietf/scripts/check_conformance_harness.rb</code> when needed.</p>
+
+<p>Exit criteria:</p>
+
+<ul>
+  <li>An implementer knows how to claim support.</li>
+  <li>Conformance text does not imply optional support is required.</li>
+  <li>Harness checks pass.</li>
+</ul>
+
+<h2 id="10-review-registry-and-governance-needs">10. Review Registry And Governance Needs</h2>
+
+<p>Decide whether the draft registers a command, grant type, identity method,<br />
+extension, error code, lifecycle state, well-known URI, media type, or other<br />
+wire identifier.</p>
+
+<p>Update:</p>
+
+<ul>
+  <li>IANA Considerations</li>
+  <li><code>ietf/registry/</code> entries</li>
+  <li><code>ietf/governance/README.md</code></li>
+  <li><code>ietf/governance/extension-registration.md</code> only when extension registration<br />
+behavior changes</li>
+  <li><code>ietf/scripts/check_registry.rb</code> when validation rules change</li>
+</ul>
+
+<p>Exit criteria:</p>
+
+<ul>
+  <li>Every new wire identifier has a registration path or a clear reason no<br />
+registration is needed.</li>
+  <li>IANA Considerations is not empty when registrable values are defined.</li>
+  <li>Registry checks pass.</li>
+</ul>
+
+<h2 id="11-update-documentation-and-navigation">11. Update Documentation And Navigation</h2>
+
+<p>Update:</p>
+
+<ul>
+  <li>root <code>README.md</code></li>
+  <li><code>ietf/README.md</code></li>
+  <li><code>ietf/specs/README.md</code></li>
+  <li>the target subdirectory <code>README.md</code></li>
+  <li><code>ietf/schemas/README.md</code></li>
+  <li><code>ietf/test-vectors/README.md</code></li>
+  <li><code>CONTRIBUTING.md</code> if the workflow changes</li>
+  <li>generated <code>docs/index.html</code></li>
+  <li>generated schema docs and copies</li>
+</ul>
+
+<p>Exit criteria:</p>
+
+<ul>
+  <li>A reader can discover the draft from the root README and IETF README.</li>
+  <li>Website index points to the correct release asset names.</li>
+  <li>No public documentation points to an old filename, old folder, or old draft<br />
+classification.</li>
+</ul>
+
+<h2 id="12-render-and-inspect-artifacts">12. Render And Inspect Artifacts</h2>
+
+<p>Run:</p>
+
+<pre><code class="language-sh">make -C ietf format
+make -C ietf render-index
+make -C ietf render-schemas
+make -C ietf render-drafts
+</code></pre>
+
+<p>Inspect generated <code>.txt</code>, <code>.html</code>, <code>.xml</code>, and <code>.pdf</code> artifacts. Record render<br />
+warnings and decide whether they block posting.</p>
+
+<p>Exit criteria:</p>
+
+<ul>
+  <li>Rendered artifacts exist under the current docname.</li>
+  <li>Generated outputs are readable enough for public review.</li>
+  <li>Checked-in generated docs have no stale links.</li>
+</ul>
+
+<h2 id="13-run-consistency-searches">13. Run Consistency Searches</h2>
+
+<p>Search for:</p>
+
+<ul>
+  <li>old draft names</li>
+  <li>old folder paths</li>
+  <li>stale terminology</li>
+  <li>old error names</li>
+  <li><code>profile</code> when the draft is not a profile</li>
+  <li><code>extension</code> in non-extension draft material</li>
+  <li>internal strategy terms</li>
+  <li>private partner names or speculative launch language</li>
+</ul>
+
+<p>Exit criteria:</p>
+
+<ul>
+  <li>Stale hits are fixed or intentionally retained with a documented reason.</li>
+  <li>Checked source and docs contain no stale draft name, path, or taxonomy.</li>
+</ul>
+
+<h2 id="14-run-the-full-check-gate">14. Run The Full Check Gate</h2>
+
+<p>Run:</p>
+
+<pre><code class="language-sh">make -C ietf check
+git diff --check
+git status --short
+git diff --stat
+</code></pre>
+
+<p>Review substantive diffs, not only summaries.</p>
+
+<p>Exit criteria:</p>
+
+<ul>
+  <li><code>make -C ietf check</code> passes.</li>
+  <li><code>git diff --check</code> reports no whitespace errors.</li>
+  <li>All modified and untracked files are expected.</li>
+  <li>No unrelated user changes were reverted or overwritten.</li>
+</ul>
+
+<h2 id="15-perform-publication-readiness-review">15. Perform Publication Readiness Review</h2>
+
+<p>Read the draft from top to bottom as if reviewing an IETF submission.</p>
+
+<p>Confirm:</p>
+
+<ul>
+  <li>title and abstract identify the specification</li>
+  <li>required sections are present</li>
+  <li>the draft can be implemented without private context</li>
+  <li>examples are consistent and useful</li>
+  <li>schemas and vectors cover stable wire behavior</li>
+  <li>conformance impact is explicit</li>
+  <li>IANA Considerations is correct</li>
+  <li>Security Considerations is complete enough for public review</li>
+  <li>Privacy Considerations is complete enough for public review</li>
+  <li>source-design gaps do not block posting</li>
+</ul>
+
+<p>Exit criteria:</p>
+
+<ul>
+  <li>The editor would be comfortable posting the draft to IETF Datatracker.</li>
+  <li>Remaining work, if any, is post-publication improvement rather than a blocker<br />
+to public review.</li>
+</ul>
+
+<h2 id="16-prepare-the-ietf-posting-package">16. Prepare The IETF Posting Package</h2>
+
+<p>Use the rendered XML artifact for Datatracker upload.</p>
+
+<p>Confirm:</p>
+
+<ul>
+  <li>XML docname matches the intended draft identifier</li>
+  <li>rendered text artifact has the expected title, date, author, and abstract</li>
+  <li>references are complete</li>
+  <li>no unresolved placeholders remain</li>
+  <li>version suffix is correct</li>
+  <li>release asset names align with the docname</li>
+</ul>
+
+<p>Prepare a short posting summary: what the draft defines, what it depends on,<br />
+and what review is requested.</p>
+
+<p>Exit criteria:</p>
+
+<ul>
+  <li>The draft can be posted to IETF without additional repo surgery.</li>
+  <li>Posting summary accurately represents the draft and its relation to AEP core.</li>
+</ul>
+    </main>
+  </body>
+</html>

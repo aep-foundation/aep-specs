@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Internet-Draft Revision Guide - AEP Foundation</title>
+    <style>
+      :root { color-scheme: light; --border: #d7dde5; --code: #f4f7fb; --fg: #17202a; --link: #0f5e9c; --muted: #5c6b7a; }
+      body { color: var(--fg); font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; line-height: 1.55; margin: 0; }
+      main { margin: 0 auto; max-width: 960px; padding: 40px 20px 64px; }
+      a { color: var(--link); }
+      h1 { font-size: 2rem; line-height: 1.2; margin: 0 0 12px; }
+      h2 { border-top: 1px solid var(--border); font-size: 1.25rem; margin-top: 32px; padding-top: 24px; }
+      p { max-width: 760px; }
+      table { border: 1px solid var(--border); border-collapse: collapse; margin-top: 24px; width: 100%; }
+      th, td { border-bottom: 1px solid var(--border); padding: 12px; text-align: left; vertical-align: top; }
+      tbody tr:last-child td { border-bottom: 0; }
+      th { color: var(--muted); font-size: 0.9rem; }
+      pre { background: var(--code); border: 1px solid var(--border); overflow-x: auto; padding: 14px; }
+      code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.92em; }
+      .introduction { color: var(--muted); }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Internet-Draft Revision Guide</h1>
+      <p class="introduction">Non-normative AEP implementation guidance.</p>
+      <p>This guide describes how to advance one or more published AEP Internet-Drafts to new revisions. It<br />
+complements <code>internet-draft-addition-guide.md</code>, which covers introducing a new draft.</p>
+
+<p>An Internet-Draft revision is an immutable publication. Never change the source for an already<br />
+published revision and submit it again under the same document name. Advance its numeric suffix and<br />
+publish the resulting revision instead.</p>
+
+<h2 id="1-establish-the-published-baseline">1. Establish The Published Baseline</h2>
+
+<p>For every affected draft:</p>
+
+<ol>
+  <li>Open its official IETF Datatracker page.</li>
+  <li>Record the latest published revision and publication date.</li>
+  <li>Compare that revision with the repository source and the proposed changes.</li>
+  <li>Identify every draft whose contents must change.</li>
+</ol>
+
+<p>Do not infer the published revision from the repository filename, website, Git tag, or GitHub<br />
+Release. Datatracker is authoritative for the publication state.</p>
+
+<h2 id="2-determine-the-revision-set-and-order">2. Determine The Revision Set And Order</h2>
+
+<p>AEP consists of a core draft and companion drafts for Claims, identity methods, grant types, and<br />
+Platforms. A change can require multiple new revisions.</p>
+
+<p>Build the dependency order before editing:</p>
+
+<ol>
+  <li>Revise foundational drafts first.</li>
+  <li>Revise drafts that normatively depend on them next.</li>
+  <li>Update informative references when publishing the dependent draft would otherwise preserve stale<br />
+publication metadata.</li>
+</ol>
+
+<p>Changing a reference inside a published draft changes that draft. Give it a new revision rather<br />
+than rewriting its published source under the existing suffix.</p>
+
+<h2 id="3-advance-each-draft-source">3. Advance Each Draft Source</h2>
+
+<p>For each revised draft:</p>
+
+<ol>
+  <li>Rename its Markdown file from <code>-NN.md</code> to <code>-(NN+1).md</code>.</li>
+  <li>Update the frontmatter <code>docname</code> to the same full document name.</li>
+  <li>Set the frontmatter <code>date</code> to the intended submission date. The date for every draft being<br />
+submitted must be within three days of the actual Datatracker upload date. Update and render the<br />
+draft again if submission is delayed beyond that window.</li>
+  <li>Update references to revised dependent drafts, including the reference <code>date</code> and <code>seriesinfo</code><br />
+revision.</li>
+  <li>Re-read the complete draft and confirm the revision contains only intended current-state text.</li>
+</ol>
+
+<p>The filename, <code>docname</code>, rendered artifact basename, Datatracker submission name, immutable Git tag,<br />
+and immutable GitHub Release name must agree.</p>
+
+<h2 id="4-update-aep-repository-references">4. Update AEP Repository References</h2>
+
+<p>Search the entire repository for both the old full document name and shortened revision labels such<br />
+as <code>draft-03</code>. Inspect every match rather than applying an unreviewed global replacement.</p>
+
+<p>Depending on the revised draft, update:</p>
+
+<ul>
+  <li>the root <code>README.md</code> draft list</li>
+  <li><code>ietf/README.md</code> and the relevant <code>ietf/specs/**/README.md</code></li>
+  <li>registry entries under <code>ietf/registry/</code></li>
+  <li>conformance scope and ownership metadata under <code>ietf/conformance/</code></li>
+  <li>test-vector <code>drafts</code> ownership arrays under <code>ietf/test-vectors/</code></li>
+  <li>validator allowlists and draft-name checks under <code>ietf/scripts/</code></li>
+  <li>schemas and examples containing versioned identifiers</li>
+  <li>website links and release-asset names</li>
+  <li>workflows or publication scripts containing explicit draft names</li>
+</ul>
+
+<p>Retain an old revision reference only when it intentionally identifies an immutable historical<br />
+publication. Confirm that reason during review.</p>
+
+<p>When the public website contains InFlow-generated per-draft pages under <code>docs/draft/</code>, treat every<br />
+affected page as part of the revision. Use the owning website process to regenerate those pages and<br />
+inspect its manifest of committed outputs. AEP can publish multiple draft pages, so verify the page<br />
+for every revised draft as well as navigation that links the complete draft set. The normal IETF<br />
+render target does not own these pages; do not hand-edit their generated HTML.</p>
+
+<h2 id="5-render-the-committed-artifacts">5. Render The Committed Artifacts</h2>
+
+<p>From the repository root, run:</p>
+
+<pre><code class="language-sh">make -C ietf format
+make -C ietf render
+</code></pre>
+
+<p>The render target creates ignored XML, text, HTML, and PDF files under <code>artifacts/</code>. It also<br />
+regenerates the committed website index, examples, schemas, and conformance material under <code>docs/</code>.<br />
+Review every committed generated-file change.</p>
+
+<h2 id="6-validate-the-revision">6. Validate The Revision</h2>
+
+<p>Run:</p>
+
+<pre><code class="language-sh">make -C ietf check
+make -C ietf idnits
+git diff --check
+git status --short
+</code></pre>
+
+<p>Then:</p>
+
+<ol>
+  <li>Repeat the repository-wide searches for the old full document name and old shortened revision.</li>
+  <li>Confirm every remaining match is intentionally historical.</li>
+  <li>Confirm each draft being submitted has a top-level publication date within three days of the<br />
+planned Datatracker upload. Do not change dates within bibliographic references unless the<br />
+referenced publication changed.</li>
+  <li>Inspect the rendered text for the expected title, date, revision, references, and abstract.</li>
+  <li>Inspect the complete Git diff, including generated files.</li>
+  <li>Run <code>make -C ietf render</code> again and confirm it does not produce additional committed changes.</li>
+</ol>
+
+<p>Do not treat a successful renderer as proof that repository references, registries, vectors,<br />
+allowlists, or InFlow-generated draft pages are current. The final searches and diff review are<br />
+required.</p>
+
+<h2 id="7-review-and-merge-the-pull-request">7. Review And Merge The Pull Request</h2>
+
+<p>Keep the complete revision set coherent in its pull request. The pull request description should<br />
+identify:</p>
+
+<ul>
+  <li>every draft being advanced</li>
+  <li>each old and new revision</li>
+  <li>draft dependencies and intended submission order</li>
+  <li>the substantive protocol changes</li>
+  <li>the commands that passed</li>
+  <li>any intentionally retained old-revision references</li>
+  <li>the state of every affected InFlow-generated public draft page</li>
+</ul>
+
+<p>Merge the reviewed pull request before submitting its artifacts to IETF Datatracker. Submit the<br />
+exact artifacts rendered from the merged commit.</p>
+
+<h2 id="8-submit-and-verify-the-drafts">8. Submit And Verify The Drafts</h2>
+
+<p>Submit the rendered XML files to IETF Datatracker in dependency order. For every submission:</p>
+
+<ol>
+  <li>Recheck that the draft’s top-level date is within three days of the current date. If it is not,<br />
+update the source date, repeat rendering and validation, and merge the corrected source before<br />
+uploading it.</li>
+  <li>Confirm Datatracker accepted the intended revision.</li>
+  <li>Confirm the published title, date, abstract, and references.</li>
+  <li>Record the merged repository commit that produced the artifact.</li>
+</ol>
+
+<p>Do not submit dependent drafts until their referenced AEP revisions are available when that ordering<br />
+is necessary for accurate publication metadata.</p>
+
+<h2 id="9-preserve-the-published-revision">9. Preserve The Published Revision</h2>
+
+<p>After Datatracker publication, follow <code>CONTRIBUTING.md</code> to create the immutable annotated Git tag<br />
+and GitHub Release named after the full document revision and attach its XML, text, HTML, and PDF<br />
+artifacts.</p>
+
+<p>The deployment workflow separately moves the replaceable <code>latest</code> Git tag and GitHub Release to<br />
+the deployed <code>main</code> commit. <code>latest</code> is a convenience snapshot; it does not replace the immutable<br />
+tag and release for a submitted revision.</p>
+
+<p>Final verification requires all of the following:</p>
+
+<ul>
+  <li>Datatracker shows the intended revision.</li>
+  <li>The immutable Git tag identifies the merged source commit.</li>
+  <li>The immutable GitHub Release contains correctly named artifacts.</li>
+  <li>The <code>latest</code> release and public website resolve to the current material.</li>
+  <li>Repository searches reveal no accidental stale revision references.</li>
+</ul>
+    </main>
+  </body>
+</html>

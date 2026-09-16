@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AEP Implementer Guide - AEP Foundation</title>
+    <style>
+      :root { color-scheme: light; --border: #d7dde5; --code: #f4f7fb; --fg: #17202a; --link: #0f5e9c; --muted: #5c6b7a; }
+      body { color: var(--fg); font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; line-height: 1.55; margin: 0; }
+      main { margin: 0 auto; max-width: 960px; padding: 40px 20px 64px; }
+      a { color: var(--link); }
+      h1 { font-size: 2rem; line-height: 1.2; margin: 0 0 12px; }
+      h2 { border-top: 1px solid var(--border); font-size: 1.25rem; margin-top: 32px; padding-top: 24px; }
+      p { max-width: 760px; }
+      table { border: 1px solid var(--border); border-collapse: collapse; margin-top: 24px; width: 100%; }
+      th, td { border-bottom: 1px solid var(--border); padding: 12px; text-align: left; vertical-align: top; }
+      tbody tr:last-child td { border-bottom: 0; }
+      th { color: var(--muted); font-size: 0.9rem; }
+      pre { background: var(--code); border: 1px solid var(--border); overflow-x: auto; padding: 14px; }
+      code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.92em; }
+      .introduction { color: var(--muted); }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>AEP Implementer Guide</h1>
+      <p class="introduction">Non-normative AEP implementation guidance.</p>
+      <p>This guide is non-normative. It summarizes how to connect the AEP drafts,<br />
+examples, test vectors, schemas, and conformance harness when building an Agent<br />
+or Service.</p>
+
+<h2 id="source-of-truth">Source Of Truth</h2>
+
+<p>Use the current Internet-Draft set as the protocol authority:</p>
+
+<ul>
+  <li>Core protocol: Inspect, Enroll, Status, Grant, Revoke, HTTP binding,<br />
+identity-method substrate, client assertions, errors, idempotency, and IANA<br />
+registrations.</li>
+  <li>did:web identity method draft: <code>did:web</code> resolution and client assertion<br />
+verification material.</li>
+  <li>Claims draft: interoperable person and contact Claim Names, value shapes,<br />
+negotiation, and forward-compatibility behavior.</li>
+  <li>OAuth Bearer credential draft: <code>oauth-bearer</code> Grant and Revoke behavior.</li>
+  <li>API-key credential draft: <code>api-key</code> Grant and Revoke behavior.</li>
+  <li>Basic credential draft: <code>basic</code> Grant and Revoke behavior.</li>
+</ul>
+
+<p>Use examples, schemas, vectors, and the offline harness to check<br />
+implementation behavior. If guidance conflicts with a draft, follow the draft.</p>
+
+<h2 id="command-sequencing">Command Sequencing</h2>
+
+<p>A typical Agent flow is:</p>
+
+<ol>
+  <li>Fetch Inspect from <code>/.well-known/aep</code>.</li>
+  <li>Confirm that <code>bindings.supported</code> contains <code>http</code>.</li>
+  <li>Confirm that <code>identity.methods</code> contains at least one identity method the<br />
+implementation supports.</li>
+  <li>Resolve required claim names from <code>claims.required</code>.</li>
+  <li>Enroll with <code>Authorization: AEP &lt;jwt&gt;</code> and <code>op</code> equal to <code>enroll</code>.</li>
+  <li>If Enroll returns <code>pending</code>, poll Status with <code>op</code> equal to <code>status</code>.</li>
+  <li>If session credentials are needed, choose a <code>grant_type</code> from<br />
+<code>commands.grant_types</code> and call Grant with <code>op</code> equal to <code>grant</code>.</li>
+  <li>Present the issued session credential only to the issuing Service.</li>
+  <li>Revoke individual credentials or grant-type credentials when no longer<br />
+needed.</li>
+  <li>Use <code>all_grant_types</code> Revoke when rotating away from all issued session<br />
+credentials.</li>
+</ol>
+
+<p>A Service can implement only Inspect, Enroll, and Status when it does not issue<br />
+session credentials. A Service that advertises Grant and Revoke needs at least<br />
+one concrete grant type.</p>
+
+<h2 id="claim-negotiation">Claim Negotiation</h2>
+
+<p>Claims support is optional. A Service requests Claim Names only through the<br />
+Inspect document’s <code>claims.required</code>, <code>claims.preferred</code>, and<br />
+<code>claims.optional</code> arrays.</p>
+
+<p>An Agent:</p>
+
+<ul>
+  <li>must satisfy every understood required Claim Name;</li>
+  <li>cannot satisfy an unknown required Claim Name without local-policy or<br />
+extension support;</li>
+  <li>ignores unknown preferred and optional Claim Names; and</li>
+  <li>may omit preferred and optional Claim Values.</li>
+</ul>
+
+<p>A Service ignores unknown submitted Claim Names by default. It may reject<br />
+unadvertised values when accepting them creates a privacy, security, or<br />
+compliance risk. Consumers ignore unknown members of object-valued Claims.</p>
+
+<p>Use <code>schemas/claim-values.schema.json</code> for the initial person and contact<br />
+catalog, and see <code>examples/claims-negotiation.md</code> for a complete negotiation<br />
+example.</p>
+
+<h2 id="endpoint-construction">Endpoint Construction</h2>
+
+<p>Agents construct command URLs from <code>http.endpoint_base</code> in the Inspect document.<br />
+If <code>endpoint_base</code> is absent, use <code>/aep/</code>.</p>
+
+<p>Append command paths with exactly one <code>/</code> separator:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Command</th>
+      <th>Relative path</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Enroll</td>
+      <td><code>enroll</code></td>
+    </tr>
+    <tr>
+      <td>Status</td>
+      <td><code>status</code></td>
+    </tr>
+    <tr>
+      <td>Grant</td>
+      <td><code>grant</code></td>
+    </tr>
+    <tr>
+      <td>Revoke</td>
+      <td><code>revoke</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Both <code>/aep</code> and <code>/aep/</code> therefore produce <code>/aep/enroll</code>.</p>
+
+<h2 id="client-assertions">Client Assertions</h2>
+
+<p>Enroll, Status, Grant, and Revoke use <code>Authorization: AEP &lt;jwt&gt;</code>. Inspect is<br />
+unauthenticated.</p>
+
+<p>For each authenticated command, construct a fresh client assertion:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Claim</th>
+      <th>Guidance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>iss</code></td>
+      <td>Agent DID.</td>
+    </tr>
+    <tr>
+      <td><code>sub</code></td>
+      <td>Same Agent DID as <code>iss</code>.</td>
+    </tr>
+    <tr>
+      <td><code>aud</code></td>
+      <td>Service DID from <code>service.did</code> in Inspect.</td>
+    </tr>
+    <tr>
+      <td><code>op</code></td>
+      <td>Command identifier: <code>enroll</code>, <code>status</code>, <code>grant</code>, or <code>revoke</code>.</td>
+    </tr>
+    <tr>
+      <td><code>iat</code></td>
+      <td>JWT NumericDate issued-at time.</td>
+    </tr>
+    <tr>
+      <td><code>exp</code></td>
+      <td>JWT NumericDate no more than 300 seconds after <code>iat</code>.</td>
+    </tr>
+    <tr>
+      <td><code>jti</code></td>
+      <td>Fresh replay identifier for this assertion.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Services should validate the signature, DID document key reference, audience,<br />
+operation, time window, and replay cache before processing command semantics.<br />
+Failures in these checks return <code>not_recognized</code>.</p>
+
+<h2 id="idempotency">Idempotency</h2>
+
+<p>POST commands are state-mutating and use the <code>Idempotency-Key</code> HTTP header:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Command</th>
+      <th>Idempotency behavior</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Enroll</td>
+      <td>Required for retry; may also appear as body <code>idempotency_key</code>.</td>
+    </tr>
+    <tr>
+      <td>Grant</td>
+      <td>Required for retry; header-only in the core draft.</td>
+    </tr>
+    <tr>
+      <td>Revoke</td>
+      <td>Required for retry; header-only in the core draft.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>When Enroll includes both the header and body field, the values must match.</p>
+
+<p>Services cache the response associated with the authenticated Agent and<br />
+idempotency key. Reusing the same key with the same body returns the cached or<br />
+equivalent response. Reusing the same key with a different body returns<br />
+<code>idempotency_conflict</code>.</p>
+
+<h2 id="credential-choice">Credential Choice</h2>
+
+<p>Agents choose a session credential only from grant types advertised in<br />
+<code>commands.grant_types</code>.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Grant type</th>
+      <th>Use when</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>oauth-bearer</code></td>
+      <td>The Service has Bearer-token middleware or wants OAuth-style token handling.</td>
+    </tr>
+    <tr>
+      <td><code>api-key</code></td>
+      <td>The Service already accepts opaque header-carried API keys.</td>
+    </tr>
+    <tr>
+      <td><code>basic</code></td>
+      <td>The Service needs compatibility with HTTP Basic authentication middleware.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Grant responses are bearer-like secrets. Agents should store them as secrets<br />
+and present them only to the issuing Service. Services should issue expiring<br />
+credentials and avoid logging raw credential values.</p>
+
+<h2 id="revoke-strategy">Revoke Strategy</h2>
+
+<p>Agents should use the narrowest Revoke form that matches their intent:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Intent</th>
+      <th>Request body</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Revoke one known credential</td>
+      <td><code>credential_id</code> plus <code>grant_type</code>.</td>
+    </tr>
+    <tr>
+      <td>Revoke all credentials of one type</td>
+      <td><code>grant_type</code>.</td>
+    </tr>
+    <tr>
+      <td>Revoke all session credentials</td>
+      <td><code>all_grant_types</code> set to string value <code>"true"</code>.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Revoke returns success even when no matching credential existed. This lets<br />
+Agents safely retry cleanup without learning extra credential-existence state.</p>
+
+<h2 id="error-handling">Error Handling</h2>
+
+<p>Implementations should branch on the AEP <code>code</code> field in Problem Details.<br />
+Authentication-recognition failures use <code>not_recognized</code>; Services do not<br />
+reveal whether the cause was an unknown Agent, bad signature, wrong audience,<br />
+wrong operation, replay, time-window violation, unsupported identity method, or<br />
+unknown session credential.</p>
+
+<p>Use <code>invalid_request</code> for malformed request structure when returning that error<br />
+does not reveal recognition state. Use <code>idempotency_conflict</code> for reuse of an<br />
+idempotency key with a different request body.</p>
+
+<h2 id="local-checks">Local Checks</h2>
+
+<p>Run the local checks before publishing changes:</p>
+
+<pre><code class="language-sh">make -C ietf check
+</code></pre>
+
+<p>The check target validates draft structure, external section references, test<br />
+vector metadata, schema mappings, published schema copies, and offline fixture<br />
+semantics.</p>
+    </main>
+  </body>
+</html>
