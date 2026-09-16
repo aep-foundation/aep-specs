@@ -96,7 +96,7 @@ as <code>draft-03</code>. Inspect every match rather than applying an unreviewed
   <li>test-vector <code>drafts</code> ownership arrays under <code>ietf/test-vectors/</code></li>
   <li>validator allowlists and draft-name checks under <code>ietf/scripts/</code></li>
   <li>schemas and examples containing versioned identifiers</li>
-  <li>website links and release-asset names</li>
+  <li>website links and stable, unnumbered release-asset names</li>
   <li>workflows or publication scripts containing explicit draft names</li>
 </ul>
 
@@ -191,6 +191,10 @@ artifacts.</p>
 <p>The deployment workflow separately moves the replaceable <code>latest</code> Git tag and GitHub Release to<br />
 the deployed <code>main</code> commit. <code>latest</code> is a convenience snapshot; it does not replace the immutable<br />
 tag and release for a submitted revision.</p>
+
+<p>The <code>latest</code> release publishes each draft under both its immutable versioned filename and a stable<br />
+filename without the revision suffix. Public website links use the stable filename so advancing a<br />
+revision does not require changing those links.</p>
 
 <p>Final verification requires all of the following:</p>
 

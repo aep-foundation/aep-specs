@@ -252,9 +252,11 @@ Update:
 Exit criteria:
 
 - A reader can discover the draft from the root README and IETF README.
-- Website index points to the correct release asset names.
+- Website index points to the stable, unnumbered release asset names.
 - No public documentation points to an old filename, old folder, or old draft
   classification.
+- The deployment workflow publishes both the immutable versioned artifacts and
+  stable aliases without the revision suffix.
 
 ## 12. Render And Inspect Artifacts
 

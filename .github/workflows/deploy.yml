@@ -71,8 +71,10 @@ jobs:
           mkdir release-artifacts
           for draft in "${drafts[@]}"; do
             artifact="artifacts/$(basename "$draft" .md)"
+            stable_name="$(basename "$draft" .md | sed -E 's/-[0-9]{2}$//')"
             for extension in html pdf txt xml; do
               cp "${artifact}.${extension}" release-artifacts/
+              cp "${artifact}.${extension}" "release-artifacts/${stable_name}.${extension}"
             done
           done
 

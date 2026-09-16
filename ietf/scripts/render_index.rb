@@ -36,7 +36,8 @@ def datatracker_url(docname)
 end
 
 def release_link(docname, ext)
-  "#{RELEASE_BASE}/#{docname}.#{ext}"
+  stable_name = docname.sub(/-\d{2}\z/, "")
+  "#{RELEASE_BASE}/#{stable_name}.#{ext}"
 end
 
 def h(value)
