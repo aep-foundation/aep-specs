@@ -118,7 +118,10 @@ make -C . render
 The render target writes artifacts to `../artifacts/` and regenerates
 `../docs/index.html` from draft front matter. The repository does not commit
 rendered specification artifacts; the deploy workflow publishes them on the
-`latest` GitHub Release.
+`latest` GitHub Release. Each draft is published under its immutable versioned
+filename and a stable filename without the revision suffix. Public website
+links use the stable filename so advancing a draft does not require changing
+those links.
 
 PDF rendering requires WeasyPrint and native font/text libraries. On macOS,
 install the Homebrew dependencies before running the full render target:

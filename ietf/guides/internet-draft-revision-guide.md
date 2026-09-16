@@ -64,7 +64,7 @@ Depending on the revised draft, update:
 - test-vector `drafts` ownership arrays under `ietf/test-vectors/`
 - validator allowlists and draft-name checks under `ietf/scripts/`
 - schemas and examples containing versioned identifiers
-- website links and release-asset names
+- website links and stable, unnumbered release-asset names
 - workflows or publication scripts containing explicit draft names
 
 Retain an old revision reference only when it intentionally identifies an immutable historical
@@ -154,6 +154,10 @@ artifacts.
 The deployment workflow separately moves the replaceable `latest` Git tag and GitHub Release to
 the deployed `main` commit. `latest` is a convenience snapshot; it does not replace the immutable
 tag and release for a submitted revision.
+
+The `latest` release publishes each draft under both its immutable versioned filename and a stable
+filename without the revision suffix. Public website links use the stable filename so advancing a
+revision does not require changing those links.
 
 Final verification requires all of the following:
 
