@@ -83,7 +83,6 @@ fixture semantics.
 When generated website files are affected, regenerate the relevant artifact:
 
 ```sh
-make -C ietf render-index
 make -C ietf render-examples
 make -C ietf render-schemas
 ```

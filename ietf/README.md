@@ -115,9 +115,10 @@ python3 -m venv .venv
 make -C . render
 ```
 
-The render target writes artifacts to `../artifacts/` and regenerates
-`../docs/index.html` from draft front matter. The repository does not commit
-rendered specification artifacts; the deploy workflow publishes them on the
+The render target writes artifacts to `../artifacts/`. The AEP website pages
+in `../docs/` are rendered from `inflow-server` with `mvn verify -Paep`; the
+specification render does not overwrite the website homepage. The repository
+does not commit rendered specification artifacts; the deploy workflow publishes them on the
 `latest` GitHub Release. Each draft is published under its immutable versioned
 filename and a stable filename without the revision suffix. Public website
 links use the stable filename so advancing a draft does not require changing
