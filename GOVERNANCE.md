@@ -45,7 +45,7 @@ when it only improves validation, documentation, examples, or generated output.
 Official SDK package versions are independent from the protocol version and from
 one another. Matching SDK versions do not establish compatibility. The current
 language, release, maintenance, and conformance policy is documented in
-[SDK_SUPPORT.md](./SDK_SUPPORT.md).
+[SDK_SUPPORT.md](https://github.com/aep-foundation/aep-specs/blob/main/SDK_SUPPORT.md).
 
 ## Artifact Compatibility
 
