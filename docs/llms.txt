@@ -15,6 +15,7 @@ repository and proposes an approved, stepwise plan.
 ## Reference
 
 - [Documentation](https://www.aep.foundation/documentation/): Concepts, role-specific guides, and SDK documentation.
+- [Service Documents](https://www.aep.foundation/documentation/guides/service-documents/): Optional document discovery, Owner acknowledgement, and repeated enrollment.
 - [Specifications](https://www.aep.foundation/protocol/): Core, identity, claims, and session-credential requirements.
 - [Official SDK repositories](https://github.com/aep-foundation): Select the SDK matching the application.
 

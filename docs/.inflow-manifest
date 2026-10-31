@@ -9,6 +9,7 @@ documentation/guides/enrollment-lifecycle-and-owner-action/index.html
 documentation/guides/platform-hosted-identity/index.html
 documentation/guides/protected-resource-access/index.html
 documentation/guides/revocation/index.html
+documentation/guides/service-documents/index.html
 documentation/guides/session-credentials/api-key/index.html
 documentation/guides/session-credentials/basic/index.html
 documentation/guides/session-credentials/index.html
@@ -50,6 +51,7 @@ draft/claim-values/index.html
 draft/did-web-identity-method/index.html
 draft/oauth-session-credential/index.html
 draft/platform-hosted-identity/index.html
+draft/service-documents/index.html
 favicon-96x96.png
 favicon.ico
 favicon.svg

@@ -82,7 +82,7 @@ missing, reassess and recreate it without assuming prior answers or completion.
 Use the [AEP documentation](https://www.aep.foundation/documentation/) for
 explanations and the [AEP specifications](https://www.aep.foundation/protocol/)
 for normative requirements. Read the core draft and the applicable identity,
-claims, session-credential, and Platform documents. Record their revisions.
+claims, session-credential, Platform, and extension documents. Record their revisions.
 
 Choose the SDK that fits the application:
 
@@ -311,6 +311,20 @@ requirements merely because issuing a credential is optional.
 
 Plan against the selected specification revision rather than treating this
 summary as an exhaustive substitute for the drafts.
+
+### Service documents
+
+[Service Documents](https://www.aep.foundation/documentation/guides/service-documents/)
+is an optional extension for presenting terms, privacy notices, and other
+documents before enrollment. Confirm whether it belongs in the integration.
+Services choose which documents require acceptance and when changed requirements
+need renewed acceptance. Agents send only document IDs authorized by the Owner;
+reading a document does not imply acceptance.
+
+Allow an explicitly requested Enroll even when an enrollment already exists.
+If Grant returns `requirements_unmet` for claims or document acknowledgements,
+present the requirements and direct the caller to Enroll. The caller decides
+when to repeat Enroll and request Grant again; do not chain either automatically.
 
 ### Related integrations
 

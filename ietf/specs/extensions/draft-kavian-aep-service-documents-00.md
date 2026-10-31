@@ -2,7 +2,7 @@
 title: "AEP Service Documents"
 abbrev: "AEP Service Documents"
 docname: draft-kavian-aep-service-documents-00
-date: 2026-10-28
+date: 2026-10-31
 category: std
 ipr: trust200902
 submissiontype: IETF
@@ -25,9 +25,9 @@ normative:
   AEP-CORE:
     title: "The Agent Enrollment Protocol"
     target: https://datatracker.ietf.org/doc/draft-kavian-agent-enrollment-protocol/
-    date: 2026-08-27
+    date: 2026-10-31
     seriesinfo:
-      Internet-Draft: draft-kavian-agent-enrollment-protocol-04
+      Internet-Draft: draft-kavian-agent-enrollment-protocol-05
     author:
       - ins: N. Kavian
         name: N. Kavian
@@ -91,6 +91,8 @@ array in Inspect. An absent array means no advertised documents. Empty
 arrays MUST be omitted. There MUST be no more than seven descriptors and
 each descriptor MUST have a distinct `id`.
 
+## Document Descriptors
+
 Each descriptor contains:
 
 * `id`: 1 to 32 ASCII characters matching
@@ -108,6 +110,20 @@ Each descriptor contains:
   `localhost`, `127.0.0.1`, or `[::1]` for local development), contain no user information,
   and be at most 2048 ASCII characters in its URI serialization.
 
+An ID MUST NOT be reassigned to an unrelated document. The same type
+MAY occur under several IDs; for example, separate general and
+product-specific terms of service. Updating content does not require
+changing its ID. Consumers MUST NOT lowercase, truncate, or otherwise
+rewrite IDs when acknowledging them.
+
+Clients MUST distinguish required from not-required documents. A
+not-required document MUST NOT require an acceptance action under this
+extension. A discovery or reading interface SHOULD show each document's
+ID, title, type, enrollment requirement, and web link. A document type
+does not itself determine whether acceptance is required.
+
+## Representations
+
 Every descriptor MUST contain exactly one `text/html` representation.
 This is its baseline human-readable web link. It MAY additionally
 contain one portable `application/json` representation and one
@@ -116,11 +132,7 @@ consumers ignore unsupported representations, not the document.
 `media_type` contains a lowercase media type without parameters.
 There MUST NOT be duplicate media types within a descriptor.
 
-An ID MUST NOT be reassigned to an unrelated document. The same type
-MAY occur under several IDs; for example, separate general and
-product-specific terms of service. Updating content does not require
-changing its ID. Consumers MUST NOT lowercase, truncate, or otherwise
-rewrite IDs when acknowledging them.
+## Advertisement Example
 
 Example Inspect members:
 
@@ -158,13 +170,9 @@ Example Inspect members:
 }
 ~~~
 
-Clients MUST distinguish required from not-required documents. A
-not-required document MUST NOT require an acceptance action under this
-extension. A discovery or reading interface SHOULD show each document's
-ID, title, type, enrollment requirement, and web link. A document type
-does not itself determine whether acceptance is required.
-
 # Reading Documents
+
+## Retrieval and Credential Isolation
 
 Documents MUST be readable before Enroll without AEP credentials.
 Reading a document MUST NOT enroll the Agent or acknowledge the document.
@@ -179,6 +187,13 @@ these fetches. Automatic fetches MUST NOT send cookies. A web link MAY
 point to a different HTTPS origin, such as a Service's document host;
 that does not authorize credential forwarding or expand the Service's
 authentication scope.
+
+If a portable representation is unavailable or unsupported, clients
+MUST offer the advertised HTML link rather than invent content or a
+summary. A link-only client need not download and parse HTML. Failure to
+retrieve a portable form does not by itself make the web form unusable.
+
+## Destination, Redirect, and Resource Limits
 
 The calling application is responsible for deciding which document
 origins it trusts before requesting a fetch. Deployment-specific network
@@ -205,12 +220,9 @@ maximum decoded response size of 1 MiB. They MUST NOT render a partial
 response as a complete document. These rules apply to document fetching,
 not to redirects in existing AEP command flows.
 
-If a portable representation is unavailable or unsupported, clients
-MUST offer the advertised HTML link rather than invent content or a
-summary. A link-only client need not download and parse HTML. Failure to
-retrieve a portable form does not by itself make the web form unusable.
-
 # Portable Content
+
+## Document Structure
 
 A portable representation is an `application/json` object with:
 
@@ -227,6 +239,8 @@ qualifications and limitations; a synopsis is not a full representation.
 sections. It MUST NOT be assumed to be a one-line description. Clients
 MUST label a summary as such and provide the full document's web link.
 The full-content view MUST remain available regardless of summary support.
+
+## Content Blocks and Limits
 
 The following block objects define the portable structure:
 
@@ -273,13 +287,15 @@ invalid, not optional content to skip.
 }
 ~~~
 
-## Presentation To People And Agents
+## Rendering Requirements
 
 Renderers MUST preserve Service-authored wording, ordering, paragraph
 boundaries, section hierarchy, and list structure. They MUST NOT produce
 an inferred summary or substitute interpretation for document text.
 Terminal renderers MUST neutralize terminal control sequences and MUST
 NOT execute embedded commands or treat content as trusted markup.
+
+## Presentation to AI Agents
 
 When returning portable content to an artificial-intelligence caller,
 a renderer MUST convert it to readable text rather than requiring the
@@ -292,6 +308,8 @@ URL MUST remain outside the untrusted content. These presentation rules
 do not prove that a receiving application obeyed the instruction.
 
 # Enrollment Acknowledgement
+
+## Request and Owner Authorization
 
 An extension-aware Agent includes `acknowledged_document_ids` in Enroll
 after the Owner has authorized the list. The field is a duplicate-free
@@ -313,6 +331,8 @@ that the Owner's decision did not cover. One affirmative decision MAY
 cover the complete displayed required list; separate approval per
 document is not required.
 
+## Platform-Mediated Approval
+
 If a Platform mediates that decision, it MUST bind the decision to the
 Service and the original required ID list. Pending presentation resolves
 that list, not a newly expanded list. If a stored ID cannot be resolved
@@ -320,6 +340,8 @@ to a usable document descriptor and web link, the decision MUST NOT
 complete by silently omitting it. An implementation MAY store the IDs
 alone and retrieve current metadata for display. This extension does
 not require retaining content, titles, dates, revisions, or digests.
+
+## Service Processing and Response
 
 A Service MUST NOT interpret omission of `acknowledged_document_ids` as
 acceptance. When its enrollment policy requires acknowledgement for
@@ -352,6 +374,8 @@ When no declaration was supplied, the response omits the field.
 }
 ~~~
 
+## Repeated Enrollment
+
 Services MAY retain acknowledged IDs on the enrollment for requirement
 enforcement. Repeated Enroll combines accepted declarations without
 discarding earlier IDs by omission. It preserves the identity, original
@@ -363,6 +387,8 @@ a later explicit requirements update uses a new key.
 
 # Changes And Unmet Requirements
 
+## Document Changes
+
 Acknowledgement refers to a document identity, not a content version.
 Content can change under an existing ID. This extension does not prove
 which text was read or accepted. Services choose whether changes warrant
@@ -370,6 +396,8 @@ notification, continued-use acceptance, or another explicit decision.
 They MAY mark Service-local requirements as needing renewed acceptance,
 including for an ID acknowledged before. No universal expiry or
 automatic re-enrollment is defined.
+
+## Reporting and Resolving Unmet Requirements
 
 For a recognized enrollment requiring further acknowledgement, Grant
 returns `requirements_unmet`, HTTP 422, with `service_documents` in
@@ -428,11 +456,15 @@ NOT truncate the required list or silently claim successful presentation.
 
 # IANA Considerations
 
+## Extension Registration
+
 This document requests registration of
 `urn:aep:ext:aep-foundation:service-documents#v=1.0.0` in the AEP Extension
 Registry, with description "Service document discovery and enrollment
 acknowledgement" and this document as its reference. It introduces no
 new command, well-known URI, or media type.
+
+## Service Document Types Registry
 
 This document requests an AEP Service Document Types registry with
 Specification Required policy {{RFC8126}}. Entries contain a type value,

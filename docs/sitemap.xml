@@ -12,6 +12,7 @@
 <url><loc>https://www.aep.foundation/documentation/guides/platform-hosted-identity/</loc></url>
 <url><loc>https://www.aep.foundation/documentation/guides/protected-resource-access/</loc></url>
 <url><loc>https://www.aep.foundation/documentation/guides/revocation/</loc></url>
+<url><loc>https://www.aep.foundation/documentation/guides/service-documents/</loc></url>
 <url><loc>https://www.aep.foundation/documentation/guides/session-credentials/</loc></url>
 <url><loc>https://www.aep.foundation/documentation/guides/session-credentials/api-key/</loc></url>
 <url><loc>https://www.aep.foundation/documentation/guides/session-credentials/basic/</loc></url>
@@ -52,6 +53,7 @@
 <url><loc>https://www.aep.foundation/draft/did-web-identity-method/</loc></url>
 <url><loc>https://www.aep.foundation/draft/oauth-session-credential/</loc></url>
 <url><loc>https://www.aep.foundation/draft/platform-hosted-identity/</loc></url>
+<url><loc>https://www.aep.foundation/draft/service-documents/</loc></url>
 <url><loc>https://www.aep.foundation/integration.md</loc></url>
 <url><loc>https://www.aep.foundation/llms.txt</loc></url>
 <url><loc>https://www.aep.foundation/protocol/</loc></url>

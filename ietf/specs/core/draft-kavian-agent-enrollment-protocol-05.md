@@ -1,8 +1,8 @@
 ---
 title: "The Agent Enrollment Protocol"
 abbrev: "AEP"
-docname: draft-kavian-agent-enrollment-protocol-04
-date: 2026-09-04
+docname: draft-kavian-agent-enrollment-protocol-05
+date: 2026-10-31
 category: std
 ipr: trust200902
 submissiontype: IETF
@@ -906,23 +906,23 @@ Each entry contains:
 
 Initial entries are:
 
-| Code                                | HTTP Status | Description                                           | Reference     |
-| ----------------------------------- | ----------: | ----------------------------------------------------- | ------------- |
-| `enrollment_failed`                 | 400         | Generic enrollment failure.                           | This document |
-| `invalid_request`                   | 400         | Malformed or invalid request.                         | This document |
-| `not_recognized`                    | 401         | Anti-enumeration recognition failure.                 | This document |
-| `identity_suspended`                | 403         | Recognized identity is suspended.                     | This document |
-| `identity_terminated`               | 403         | Recognized identity is terminated.                    | This document |
-| `identity_unavailable`              | 403         | Recognized identity is temporarily unavailable.       | This document |
-| `requirements_unmet`                | 422         | Required claims are missing or invalid.               | This document |
-| `verification_pending`              | 403         | Verification has not completed.                       | This document |
-| `verification_timeout`              | 422         | Verification did not complete in time.                | This document |
-| `rate_limited`                      | 429         | Rate limit exceeded.                                  | This document |
-| `unsupported_grant_type`            | 400         | Unsupported Grant or Revoke grant type.               | This document |
-| `idempotency_conflict`              | 409         | Idempotency key reused with a different request body. | This document |
-| `authentication_required`           | 401         | Protected-resource authentication is required.        | This document |
-| `unsupported_authentication_method` | 401         | Authentication method is not accepted.                | This document |
-| `insufficient_scope`                | 403         | Authenticated principal lacks sufficient scope.       | This document |
+| Code                                | HTTP Status | Description                                                                 | Reference     |
+| ----------------------------------- | ----------: | --------------------------------------------------------------------------- | ------------- |
+| `enrollment_failed`                 | 400         | Generic enrollment failure.                                                 | This document |
+| `invalid_request`                   | 400         | Malformed or invalid request.                                               | This document |
+| `not_recognized`                    | 401         | Anti-enumeration recognition failure.                                       | This document |
+| `identity_suspended`                | 403         | Recognized identity is suspended.                                           | This document |
+| `identity_terminated`               | 403         | Recognized identity is terminated.                                          | This document |
+| `identity_unavailable`              | 403         | Recognized identity is temporarily unavailable.                             | This document |
+| `requirements_unmet`                | 422         | Required claims or supported extension requirements are missing or invalid. | This document |
+| `verification_pending`              | 403         | Verification has not completed.                                             | This document |
+| `verification_timeout`              | 422         | Verification did not complete in time.                                      | This document |
+| `rate_limited`                      | 429         | Rate limit exceeded.                                                        | This document |
+| `unsupported_grant_type`            | 400         | Unsupported Grant or Revoke grant type.                                     | This document |
+| `idempotency_conflict`              | 409         | Idempotency key reused with a different request body.                       | This document |
+| `authentication_required`           | 401         | Protected-resource authentication is required.                              | This document |
+| `unsupported_authentication_method` | 401         | Authentication method is not accepted.                                      | This document |
+| `insufficient_scope`                | 403         | Authenticated principal lacks sufficient scope.                             | This document |
 
 ## AEP Grant Type Registry
 

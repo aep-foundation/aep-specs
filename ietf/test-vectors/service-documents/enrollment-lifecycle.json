@@ -3,7 +3,7 @@
   "title": "Repeated enrollment preserves identity and applies only declared acknowledgements",
   "description": "Repeated enrollment preserves identity and applies only declared acknowledgements.",
   "drafts": [
-    "draft-kavian-agent-enrollment-protocol-04",
+    "draft-kavian-agent-enrollment-protocol-05",
     "draft-kavian-aep-service-documents-00"
   ],
   "category": "service-documents",

@@ -23,9 +23,9 @@ normative:
   AEP-CORE:
     title: "The Agent Enrollment Protocol"
     target: https://datatracker.ietf.org/doc/draft-kavian-agent-enrollment-protocol/
-    date: 2026-08-24
+    date: 2026-10-31
     seriesinfo:
-      Internet-Draft: draft-kavian-agent-enrollment-protocol-04
+      Internet-Draft: draft-kavian-agent-enrollment-protocol-05
     author:
       - ins: N. Kavian
         name: N. Kavian
