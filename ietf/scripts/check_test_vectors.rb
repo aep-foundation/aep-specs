@@ -8,7 +8,7 @@ ROOT = Pathname.new(__dir__).join("..").expand_path
 VECTOR_ROOT = ROOT.join("test-vectors")
 
 ALLOWED_DRAFTS = %w[
-  draft-kavian-agent-enrollment-protocol-04
+  draft-kavian-agent-enrollment-protocol-05
   draft-kavian-aep-claims-01
   draft-kavian-aep-oauth-session-credential-04
   draft-kavian-aep-api-key-session-credential-04

@@ -50,7 +50,7 @@ The first Internet-Draft document set is:
 - [`draft-kavian-aep-did-web-identity-method-00`](https://datatracker.ietf.org/doc/draft-kavian-aep-did-web-identity-method/): `ietf/specs/identity-methods/draft-kavian-aep-did-web-identity-method-00.md`
 - [`draft-kavian-aep-oauth-session-credential-04`](https://datatracker.ietf.org/doc/draft-kavian-aep-oauth-session-credential/): `ietf/specs/grant-types/draft-kavian-aep-oauth-session-credential-04.md`
 - [`draft-kavian-aep-platform-hosted-identity-01`](https://datatracker.ietf.org/doc/draft-kavian-aep-platform-hosted-identity/): `ietf/specs/platforms/draft-kavian-aep-platform-hosted-identity-01.md`
-- [`draft-kavian-agent-enrollment-protocol-04`](https://datatracker.ietf.org/doc/draft-kavian-agent-enrollment-protocol/): `ietf/specs/core/draft-kavian-agent-enrollment-protocol-04.md`
+- [`draft-kavian-agent-enrollment-protocol-05`](https://datatracker.ietf.org/doc/draft-kavian-agent-enrollment-protocol/): `ietf/specs/core/draft-kavian-agent-enrollment-protocol-05.md`
 
 The core document defines the baseline HTTP binding, including:
 
@@ -76,11 +76,6 @@ The Claims document defines the initial interoperable person and contact Claim
 Names and their forward-compatible JSON value shapes.
 
 ## Governance
-
-The [Service Documents extension](specs/extensions/draft-kavian-aep-service-documents-00.md)
-defines document discovery, portable content, and identifier-only
-acknowledgement during enrollment. Services control whether later requirements
-need another explicit Enroll before Grant.
 
 Repository-level governance lives in `../GOVERNANCE.md`. IETF-specific support
 governance, including extension registration guidance before formal IANA

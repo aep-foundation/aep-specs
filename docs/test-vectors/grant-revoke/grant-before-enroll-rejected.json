@@ -3,7 +3,7 @@
   "title": "Grant before enrollment is rejected",
   "description": "Grant never implicitly enrolls an unrecognized Agent.",
   "drafts": [
-    "draft-kavian-agent-enrollment-protocol-04"
+    "draft-kavian-agent-enrollment-protocol-05"
   ],
   "category": "grant-revoke",
   "applicability": {

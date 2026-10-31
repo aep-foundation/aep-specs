@@ -118,7 +118,8 @@ sections << item(
 governance_children = [
   item("Project Governance", [["open", "#{LOCAL_PATH}/governance/project-governance.html", false]]),
   item("Extension Registration", [["open", "#{LOCAL_PATH}/governance/extension-registration.html", false]]),
-  item("Extension Registry", [["browse", "#{LOCAL_PATH}/registry/", false]])
+  item("Extension Registry", [["browse", "#{LOCAL_PATH}/registry/", false]]),
+  item("Service Document Types", [["browse", "#{LOCAL_PATH}/registry/service-document-types/", false]])
 ]
 sections << item(
   "Governance",

@@ -12,7 +12,7 @@ The current conformance scope is limited to:
 - `draft-kavian-aep-platform-hosted-identity-01`
 - `draft-kavian-aep-oauth-session-credential-04`
 - `draft-kavian-aep-service-documents-00`
-- `draft-kavian-agent-enrollment-protocol-04`
+- `draft-kavian-agent-enrollment-protocol-05`
 
 This scope covers the HTTP binding, identity-method substrate, the initial
 `did:web` identity method feature, Inspect, Enroll, Status, Grant, Revoke,
@@ -147,7 +147,6 @@ not advertise this profile until their adapters exercise the real behavior.
 Repository checks validate schemas, fixture consistency, and profile dispatch.
 The fixture adapter tests the harness process contract only; it does not prove
 that any SDK implements document approval, retrieval, or lifecycle behavior.
-No live multi-service deployment is required by these vectors.
 
 See the validated
 [`capability-manifest.json`](./examples/capability-manifest.json) example.

@@ -34,7 +34,7 @@
   "sequence": 1,
   "vector": {
     "category": "inspect",
-    "drafts": ["draft-kavian-agent-enrollment-protocol-04"],
+    "drafts": ["draft-kavian-agent-enrollment-protocol-05"],
     "id": "inspect-minimal-http",
     "title": "Minimal HTTP Inspect document"
   }
