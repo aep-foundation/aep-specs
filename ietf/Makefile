@@ -10,6 +10,8 @@ EXAMPLES := \
 	examples/openapi-authentication.md \
 	examples/claims-negotiation.md \
 	examples/authorization-composition.md
+
+EXAMPLES += examples/service-documents.md
 ARTIFACTS := ../artifacts
 EXAMPLE_ARTIFACTS := ../docs/examples
 SCHEMA_ARTIFACTS := ../docs/schemas

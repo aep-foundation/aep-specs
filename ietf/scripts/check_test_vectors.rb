@@ -15,6 +15,7 @@ ALLOWED_DRAFTS = %w[
   draft-kavian-aep-basic-session-credential-04
   draft-kavian-aep-did-web-identity-method-00
   draft-kavian-aep-platform-hosted-identity-01
+  draft-kavian-aep-service-documents-00
 ].freeze
 
 ALLOWED_CATEGORIES = %w[
@@ -30,13 +31,14 @@ ALLOWED_CATEGORIES = %w[
   grant-revoke
   platform
   protected-resource
+  service-documents
   credentials/oauth-bearer
   credentials/api-key
   credentials/basic
 ].freeze
 
 ALLOWED_ROLES = %w[agent platform service].freeze
-ALLOWED_PROFILES = %w[core-http claims platform-hosted-identity oauth-bearer api-key basic].freeze
+ALLOWED_PROFILES = %w[core-http claims platform-hosted-identity oauth-bearer api-key basic service-documents].freeze
 ALLOWED_EXPECTATIONS = %w[required optional unsupported].freeze
 ID_RE = /\A[a-z0-9]+(?:-[a-z0-9]+)*\z/
 

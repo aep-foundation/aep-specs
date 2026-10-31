@@ -1,6 +1,6 @@
 # AEP Conformance
 
-This directory defines the conformance model for the currently published AEP
+This directory defines the conformance model for the AEP
 Internet-Draft set.
 
 The current conformance scope is limited to:
@@ -11,6 +11,7 @@ The current conformance scope is limited to:
 - `draft-kavian-aep-did-web-identity-method-00`
 - `draft-kavian-aep-platform-hosted-identity-01`
 - `draft-kavian-aep-oauth-session-credential-04`
+- `draft-kavian-aep-service-documents-00`
 - `draft-kavian-agent-enrollment-protocol-04`
 
 This scope covers the HTTP binding, identity-method substrate, the initial
@@ -32,14 +33,15 @@ The conformance model defines these implementation roles:
 
 ## Profiles
 
-| Profile                  | Requirement                                                                         |
-| ------------------------ | ----------------------------------------------------------------------------------- |
-| Core HTTP                | Implements the core AEP draft over HTTP with an enabled identity method.            |
-| Claims                   | Implements the Claims catalog and negotiation rules in addition to Core HTTP.       |
-| API-Key Credential       | Implements the API-key session-credential draft in addition to Core HTTP.           |
-| Basic Credential         | Implements the Basic session-credential draft in addition to Core HTTP.             |
-| OAuth Bearer Credential  | Implements the OAuth Bearer session-credential draft in addition to Core HTTP.      |
-| Platform Hosted Identity | Implements the Platform Hosted Identity draft as an optional Platform role profile. |
+| Profile                  | Requirement                                                                                             |
+| ------------------------ | ------------------------------------------------------------------------------------------------------- |
+| Core HTTP                | Implements the core AEP draft over HTTP with an enabled identity method.                                |
+| Claims                   | Implements the Claims catalog and negotiation rules in addition to Core HTTP.                           |
+| Service Documents        | Implements document discovery, reading, acknowledgements, and requirement updates for the claimed role. |
+| API-Key Credential       | Implements the API-key session-credential draft in addition to Core HTTP.                               |
+| Basic Credential         | Implements the Basic session-credential draft in addition to Core HTTP.                                 |
+| OAuth Bearer Credential  | Implements the OAuth Bearer session-credential draft in addition to Core HTTP.                          |
+| Platform Hosted Identity | Implements the Platform Hosted Identity draft as an optional Platform role profile.                     |
 
 An implementation may claim one or more credential profiles. A Service that
 does not advertise `grant` and `revoke` does not need to claim a credential
@@ -101,9 +103,51 @@ published through Inspect or Platform discovery, and is not required by a
 production runtime.
 
 Agent and Service claims include `core-http`. They can additionally claim
-`claims`, `api-key`, `basic`, `oauth-bearer`, and
-`platform-hosted-identity`. A Platform claim contains only
-`platform-hosted-identity`. Each role occurs at most once.
+`claims`, `api-key`, `basic`, `oauth-bearer`, `service-documents`, and
+`platform-hosted-identity`. A Platform claim contains
+`platform-hosted-identity` and may additionally contain `service-documents`.
+Each role occurs at most once.
+
+## Service Documents Profile
+
+`service-documents` is optional and activates only its explicitly classified
+vectors. Agent and Service implementations retain their `core-http` claim;
+a Platform retains `platform-hosted-identity`. Existing implementations must
+not advertise this profile until their adapters exercise the real behavior.
+
+- `wire-shapes`: feed each `value` through the named public parser or validator
+  and compare its acceptance to the corresponding named result. Unsupported
+  portable structure requires HTML fallback at the reading layer.
+- `structural-limits`: construct boundary inputs from the fixture templates.
+  `catalog` clones descriptors with distinct `doc0` through `docN` IDs;
+  `duplicate-ids` changes only a cloned descriptor's title; `duplicate-media`
+  adds two JSON representations with different URLs. `title`, `text`, and
+  `url` produce values of the specified length. `blocks` creates the specified
+  paragraph counts in summary and content; `sections` wraps the document to
+  the specified depth; `list` creates the specified number of string items.
+  Exercise actual parser limits, including both sides of each boundary.
+- `enrollment-lifecycle`: configure a Service policy to accept valid updates,
+  stage the supplied record, run operations in order, then run the two distinct
+  concurrent updates. Compare stored identity, claims, acknowledgements and
+  credentials. Independently repeat against each listed lifecycle state and
+  verify it is preserved. Stored ID order is not significant; wire IDs retain case.
+- `approval-snapshot`: begin with the captured IDs and then present each current
+  catalog scenario independently. A Platform must block missing/unavailable IDs
+  and wrong-Service binding while allowing HTML fallback and ignoring added IDs.
+- `grant-guidance`: Service adapters exercise Grant rejection and the supplied
+  Enroll requests with document requirements enabled. Agent adapters surface
+  the supplied error and verify that no Enroll or Grant retry is invoked.
+- `portable-presentation`: Agent adapters exercise their document renderer;
+  compare wording, structure, summary labeling, safe fencing, and web fallback.
+- `retrieval-safety`: drive the real fetch boundary with controlled HTTP/DNS
+  transports and inspect every outgoing request. Do not contact public services
+  or real private addresses. Feed oversized bodies and failures without exposing
+  partial content. Platform applicability covers document approval fetches.
+
+Repository checks validate schemas, fixture consistency, and profile dispatch.
+The fixture adapter tests the harness process contract only; it does not prove
+that any SDK implements document approval, retrieval, or lifecycle behavior.
+No live multi-service deployment is required by these vectors.
 
 See the validated
 [`capability-manifest.json`](./examples/capability-manifest.json) example.

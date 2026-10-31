@@ -202,12 +202,89 @@ def valid_mailbox?(value)
 end
 
 def schema_errors(schema, value)
-  JSONSchemer.schema(
+  result = JSONSchemer.schema(
     schema,
+    ref_resolver: proc do |uri|
+      name = uri.path.delete_prefix("/schemas/")
+      unless uri.scheme == "https" && uri.host == "www.aep.foundation" &&
+             name.match?(/\A[a-z0-9-]+\.schema\.json\z/)
+        raise "unrecognized schema reference #{uri}"
+      end
+      load_json(SCHEMA_ROOT.join(name))
+    end,
     formats: {
       "email" => proc { |instance, _format| instance.is_a?(String) && valid_mailbox?(instance) }
     }
   ).validate(value).map { |error| error.fetch("error") }.to_a
+  return result unless result.empty? && value.is_a?(Hash)
+
+  if %w[inspect-document.schema.json service-documents.schema.json].any? { |name| schema.fetch("$id").end_with?("/#{name}") } && value.key?("service_documents")
+    documents = value.fetch("service_documents")
+    identifiers = documents.map { |document| document.fetch("id") }
+    result << "duplicate document IDs" unless identifiers == identifiers.uniq
+    documents.each do |document|
+      media_types = document.fetch("representations").map { |representation| representation.fetch("media_type") }
+      result << "duplicate representation media types" unless media_types == media_types.uniq
+    end
+  end
+  if schema.fetch("$id").end_with?("/portable-service-document.schema.json")
+    pending = (value.fetch("content") + value.fetch("summary", [])).map { |block| [block, 0] }
+    count = 0
+    until pending.empty?
+      block, depth = pending.pop
+      count += 1
+      next unless block.fetch("type") == "section"
+
+      depth += 1
+      result << "section depth exceeds eight" if depth > 8
+      pending.concat(block.fetch("blocks").map { |child| [child, depth] })
+    end
+    result << "total block count exceeds 1024" if count > 1024
+  end
+  result
+end
+
+def document_boundary_value(vector, test_case)
+  descriptor = JSON.parse(JSON.generate(vector.dig("input", "descriptor")))
+  document = JSON.parse(JSON.generate(vector.dig("input", "document")))
+  kind = test_case.fetch("kind")
+  descriptors = [descriptor]
+  case kind
+  when "catalog"
+    descriptors = Array.new(test_case.fetch("count")) { |index| descriptor.merge("id" => "doc#{index}") }
+  when "duplicate-ids"
+    descriptors << descriptor.merge("title" => "Another title")
+  when "duplicate-media"
+    descriptor["representations"] += %w[first second].map do |name|
+      { "media_type" => "application/json", "url" => "https://example.com/#{name}.json" }
+    end
+  when "title"
+    descriptor["title"] = "x" * test_case.fetch("length")
+  when "url"
+    base = "https://example.com/"
+    descriptor["representations"][0]["url"] = base + "x" * (test_case.fetch("length") - base.length)
+  when "blocks"
+    document["content"] = Array.new(test_case.fetch("content_count")) { { "type" => "paragraph", "text" => "Text." } }
+    document["summary"] = Array.new(test_case.fetch("summary_count")) { { "type" => "paragraph", "text" => "Summary." } }
+  when "sections"
+    test_case.fetch("depth").times do
+      document["content"] = [{ "type" => "section", "title" => "Section", "blocks" => document.fetch("content") }]
+    end
+  when "text"
+    document["content"] = [{ "type" => "paragraph", "text" => "x" * test_case.fetch("length") }]
+  when "list"
+    document["content"] = [{ "type" => "numbered_list", "items" => Array.new(test_case.fetch("count"), "Item") }]
+  else
+    raise "unknown document boundary kind #{kind}"
+  end
+  if %w[catalog duplicate-ids duplicate-media title url].include?(kind)
+    ["service-documents.schema.json", {
+      "extensions" => { "supported" => ["urn:aep:ext:aep-foundation:service-documents#v=1.0.0"] },
+      "service_documents" => descriptors
+    }]
+  else
+    ["portable-service-document.schema.json", document]
+  end
 end
 
 errors = []
@@ -294,6 +371,22 @@ errors << "platform/discovery.json: aep_version 01.0 must be invalid" if schema_
   platform_schema,
   platform_discovery.merge("aep_version" => "01.0")
 ).empty?
+
+document_cases = load_json(VECTOR_ROOT.join("service-documents/wire-shapes.json"))
+expected_cases = document_cases.dig("expected", "cases").to_h { |item| [item.fetch("name"), item.fetch("valid")] }
+document_cases.dig("input", "cases").each do |item|
+  schema = load_json(SCHEMA_ROOT.join(item.fetch("schema")))
+  actual_valid = schema_errors(schema, item.fetch("value")).empty?
+  errors << "service-documents/#{item.fetch('name')}: unexpected schema result" unless actual_valid == expected_cases.fetch(item.fetch("name"))
+end
+
+boundaries = load_json(VECTOR_ROOT.join("service-documents/structural-limits.json"))
+expected_boundaries = boundaries.dig("expected", "cases").to_h { |item| [item.fetch("name"), item.fetch("valid")] }
+boundaries.dig("input", "cases").each do |item|
+  schema_name, value = document_boundary_value(boundaries, item)
+  actual_valid = schema_errors(load_json(SCHEMA_ROOT.join(schema_name)), value).empty?
+  errors << "service-documents/#{item.fetch('name')}: unexpected boundary result" unless actual_valid == expected_boundaries.fetch(item.fetch("name"))
+end
 
 if errors.empty?
   puts "Schemas OK"

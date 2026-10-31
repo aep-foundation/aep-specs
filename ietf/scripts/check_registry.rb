@@ -9,7 +9,7 @@ REGISTRY_ROOT = ROOT.join("registry")
 SCHEMA_PATH = REGISTRY_ROOT.join("registry-entry.schema.json")
 CLAIM_SCHEMA_PATH = ROOT.join("schemas/claim-values.schema.json")
 CLAIMS_DRAFT_PATH = ROOT.join("specs/core/draft-kavian-aep-claims-01.md")
-ENTRY_PATHS = Dir[REGISTRY_ROOT.join("{authentication-methods,claim-names,extensions,grant-types,http-fields,identity-methods}/*.json")].sort.map { |path| Pathname.new(path) }
+ENTRY_PATHS = Dir[REGISTRY_ROOT.join("{authentication-methods,claim-names,extensions,grant-types,http-fields,identity-methods,service-document-types}/*.json")].sort.map { |path| Pathname.new(path) }
 
 def load_json(path)
   JSON.parse(path.read)
@@ -138,6 +138,15 @@ claim_entries.each do |claim_name, entry|
               "#{entry['value_type'].inspect} does not match schema type " \
               "#{schema_type.inspect}"
   end
+end
+
+document_entries = ENTRY_PATHS.select { |path| path.dirname.basename.to_s == "service-document-types" }.map { |path| load_json(path) }
+document_types = document_entries.map { |entry| entry.fetch("wire_identifier") }
+document_draft = ROOT.join("specs/extensions/draft-kavian-aep-service-documents-00.md").read
+draft_types = document_draft.scan(/^\| `([a-z][a-z0-9_]*)`\s*\|/).flatten
+errors << "service document types: registry must match the alphabetized draft catalog" unless document_types == draft_types && draft_types == draft_types.sort
+document_types.each do |type|
+  errors << "service document types: invalid type #{type}" unless type.match?(/\A[a-z][a-z0-9_]{0,63}\z/)
 end
 
 if errors.empty?

@@ -77,6 +77,11 @@ Names and their forward-compatible JSON value shapes.
 
 ## Governance
 
+The [Service Documents extension](specs/extensions/draft-kavian-aep-service-documents-00.md)
+defines document discovery, portable content, and identifier-only
+acknowledgement during enrollment. Services control whether later requirements
+need another explicit Enroll before Grant.
+
 Repository-level governance lives in `../GOVERNANCE.md`. IETF-specific support
 governance, including extension registration guidance before formal IANA
 registries exist, lives in `governance/`. Repository-local machine-readable
@@ -88,8 +93,9 @@ The `conformance/`, `test-vectors/`, and `schemas/` directories define the
 initial implementation-checking surface for the published draft set. They are
 scoped to the current core HTTP draft and the three published
 session-credential drafts, the Claims catalog, and Platform Hosted Identity.
-They do not include later lifecycle commands, additional identity methods
-beyond `did:web`, or deferred extensions.
+The optional Service Documents profile covers document discovery, portable
+content, acknowledgement, and repeated-enrollment requirements. Other lifecycle
+commands and additional identity methods beyond `did:web` are outside this set.
 
 JSON Schemas validate stable wire objects used by the current test vectors.
 They are support artifacts derived from the Internet-Draft prose, not a

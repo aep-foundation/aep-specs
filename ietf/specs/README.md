@@ -6,7 +6,7 @@ This directory contains Internet-Draft source files for AEP.
 - `grant-types/`: optional session-credential grant type documents for Grant and Revoke.
 - `identity-methods/`: optional identity method documents for authenticated AEP commands.
 - `platforms/`: optional Platform API documents for hosted identity, key custody, and delegated signing.
-- `extensions/`: optional protocol extensions that build on the core.
+- `extensions/`: optional protocol extensions that build on the core, including [Service Documents](extensions/draft-kavian-aep-service-documents-00.md).
 - `transports/`: non-baseline transport bindings.
 
 Conformance material and test vectors live outside `specs/` until they become

@@ -98,6 +98,26 @@ end
 end
 
 if errors.empty?
+  Tempfile.create(["aep-documents-manifest", ".json"]) do |document_manifest|
+    declaration = JSON.parse(manifest.read)
+    declaration.fetch("claims").each { |claim| claim.fetch("profiles") << "service-documents" }
+    document_manifest.write(JSON.generate(declaration))
+    document_manifest.flush
+    %w[agent platform service].each do |role|
+      Tempfile.create(["aep-documents-report", ".json"]) do |output|
+        _, stderr, status = run_harness(runner, adapter, Pathname.new(document_manifest.path), output, role, "passed", ["service-documents"])
+        errors << "#{role} document-profile dispatch failed: #{stderr}" unless status.success?
+        next unless status.success?
+
+        report = JSON.parse(output.read)
+        errors << "#{role} document profile was not selected" unless report.fetch("profiles").include?("service-documents")
+        errors << "#{role} document cases were not dispatched" unless report.fetch("suites").any? { |suite| suite.fetch("passed").positive? }
+      end
+    end
+  end
+end
+
+if errors.empty?
   puts "Conformance runner OK"
 else
   warn errors.join("\n")

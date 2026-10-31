@@ -31,7 +31,8 @@
         "api-key",
         "basic",
         "oauth-bearer",
-        "platform-hosted-identity"
+        "platform-hosted-identity",
+        "service-documents"
       ]
     },
     "expectation": {
@@ -89,7 +90,7 @@
       },
       "then": {
         "properties": {
-          "profile": { "const": "platform-hosted-identity" }
+          "profile": { "enum": ["platform-hosted-identity", "service-documents"] }
         }
       }
     }

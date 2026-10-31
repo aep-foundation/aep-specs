@@ -430,11 +430,24 @@ Request body:
 `idempotency_key` is an opaque retry key. When both the HTTP `Idempotency-Key` header and body field are present, they MUST contain the same value.
 
 When the authenticated Agent DID already has an enrollment record, the Service
-MUST return the current enrollment lifecycle representation. It MUST NOT treat
-the request as renewal or replacement, rerun enrollment policy, reset lifecycle
-timestamps, or replace the existing record. This requirement applies when the
-request uses a new idempotency key and is distinct from replaying a request with
-the same idempotency key.
+MAY evaluate supplied claims and supported extension inputs to satisfy current
+enrollment requirements. It MAY instead return the current enrollment
+lifecycle representation unchanged. An Agent MUST NOT suppress an explicitly
+requested Enroll solely because Status reports an existing enrollment.
+
+A repeated Enroll MUST preserve the Agent DID, Service-local enrollment
+identifier, and original creation time. It MUST NOT implicitly replace the
+enrollment, reset unrelated lifecycle state, or reactivate a suspended or
+terminated identity. A Service MUST preserve existing claim values that the
+request does not update; omission is not a deletion instruction. Supplied
+values remain subject to Service validation and verification policy. The
+Service MUST NOT reset lifecycle timestamps unless the corresponding state
+actually changes. Issued credentials remain valid unless the Service
+explicitly revokes them under its credential policy.
+
+These rules apply to a new explicit Enroll using a new idempotency key.
+Retrying the same request with the same key follows the Idempotency section
+and MUST NOT independently repeat policy effects or requirement updates.
 
 The Enroll response `status` uses the complete lifecycle vocabulary defined by
 the Status command. A Service returns `active`, `pending`, or `rejected` for an
@@ -511,6 +524,15 @@ The lifecycle fields defined for Enroll apply identically to Status. `owner_acti
 Grant exchanges a baseline client assertion for a session credential. The request uses the baseline client assertion with `op` equal to `grant`. A session credential MUST NOT be used to authenticate Grant.
 
 Grant requires an existing enrollment recognized by the Service. When current enrollment is not already authoritative, an Agent SHOULD call Status before beginning an approval, signing, or credential-issuance workflow. The Service remains authoritative and MUST reject Grant for an unrecognized Agent with `not_recognized`; it MUST NOT implicitly enroll the Agent.
+
+A Service MAY reject Grant for a recognized enrollment with
+`requirements_unmet` when claims or supported extension requirements need to
+be satisfied through Enroll. An active Status is not a guarantee that every
+Grant requirement is satisfied. Agents MUST surface the Service's unmet
+requirements and identify Enroll as the next action when those requirements
+are enrollment requirements. The error does not authorize automatic Enroll
+or a later automatic retry of Grant. The caller decides when to invoke each
+command.
 
 Endpoint:
 
@@ -661,7 +683,7 @@ This document defines the following HTTP error codes:
 | `identity_suspended`                | 403         | The recognized identity is temporarily disabled by Service action.                                                                                         |
 | `identity_terminated`               | 403         | The recognized identity is permanently de-registered.                                                                                                      |
 | `identity_unavailable`              | 403         | The recognized identity is temporarily unavailable for Service-defined reasons.                                                                            |
-| `requirements_unmet`                | 422         | Required claims are missing or invalid.                                                                                                                    |
+| `requirements_unmet`                | 422         | Required claims or supported extension requirements are missing or invalid.                                                                                |
 | `verification_pending`              | 403         | Enrollment or required verification has not completed.                                                                                                     |
 | `verification_timeout`              | 422         | Required asynchronous verification did not complete in the Service's policy window.                                                                        |
 | `rate_limited`                      | 429         | The Agent exceeded a Service rate limit.                                                                                                                   |
