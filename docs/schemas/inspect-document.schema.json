@@ -228,6 +228,7 @@
     }
   },
   "allOf": [
+    {"$ref": "service-documents.schema.json"},
     {
       "if": {
         "properties": {

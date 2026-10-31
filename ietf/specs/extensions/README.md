@@ -6,7 +6,7 @@ Extension drafts should remain separate from the core unless they are required f
 
 Current extension draft sources:
 
-None.
+- [AEP Service Documents](draft-kavian-aep-service-documents-00.md): document discovery, portable presentation, and identifier-only enrollment acknowledgements.
 
 Grant type, identity method, Platform, and transport specifications live in
 their respective `specs/` subdirectories rather than in `extensions/`.

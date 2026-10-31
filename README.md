@@ -51,6 +51,10 @@ useful.
 
 ## Implement and Test
 
+The optional [Service Documents extension](./ietf/specs/extensions/draft-kavian-aep-service-documents-00.md)
+defines how Services advertise documents, provide portable content for reading,
+and receive identifier-only acknowledgements during enrollment.
+
 The repository connects normative documents to artifacts that can be consumed
 by SDKs, servers, and conformance suites:
 

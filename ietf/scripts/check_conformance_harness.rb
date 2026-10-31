@@ -434,6 +434,45 @@ expect(errors, platform_unrecognized.fetch("reason") == "not_recognized", "Platf
   expect(errors, !platform_unrecognized.key?(field), "Platform unrecognized verification must not disclose #{field}")
 end
 
+%w[wire-shapes structural-limits approval-snapshot portable-presentation retrieval-safety].each do |name|
+  fixture = vector("service-documents/#{name}.json")
+  names = fixture.dig("input", "cases").map { |item| item.fetch("name") }
+  expected_names = fixture.dig("expected", "cases").map { |item| item.fetch("name") }
+  expect(errors, names == names.uniq && names == expected_names, "#{fixture.fetch('id')}: every input needs exactly one expected result")
+end
+
+documents_enroll = vector("service-documents/enrollment-lifecycle.json")
+operations = documents_enroll.dig("input", "operations").to_h { |item| [item.fetch("name"), item] }
+outcomes = documents_enroll.dig("expected", "operations").to_h { |item| [item.fetch("name"), item] }
+initial_ids = documents_enroll.dig("input", "existing", "acknowledged_document_ids")
+updated_ids = initial_ids | operations.fetch("update").fetch("acknowledged_document_ids")
+expect(errors, outcomes.dig("update", "stored_ids") == updated_ids, "Repeated Enroll must merge IDs without replacing prior acceptance")
+expect(errors, outcomes.dig("empty-declaration", "stored_ids") == updated_ids, "Empty declaration must not erase stored acceptance")
+expect(errors, operations.dig("retry", "key") == operations.dig("update", "key"), "Retry must use the original key")
+expect(errors, outcomes.dig("retry", "policy_effects_repeated") == false, "Retry must not repeat policy effects")
+expect(errors, outcomes.dig("conflicting-key", "http_status") == 409 && outcomes.dig("conflicting-key", "mutated") == false, "Changed same-key acknowledgement must fail without mutation")
+outstanding_ids = documents_enroll.dig("input", "current_required_ids") - updated_ids
+expect(errors, documents_enroll.dig("expected", "outstanding_ids_after_update") == outstanding_ids, "Missing IDs must remain outstanding after Enroll")
+%w[identity_preserved creation_preserved unchanged_state_timestamp_preserved unrelated_lifecycle_states_preserved].each do |field|
+  expect(errors, documents_enroll.dig("expected", field) == true, "Repeated Enroll must preserve #{field}")
+end
+
+snapshot = vector("service-documents/approval-snapshot.json")
+snapshot_expected = snapshot.dig("expected", "cases").to_h { |item| [item.fetch("name"), item] }
+expect(errors, snapshot_expected.dig("new-document", "acknowledged_document_ids") == snapshot.dig("input", "captured_ids"), "Pending approval must not expand its ID list")
+%w[missing-document document-unavailable different-service].each do |name|
+  expect(errors, snapshot_expected.dig(name, "approval_allowed") == false, "#{name} must block approval")
+end
+expect(errors, snapshot_expected.dig("web-fallback", "approval_allowed") == true, "Portable failure may use the web link")
+
+guidance = vector("service-documents/grant-guidance.json").fetch("expected")
+expect(errors, guidance.fetch("credential_issued") == false, "Unmet Grant requirements must not issue credentials")
+%w[automatic_enroll_calls automatic_grant_retries].each do |field|
+  expect(errors, guidance.dig("agent", field).zero?, "Grant guidance must not chain #{field}")
+end
+expect(errors, guidance.dig("agent", "persisted_error") == false, "Grant errors must not require persisted client state")
+expect(errors, guidance.dig("unrecognized", "requirements_disclosed") == false, "Unrecognized identities must not receive document requirements")
+
 if errors.empty?
   puts "Conformance harness OK"
 else

@@ -11,7 +11,7 @@ module ConformanceHarness
   PROTOCOL_VERSION = "1"
   AEP_VERSION = "1.0"
   ROLES = %w[agent platform service].freeze
-  PROFILES = %w[core-http claims api-key basic oauth-bearer platform-hosted-identity].freeze
+  PROFILES = %w[core-http claims api-key basic oauth-bearer platform-hosted-identity service-documents].freeze
   STATUSES = %w[passed failed skipped].freeze
   EXPECTATIONS = %w[required optional unsupported].freeze
   VECTOR_FIELDS = %w[id title description drafts category applicability input expected].freeze
