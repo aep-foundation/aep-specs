@@ -39,6 +39,16 @@ Host: api.example.com
 x-api-key: aep_live_7Jm5Example
 </code></pre>
 
+<p>The <code>header</code> and <code>api_key</code> fields are used together without changing either value.<br />
+A Service that selects <code>Authorization</code> can return <code>api_key</code> as<br />
+<code>Bearer aep_live_7Jm5Example</code>. The Agent then sends exactly:</p>
+
+<pre><code class="language-http">Authorization: Bearer aep_live_7Jm5Example
+</code></pre>
+
+<p>The Agent does not add or remove a prefix. This is an <code>api-key</code> grant, not an<br />
+<code>oauth-bearer</code> grant, even though the Service chose a Bearer-shaped header value.</p>
+
 <h2 id="3-revoke-one-api-key-credential">3. Revoke One API-key Credential</h2>
 
 <pre><code class="language-http">POST /aep/revoke HTTP/1.1

@@ -284,7 +284,7 @@ CREDENTIAL_PROFILES.each do |grant_type, config|
 
   expect(errors, expected["credential_id"].is_a?(String), "#{grant_type} credential_id must be a string")
   expect(errors, expected["scopes"].nil? || expected["scopes"].is_a?(Array), "#{grant_type} scopes must be null or an array when present")
-  expect(errors, expected["token_type"] == config[:token_type], "#{grant_type} token_type must be #{config[:token_type]}") if config[:token_type]
+  expect(errors, expected["token_type"].is_a?(String) && expected["token_type"].casecmp?(config[:token_type]), "#{grant_type} token_type must be #{config[:token_type]} (case-insensitive)") if config[:token_type]
 end
 
 POST_COMMANDS.each do |command|

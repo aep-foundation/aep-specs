@@ -20,6 +20,7 @@ author:
 
 normative:
   RFC3339:
+  RFC6749:
   RFC6750:
   RFC8259:
   RFC9110:
@@ -132,7 +133,7 @@ A successful Grant response is a JSON object:
 
 `access_token` is REQUIRED and contains the Bearer token value.
 
-`token_type` is REQUIRED and MUST be `Bearer`.
+`token_type` is REQUIRED and MUST be `Bearer`, compared case-insensitively as specified in Section 5.1 of {{RFC6749}}. Agents MUST accept any capitalization of this value. The `access_token` value remains case-sensitive and MUST NOT be modified.
 
 `expires_at` is REQUIRED and is an RFC 3339 {{RFC3339}} timestamp for credential expiry.
 

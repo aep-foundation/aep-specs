@@ -123,15 +123,15 @@ A successful Grant response is a JSON object:
 }
 ~~~
 
-`api_key` is REQUIRED and contains the opaque API key value. Services MUST generate API key values with at least 128 bits of entropy. Agents MUST treat the value as an opaque bearer secret.
+`api_key` is REQUIRED and contains the complete, opaque HTTP field value to send in `header`. The value MAY include a Service-required authentication scheme, such as `Bearer `, followed by the secret. Services MUST generate the secret component with at least 128 bits of entropy. Agents MUST treat the entire value as a secret.
 
 API key values MUST match the following syntax. Numeric character values and repetition operators are defined by RFC 5234 {{RFC5234}}.
 
 ~~~ abnf
-api-key-value = 1*(%x21 / %x23-2B / %x2D-3A / %x3C-5B / %x5D-7E)
+api-key-value = %x21-7E [*(%x20-7E) %x21-7E]
 ~~~
 
-This syntax permits visible ASCII characters while excluding whitespace, control characters, double quote, comma, semicolon, and backslash. The restricted character set avoids header parsing ambiguity when API keys are presented in HTTP field values.
+This syntax permits visible ASCII characters and internal spaces. The value MUST NOT be empty or contain leading or trailing spaces, control characters (including tab, carriage return, line feed, and NUL), or non-ASCII characters. These constraints allow unchanged HTTP transmission without header injection or whitespace normalization. The Service is responsible for choosing a value that is valid for its selected header.
 
 `header` is REQUIRED and identifies the HTTP header used for presentation.  When `header_names` is advertised, the value MUST be one of the advertised names.
 
@@ -149,7 +149,11 @@ On later protected-resource requests, the Agent presents the API key in exactly 
 
 A field value outside the response-selected `header` is not an API-key credential presentation, even if the value equals an issued API key. If the request contains no other AEP credential presentation, the Service returns the core `authentication_required` error. When the response-selected `header` is present but its value is malformed, expired, revoked, unknown, or bound to a different Agent, the Service returns `not_recognized`.
 
-The dedicated `AEP-Authorization` carrier does not apply to this grant type because its normal presentation does not use `Authorization`. Agents MUST NOT synthesize a generic API-key scheme; they continue using the issued `header` exactly.
+Agents MUST send `api_key` unchanged in the issued `header`. They MUST NOT add or remove an authentication scheme, split or decode the value, or trim whitespace. Selecting `Authorization` does not cause the Agent to add `Bearer `. Selecting the dedicated AEP carrier does not override the issued API-key header.
+
+For example, a Service can issue `header: "Authorization"` and `api_key: "Bearer example-secret"`. The Agent sends exactly `Authorization: Bearer example-secret`, not `Authorization: Bearer Bearer example-secret`. This remains an `api-key` grant; unlike `oauth-bearer`, its complete field value is supplied by the Service rather than constructed by the Agent.
+
+A `Bearer`, `bearer`, `Basic`, or `basic` prefix does not change the Grant Type. The Service validates the complete value as the issued API key; accepting it does not require the corresponding OAuth Bearer or Basic Grant Type to be enabled.
 
 ~~~ http-message
 x-api-key: aep_live_7Jm5Example

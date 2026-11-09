@@ -126,11 +126,11 @@ A successful Grant response is a JSON object:
 }
 ~~~
 
-`username` and `password` are REQUIRED.  Agents MUST treat `password` as an opaque secret. Services MUST generate values that can be encoded according to RFC 7617 without lossy transformation. Generated passwords MUST contain at least 128 bits of entropy. Generated usernames and passwords MUST NOT contain control characters.
+`username` and `password` are REQUIRED strings. Either or both MAY be empty; an absent or `null` field is not an empty string. Agents MUST preserve both values and treat `password` as an opaque secret. Services MUST issue values that can be encoded according to RFC 7617 without lossy transformation. Usernames MUST NOT contain a colon, and usernames and passwords MUST NOT contain control characters. AEP does not impose password length, complexity, or entropy requirements; the Service determines its credential policy.
 
 `expires_at` is REQUIRED and is an RFC 3339 {{RFC3339}} timestamp for credential expiry.
 
-`realm`, when present, identifies the associated HTTP Basic realm.
+`realm`, when present, identifies the associated HTTP Basic realm: a label for the protected area on the Service. It MAY be an empty string. It is not part of the username or password and is not included in the encoded credential. RFC 7617 requires a realm parameter in a Basic authentication challenge; that requirement does not make this optional Grant response field mandatory.
 
 `scopes` is OPTIONAL and contains the granted scope strings when present.  A missing or `null` value means the Basic credential has no scope-limited authorization.  The Service MAY return an empty array with the same meaning.
 
