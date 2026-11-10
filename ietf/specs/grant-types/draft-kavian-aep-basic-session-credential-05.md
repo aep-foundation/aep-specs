@@ -1,8 +1,8 @@
 ---
 title: "Basic Session Credential Grant Type for the Agent Enrollment Protocol"
 abbrev: "AEP Basic"
-docname: draft-kavian-aep-basic-session-credential-04
-date: 2026-09-04
+docname: draft-kavian-aep-basic-session-credential-05
+date: 2026-11-15
 category: std
 ipr: trust200902
 submissiontype: IETF
@@ -26,9 +26,9 @@ normative:
   AEP-CORE:
     title: "The Agent Enrollment Protocol"
     target: https://datatracker.ietf.org/doc/draft-kavian-agent-enrollment-protocol/
-    date: 2026-08-27
+    date: 2026-10-31
     seriesinfo:
-      Internet-Draft: draft-kavian-agent-enrollment-protocol-04
+      Internet-Draft: draft-kavian-agent-enrollment-protocol-05
     author:
       - ins: N. Kavian
         name: N. Kavian
